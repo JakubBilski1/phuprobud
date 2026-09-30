@@ -1,0 +1,106 @@
+---
+// Teren dealera BOMAG: wojewodztwa z prawdziwych granic (Natural Earth, domena publiczna).
+// Najpierw rysujemy statyczna mape SVG (dziala bez JS i bez WebGL), scena 3D podmienia ja,
+// gdy sekcja wchodzi w ekran.
+import teren from '../data/teren.json';
+import { firma } from '../data/firma';
+import { sierotki } from '../lib/tekst';
+
+type Woj = { kod: string; nazwa: string; nasz: boolean; obrys: [number, number][] };
+const woj = teren.wojewodztwa as Woj[];
+const miejsca = teren.miejsca as { nazwa: string; xy: [number, number]; siedziba?: boolean }[];
+const sciezka = (o: [number, number][]) => 'M' + o.map(([x, y]) => `${x},${-y}`).join('L') + 'Z';
+const siedziba = miejsca.find((m) => m.siedziba)!;
+const PODPISANE = ['Poznań', 'Bydgoszcz', 'Toruń', 'Kalisz'];
+---
+<section class="teren sekcja sekcja--beton" aria-labelledby="teren-tytul">
+  <div class="kontener teren__siatka">
+    <div class="teren__tekst">
+      <h2 id="teren-tytul">Dealer BOMAG na Wielkopolskę i Kujawy</h2>
+      <p class="lead">{sierotki('Maszyny BOMAG Light Equipment sprzedajemy jako autoryzowany dystrybutor na dwa województwa: wielkopolskie i kujawsko-pomorskie.')}</p>
+      <p>{sierotki(`Plac i biuro: ${firma.adres.miasto} pod Poznaniem, ${firma.adres.ulica}.`)}</p>
+      <dl class="teren__legenda">
+        <div><dt><span class="kolor kolor--zolty"></span>Teren dystrybucji</dt><dd>wielkopolskie, kujawsko-pomorskie</dd></div>
+        <div><dt><span class="kolor kolor--czerwony"></span>Siedziba</dt><dd>{firma.adres.miasto}, {firma.adres.ulica}</dd></div>
+      </dl>
+      <p class="teren__podpowiedz drugorzedny" data-teren-podpowiedz hidden>Przeciągnij mapę, żeby ją obrócić.</p>
+    </div>
+
+    <div class="teren__scena" data-teren>
+      <svg class="teren__svg" viewBox="-380 -335 750 680" role="img" aria-label="Mapa Polski z zaznaczonymi województwami wielkopolskim i kujawsko-pomorskim oraz siedzibą w Komornikach">
+        {woj.map((w) => <path d={sciezka(w.obrys)} class={w.nasz ? 'nasze' : 'inne'} />)}
+        {miejsca.filter((m) => PODPISANE.includes(m.nazwa)).map((m) => (
+          <g class="miasto"><circle cx={m.xy[0]} cy={-m.xy[1]} r="3.2" /><text x={m.xy[0] + 7} y={-m.xy[1] + 4}>{m.nazwa}</text></g>
+        ))}
+        <g class="siedziba">
+          <circle cx={siedziba.xy[0]} cy={-siedziba.xy[1]} r="9" />
+          <text x={siedziba.xy[0] - 12} y={-siedziba.xy[1] + 26} text-anchor="end">Komorniki</text>
+        </g>
+      </svg>
+      <div class="teren__etykiety" aria-hidden="true" data-teren-etykiety></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-teren]').forEach((el) => {
+    const spokoj = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const obs = new IntersectionObserver(async (wpisy) => {
+      if (!wpisy.some((w) => w.isIntersecting)) return;
+      obs.disconnect();
+      const { uruchomTeren } = await import('../scripts/teren3d');
+      uruchomTeren(el, { spokoj });
+    }, { rootMargin: '300px 0px' });
+    obs.observe(el);
+  });
+</script>
+
+<style>
+  .teren__siatka { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr); gap: 2rem clamp(2rem, 5vw, 5rem); align-items: center; }
+  .teren__tekst h2 { margin-bottom: 1.25rem; }
+  .teren__tekst p + p { margin-top: 0.9rem; }
+  .teren__legenda { margin-top: 1.75rem; display: grid; gap: 0.6rem; border-top: 2px solid var(--grafit); padding-top: 1rem; }
+  .teren__legenda div { display: grid; grid-template-columns: 11rem 1fr; gap: 0.5rem; }
+  .teren__legenda dt { display: flex; align-items: center; gap: 0.55rem; font-weight: 700; }
+  .teren__legenda dd { margin: 0; }
+  .kolor { width: 1rem; height: 1rem; flex: none; }
+  .kolor--zolty { background: var(--zolty); box-shadow: inset 0 0 0 1px #0000002e; }
+  .kolor--czerwony { background: var(--probud); border-radius: 50%; }
+  .teren__podpowiedz { margin-top: 1rem; font-size: var(--t-maly); }
+
+  .teren__scena { position: relative; aspect-ratio: 1.12; }
+  /* Reszta kraju gasnie ku krawedziom zamiast byc ucieta prostokatem plotna. */
+  .teren__scena :global(canvas) {
+    position: absolute; inset: 0; width: 100% !important; height: 100% !important; touch-action: pan-y; cursor: grab;
+    -webkit-mask-image: radial-gradient(115% 100% at 52% 46%, #000 48%, transparent 76%);
+    mask-image: radial-gradient(115% 100% at 52% 46%, #000 48%, transparent 76%);
+  }
+  .teren__scena :global(canvas:active) { cursor: grabbing; }
+  .teren__svg { width: 100%; height: 100%; overflow: visible; }
+  .teren__svg path { stroke: var(--beton); stroke-width: 1.4; stroke-linejoin: round; }
+  .teren__svg .inne { fill: var(--beton-ciemny); }
+  .teren__svg .nasze { fill: var(--zolty); }
+  .teren__svg .miasto circle { fill: var(--grafit); }
+  .teren__svg text { font: 700 13px var(--kroj-tekst); fill: var(--grafit); }
+  .teren__svg .siedziba circle { fill: var(--probud); stroke: var(--papier); stroke-width: 3; }
+  .teren__svg .siedziba text { fill: var(--probud); font-size: 15px; }
+  .teren__scena[data-3d] .teren__svg { visibility: hidden; }
+
+  .teren__etykiety { position: absolute; inset: 0; pointer-events: none; }
+  .teren__etykiety :global(span) {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0.15rem 0.45rem;
+    font: 700 0.8rem/1.2 var(--kroj-tekst);
+    background: #ffffffd9;
+    color: var(--grafit);
+    white-space: nowrap;
+  }
+  .teren__etykiety :global(span.siedziba) { background: var(--probud); color: var(--papier); font-size: 0.9rem; }
+
+  @media (max-width: 63.99rem) {
+    .teren__siatka { grid-template-columns: 1fr; }
+    .teren__legenda div { grid-template-columns: 1fr; gap: 0.1rem; }
+  }
+</style>

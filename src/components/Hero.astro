@@ -1,0 +1,153 @@
+---
+import Foto from './Foto.astro';
+import { firma } from '../data/firma';
+import { modele } from '../data/katalog';
+import { sierotki } from '../lib/tekst';
+
+const walec = modele.find((m) => m.id === 'bw-138-ac-5')!;
+const masa = walec.parametry.find((p) => p.klucz === 'masa_robocza_kg')?.wartosc;
+---
+<section class="hero" data-hero aria-labelledby="hero-tytul">
+  <div class="hero__scena">
+    <div class="hero__pas" aria-hidden="true"></div>
+    <h1 class="hero__tytul" id="hero-tytul">
+      <span class="hero__wiersz hero__wiersz--gora"><span>Maszyny</span></span>
+      <span class="hero__wiersz hero__wiersz--dol"><span>budowlane</span></span>
+    </h1>
+    <div class="hero__maszyna">
+      <Foto
+        nazwa="hero/bw-138-ac-5"
+        alt="Walec BOMAG BW 138 AC-5"
+        priorytet
+        sizes="(min-width: 64rem) 52vw, 96vw"
+        class="hero__foto"
+      />
+    </div>
+  </div>
+
+  <div class="hero__dol">
+    <div class="kontener hero__dol-siatka">
+      <div class="hero__tekst">
+      <p class="hero__lead">{sierotki(`${firma.adres.miasto} pod Poznaniem, od ${firma.od} roku. Sprzedajemy nowe maszyny BOMAG, Schaeff i Gehl, sprowadzamy używane z całej Europy i skupujemy maszyny budowlane.`)}</p>
+      <div class="hero__akcje">
+        <a class="przycisk przycisk--jasny" href="/oferta/">Zobacz maszyny nowe</a>
+        <a class="przycisk przycisk--obrys-jasny" href={firma.otomoto} target="_blank" rel="noopener">Używane na otomoto</a>
+      </div>
+      </div>
+      <a class="hero__podpis" href={walec.href}>Na zdjęciu: {walec.nazwa}, walec kombinowany, {masa}</a>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Glebia pod kursorem: warstwy przesuwaja sie o kilka pikseli, kazda o inna wartosc.
+  // Tylko mysz i tylko bez ograniczenia ruchu; na dotyku kadr jest statyczny.
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  const mysz = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const spokoj = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (hero && mysz && !spokoj) {
+    let klatka = 0;
+    hero.addEventListener('pointermove', (e) => {
+      cancelAnimationFrame(klatka);
+      klatka = requestAnimationFrame(() => {
+        const r = hero.getBoundingClientRect();
+        hero.style.setProperty('--mx', (((e.clientX - r.left) / r.width) * 2 - 1).toFixed(3));
+        hero.style.setProperty('--my', (((e.clientY - r.top) / r.height) * 2 - 1).toFixed(3));
+      });
+    });
+    hero.addEventListener('pointerleave', () => {
+      hero.style.setProperty('--mx', '0');
+      hero.style.setProperty('--my', '0');
+    });
+  }
+</script>
+
+<style>
+  .hero {
+    --mx: 0;
+    --my: 0;
+    --rozmiar: clamp(4.4rem, 16.4vw, 16.5rem);
+    position: relative;
+    overflow: clip;
+    background: var(--papier);
+  }
+  .hero__scena {
+    position: relative;
+    max-width: var(--szer-max);
+    margin-inline: auto;
+    padding-inline: var(--margines);
+    padding-top: clamp(1.5rem, 3.5vw, 3rem);
+  }
+  .hero__tytul { font-size: var(--rozmiar); line-height: 0.8; text-transform: uppercase; letter-spacing: -0.01em; }
+  .hero__wiersz { display: block; overflow: clip; padding-bottom: 0.04em; }
+  .hero__wiersz > span { display: inline-block; }
+  .hero__wiersz--gora { position: relative; z-index: 1; color: var(--grafit); }
+  .hero__wiersz--dol { position: relative; z-index: 4; color: var(--papier); margin-top: 0.06em; padding-left: 0.62em; }
+  /* Cien oddziela biale litery od zoltej maszyny, na czerwieni jest prawie niewidoczny. */
+  .hero__wiersz--dol > span { text-shadow: 0 0.015em 0.06em #3d0905b3; }
+  .hero__wiersz--gora > span, .hero__wiersz--dol > span {
+    transform: translate(calc(var(--mx) * -8px), calc(var(--my) * -4px));
+    transition: transform 500ms var(--ruch-wyjscie);
+  }
+
+  /* Czerwony pas: od polowy gornego wiersza do dolu sekcji, na cala szerokosc ekranu. */
+  .hero__pas {
+    position: absolute;
+    left: calc(50% - 50vw);
+    right: calc(50% - 50vw);
+    top: calc(clamp(1.5rem, 3.5vw, 3rem) + var(--rozmiar) * 0.86);
+    bottom: -2px; /* zakladka na pas ponizej - bez jasnej linii na styku */
+    background: var(--probud);
+  }
+
+  /* Walec miedzy wierszami: gorny wiersz za nim, dolny przed nim. */
+  .hero__maszyna {
+    position: absolute;
+    z-index: 3;
+    right: calc(var(--margines) - 0.5vw);
+    bottom: calc(var(--rozmiar) * -0.46);
+    width: calc(var(--rozmiar) * 2.3);
+    max-width: 60%;
+    pointer-events: none;
+  }
+  .hero__foto {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 18px 18px #3d0905aa);
+    transform: translate(calc(var(--mx) * 16px), calc(var(--my) * 7px));
+    transition: transform 500ms var(--ruch-wyjscie);
+  }
+  .hero__dol { position: relative; background: var(--probud); color: var(--papier); padding-block: clamp(1.75rem, 3.5vw, 3rem) clamp(2.5rem, 5vw, 4rem); }
+  /* Tekst i przyciski po lewej; po prawej miejsce na kola walca, ktory wjezdza w ten pas. */
+  .hero__dol-siatka {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1.25rem 3rem;
+    align-items: end;
+  }
+  .hero__tekst { display: grid; gap: 1.5rem; justify-items: start; }
+  .hero__lead { font-size: var(--t-lead); line-height: 1.45; max-width: 46ch; }
+  .hero__akcje { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+  .hero__podpis { position: relative; z-index: 4; font-size: var(--t-maly); color: #ffffffb3; text-decoration-color: #ffffff55; justify-self: end; text-align: right; }
+  .hero__podpis:hover { color: var(--papier); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__pas { animation: pas 760ms var(--ruch-wyjscie) both; }
+    .hero__wiersz > span { animation: litery 820ms var(--ruch-wyjscie) both; }
+    .hero__wiersz--dol > span { animation-delay: 110ms; }
+    .hero__maszyna { animation: przejazd 1250ms cubic-bezier(0.16, 0.8, 0.2, 1) 260ms both; }
+    .hero__dol-siatka > * { animation: pojaw 500ms ease-out 900ms both; }
+    @keyframes pas { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+    @keyframes litery { from { transform: translateY(105%); } }
+    @keyframes przejazd { from { transform: translateX(46vw); } 88% { transform: translateX(-0.6vw); } to { transform: none; } }
+    @keyframes pojaw { from { opacity: 0; } }
+  }
+
+  @media (max-width: 63.99rem) {
+    .hero { --rozmiar: clamp(4rem, 18.5vw, 9rem); }
+    .hero__wiersz--dol { padding-left: 0; }
+    .hero__maszyna { position: relative; right: auto; bottom: auto; width: 100%; max-width: none; margin-top: -0.12em; }
+    .hero__dol-siatka { grid-template-columns: 1fr; }
+    .hero__podpis { justify-self: start; }
+  }
+</style>

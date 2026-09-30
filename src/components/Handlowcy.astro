@@ -1,0 +1,110 @@
+---
+import Foto from './Foto.astro';
+import { handlowcy, dzialy } from '../data/firma';
+import { sierotki, telHref, telKrotki } from '../lib/tekst';
+
+const email = dzialy.find((d) => d.id === 'sprzedaz')!.email;
+---
+<section class="handlowcy sekcja" id="handlowcy" aria-labelledby="handlowcy-tytul">
+  <div class="kontener">
+    <div class="handlowcy__glowa">
+      <h2 id="handlowcy-tytul">Sprzedaż maszyn</h2>
+      <p class="lead">{sierotki('Dzwoń bezpośrednio do handlowca. O nowe BOMAG‑i, o maszyny używane i o wycenę maszyny, którą chcesz nam sprzedać.')}</p>
+    </div>
+
+    <div class="handlowcy__pas">
+      {handlowcy.map((h, i) => (
+        <article class={`osoba ${i === 0 ? 'osoba--lewa' : 'osoba--prawa'}`}>
+          <div class="osoba__tekst">
+            <h3 class="osoba__imie">{h.imie}<br />{h.nazwisko}</h3>
+            <p class="osoba__rola">{h.rola}</p>
+            <a class="osoba__tel numer" href={telHref(h.telefon)} aria-label={`Zadzwoń: ${h.imie} ${h.nazwisko}, ${telKrotki(h.telefon)}`}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor" /></svg>
+              {telKrotki(h.telefon)}
+            </a>
+          </div>
+          <Foto
+            nazwa={h.zdjecie}
+            alt={`${h.imie} ${h.nazwisko}`}
+            class="osoba__foto"
+            sizes="(min-width: 64rem) 34vw, 80vw"
+            style={`--udzial:${h.twarz}`}
+            data-strona={i === 0 ? 'lewa' : 'prawa'}
+          />
+        </article>
+      ))}
+    </div>
+
+    <p class="handlowcy__email">E-mail działu sprzedaży: <a href={`mailto:${email}`}>{email}</a></p>
+  </div>
+</section>
+
+<style>
+  .handlowcy__glowa {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 1rem 3rem;
+    align-items: end;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+  .handlowcy__glowa .lead { max-width: 46ch; }
+
+  .handlowcy__pas {
+    --twarz: clamp(88px, 9.5vw, 138px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--zolty);
+    border-radius: 0 0 0 var(--rog);
+    overflow: hidden;
+  }
+  .osoba {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: clamp(27rem, 40vw, 36rem);
+    padding: clamp(1.5rem, 3vw, 2.75rem);
+  }
+  .osoba--prawa { align-items: flex-end; text-align: right; box-shadow: inset 1px 0 0 #2222222e; }
+  .osoba__tekst { position: relative; z-index: 1; max-width: 25rem; }
+  .osoba__imie { font-size: clamp(2.5rem, 4vw, 3.8rem); line-height: 0.9; }
+  .osoba__rola { margin-top: 0.75rem; font-weight: 600; max-width: 14rem; }
+  .osoba--prawa .osoba__rola { margin-left: auto; }
+  .osoba__tel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 1.25rem;
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: var(--t-numer);
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .osoba__tel svg { width: 0.55em; height: 0.55em; }
+  .osoba__tel:hover { text-decoration: underline; text-decoration-thickness: 3px; }
+
+  /* Szerokosc zdjecia liczona z udzialu twarzy w kadrze, wiec twarze wychodza rowne. */
+  .osoba__foto {
+    position: absolute;
+    bottom: 0;
+    width: calc(var(--twarz) / var(--udzial));
+    max-width: none;
+    height: auto;
+  }
+  .osoba__foto[data-strona='lewa'] { right: 0; }
+  .osoba__foto[data-strona='prawa'] { left: 0; }
+
+  .handlowcy__email { margin-top: 1.25rem; font-weight: 600; }
+
+  @media (max-width: 63.99rem) {
+    .handlowcy__glowa { grid-template-columns: 1fr; }
+    .handlowcy__pas { grid-template-columns: 1fr; --twarz: clamp(72px, 19vw, 118px); }
+    .osoba { min-height: 30rem; }
+    .osoba--prawa { box-shadow: inset 0 1px 0 #2222222e; }
+  }
+  @media (max-width: 30rem) {
+    .osoba__tekst { max-width: 12rem; }
+  }
+</style>

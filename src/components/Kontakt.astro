@@ -1,0 +1,69 @@
+---
+import Formularz from './Formularz.astro';
+import Mapa from './Mapa.astro';
+import { dzialy, firma } from '../data/firma';
+import { telHref, telKrotki } from '../lib/tekst';
+---
+<section class="kontakt" id="kontakt" aria-labelledby="kontakt-tytul">
+  <div class="kontener sekcja kontakt__centrala">
+    <div class="kontakt__glowa">
+      <h2 id="kontakt-tytul">Kontakt</h2>
+      <p class="lead">{firma.nazwa}, {firma.adres.ulica}, {firma.adres.kod} {firma.adres.miasto}</p>
+    </div>
+    <ul class="dzialy" role="list">
+      {dzialy.map((d) => (
+        <li class="dzial">
+          <h3 class="dzial__nazwa">{d.nazwa}</h3>
+          {d.telefony.map((t) => (
+            <a class="dzial__tel numer" href={telHref(t)}>{telKrotki(t)}</a>
+          ))}
+          <a class="dzial__email" href={`mailto:${d.email}`}>{d.email}</a>
+          {d.dopisek && <p class="dzial__dopisek drugorzedny">{d.dopisek}</p>}
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <Formularz />
+  <Mapa />
+</section>
+
+<style>
+  .kontakt__centrala { padding-bottom: clamp(3rem, 6vw, 5rem); }
+  .kontakt__glowa { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 1rem 3rem; margin-bottom: clamp(2rem, 4vw, 3rem); }
+  .dzialy {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 3px solid var(--grafit);
+  }
+  .dzial {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    padding: 1.5rem clamp(1rem, 2vw, 1.75rem) 1.5rem 0;
+  }
+  .dzial + .dzial { padding-left: clamp(1rem, 2vw, 1.75rem); border-left: 1px solid var(--linia); }
+  .dzial__nazwa { font-size: clamp(1.5rem, 2.2vw, 2rem); margin-bottom: 0.5rem; }
+  .dzial__tel {
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: clamp(1.9rem, 2.9vw, 2.6rem);
+    line-height: 1.05;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .dzial__tel:hover { color: var(--probud); }
+  .dzial__email { margin-top: 0.4rem; overflow-wrap: anywhere; }
+  .dzial__dopisek { font-size: var(--t-maly); }
+
+  @media (max-width: 63.99rem) {
+    .dzialy { grid-template-columns: 1fr 1fr; }
+    .dzial:nth-child(3) { padding-left: 0; border-left: 0; }
+    .dzial:nth-child(n + 3) { border-top: 1px solid var(--linia); }
+  }
+  @media (max-width: 34rem) {
+    .dzialy { grid-template-columns: 1fr; }
+    .dzial + .dzial { padding-left: 0; border-left: 0; border-top: 1px solid var(--linia); }
+  }
+</style>

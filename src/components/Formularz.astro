@@ -1,0 +1,146 @@
+---
+// Formularz trafia na adres wybranego dzialu. Bez serwera pocztowego (demo) sklada
+// gotowa wiadomosc w programie pocztowym; gdy ustawiony jest PUBLIC_FORMULARZ_URL,
+// wysyla JSON na ten adres. Tryb jest widoczny dla uzytkownika, niczego nie udajemy.
+import { dzialy, firma } from '../data/firma';
+import { telKrotki } from '../lib/tekst';
+
+const wybor = dzialy.map((d) => ({
+  id: d.id,
+  nazwa: d.nazwa,
+  email: d.email,
+  telefon: d.telefony[0],
+  przycisk: { sprzedaz: 'Wyślij do działu sprzedaży', serwis: 'Wyślij do serwisu', czesci: 'Wyślij do działu części', administracja: 'Wyślij do administracji', finansowanie: 'Wyślij' }[d.id],
+}));
+const endpoint = import.meta.env.PUBLIC_FORMULARZ_URL ?? '';
+---
+<div class="formularz" id="formularz">
+  <div class="kontener">
+    <h3 class="formularz__tytul">Wiadomość do działu</h3>
+    <p class="formularz__wstep">Wybierz dział, a wiadomość trafi prosto na jego adres. Podaj telefon albo e-mail, żeby było jak odpowiedzieć.</p>
+
+    <form class="formularz__pola" novalidate data-formularz data-endpoint={endpoint} data-dzialy={JSON.stringify(wybor)}>
+      <fieldset class="dzialy-wybor">
+        <legend>Dział</legend>
+        {wybor.map((d, i) => (
+          <label class="chip">
+            <input type="radio" name="dzial" value={d.id} checked={i === 0} />
+            <span>{d.nazwa}</span>
+          </label>
+        ))}
+      </fieldset>
+
+      <div class="pole">
+        <label for="f-imie">Imię i nazwisko</label>
+        <input id="f-imie" name="imie" type="text" autocomplete="name" required aria-describedby="f-imie-blad" />
+        <p class="pole__blad" id="f-imie-blad" data-blad="imie"></p>
+      </div>
+      <div class="pole">
+        <label for="f-telefon">Telefon</label>
+        <input id="f-telefon" name="telefon" type="tel" autocomplete="tel" inputmode="tel" aria-describedby="f-kontakt-blad" />
+      </div>
+      <div class="pole">
+        <label for="f-email">E-mail</label>
+        <input id="f-email" name="email" type="email" autocomplete="email" aria-describedby="f-kontakt-blad" />
+        <p class="pole__blad" id="f-kontakt-blad" data-blad="kontakt"></p>
+      </div>
+      <div class="pole">
+        <label for="f-maszyna">Maszyna <span class="pole__opcja">(jeśli dotyczy)</span></label>
+        <input id="f-maszyna" name="maszyna" type="text" placeholder="np. BOMAG BW 120 AD-5" />
+      </div>
+      <div class="pole pole--szerokie">
+        <label for="f-wiadomosc">Wiadomość</label>
+        <textarea id="f-wiadomosc" name="wiadomosc" rows="5" required aria-describedby="f-wiadomosc-blad"></textarea>
+        <p class="pole__blad" id="f-wiadomosc-blad" data-blad="wiadomosc"></p>
+      </div>
+
+      <div class="formularz__stopka pole--szerokie">
+        <button class="przycisk" type="submit" data-przycisk-wyslij>{wybor[0].przycisk}</button>
+        <p class="formularz__tryb drugorzedny" data-tryb>
+          {endpoint
+            ? 'Wiadomość zostanie wysłana z tej strony.'
+            : <>Otworzy się program pocztowy z gotową wiadomością na adres <strong data-adres>{wybor[0].email}</strong>.</>}
+        </p>
+        <p class="formularz__rodo drugorzedny">Administratorem danych jest {firma.nazwaPrawna}. Szczegóły w <a href={firma.dokumenty.polityka}>polityce prywatności</a>.</p>
+      </div>
+    </form>
+
+    <div class="formularz__wynik" data-wynik hidden tabindex="-1">
+      <p class="formularz__wynik-tytul" data-wynik-tytul></p>
+      <p data-wynik-tekst></p>
+      <div class="formularz__wynik-akcje">
+        <button class="przycisk przycisk--obrys" type="button" data-kopiuj>Kopiuj treść wiadomości</button>
+        <button class="przycisk przycisk--obrys" type="button" data-nowa>Napisz kolejną</button>
+      </div>
+    </div>
+    <noscript><p class="formularz__noscript">Bez JavaScriptu formularz nie zadziała. Napisz na {wybor[0].email} albo zadzwoń: {telKrotki(wybor[0].telefon)}.</p></noscript>
+  </div>
+</div>
+
+<script>
+  import { uruchomFormularz } from '../scripts/formularz';
+  document.querySelectorAll<HTMLFormElement>('[data-formularz]').forEach(uruchomFormularz);
+</script>
+
+<style>
+  .formularz { background: var(--beton); padding-block: clamp(3.5rem, 7vw, 6rem); }
+  .formularz__tytul { font-size: var(--t-h2); }
+  .formularz__wstep { margin-top: 0.9rem; max-width: 52ch; }
+
+  .formularz__pola {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem clamp(1rem, 2.5vw, 2rem);
+    margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  }
+  .pole--szerokie, .dzialy-wybor { grid-column: 1 / -1; }
+
+  .dzialy-wybor { border: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .dzialy-wybor legend { font-weight: 700; margin-bottom: 0.6rem; float: left; width: 100%; }
+  .chip { position: relative; }
+  .chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .chip span {
+    display: inline-block;
+    padding: 0.7rem 1.1rem;
+    border: 2px solid var(--grafit);
+    background: var(--papier);
+    font-weight: 650;
+    transition: background-color var(--ruch-szybki), color var(--ruch-szybki);
+  }
+  .chip input:hover + span { background: var(--zolty); }
+  .chip input:checked + span { background: var(--grafit); color: var(--papier); }
+  .chip input:focus-visible + span { outline: 3px solid var(--zolty); outline-offset: 3px; box-shadow: 0 0 0 6px var(--grafit); }
+
+  .pole { display: flex; flex-direction: column; gap: 0.4rem; }
+  .pole label { font-weight: 700; }
+  .pole__opcja { font-weight: 400; color: var(--stal); }
+  .pole input, .pole textarea {
+    width: 100%;
+    padding: 0.85rem 0.95rem;
+    background: var(--papier);
+    border: 2px solid var(--grafit);
+    border-radius: 0;
+    font-size: 1.05rem;
+  }
+  .pole textarea { resize: vertical; min-height: 8.5rem; }
+  .pole input::placeholder { color: #6b6c70; }
+  .pole input:focus-visible, .pole textarea:focus-visible { outline-offset: 0; }
+  .pole [aria-invalid='true'] { border-color: var(--probud); background: #fff5f4; }
+  .pole__blad { color: var(--probud); font-weight: 650; font-size: var(--t-maly); min-height: 0; }
+  .pole__blad:empty { display: none; }
+
+  .formularz__stopka { display: grid; gap: 0.75rem; justify-items: start; margin-top: 0.5rem; }
+  .formularz__tryb, .formularz__rodo { font-size: var(--t-maly); max-width: 60ch; }
+
+  .formularz__wynik {
+    margin-top: 2rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    background: var(--papier);
+    border-left: 6px solid var(--zolty);
+  }
+  .formularz__wynik-tytul { font-family: var(--kroj-naglowki); font-weight: 800; font-size: var(--t-h3); line-height: 1; margin-bottom: 0.6rem; }
+  .formularz__wynik-akcje { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; }
+  .formularz__noscript { margin-top: 1rem; font-weight: 650; }
+
+  @media (max-width: 40rem) { .formularz__pola { grid-template-columns: 1fr; } }
+</style>

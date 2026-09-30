@@ -1,0 +1,154 @@
+---
+import Strona from '../../../layouts/Strona.astro';
+import KartaModelu from '../../../components/KartaModelu.astro';
+import ZapytajHandlowca from '../../../components/ZapytajHandlowca.astro';
+import Okruszki from '../../../components/Okruszki.astro';
+import Foto from '../../../components/Foto.astro';
+import { kategorie, modele, type Model } from '../../../data/katalog';
+import { handlowcy } from '../../../data/firma';
+import { sierotki, telHref, telKrotki } from '../../../lib/tekst';
+
+export function getStaticPaths() {
+  return modele.map((m) => ({ params: { kategoria: m.kategoria, model: m.id }, props: { m } }));
+}
+const { m } = Astro.props as { m: Model };
+const k = kategorie.find((x) => x.id === m.kategoria)!;
+const inne = k.modele.filter((x) => x.id !== m.id).slice(0, 4);
+const kodTla = m.kod.replace(/\s+STONEGUARD$/i, '').replace(/\s+(AD|AC|DH|D|E)(-\d)?$/i, '');
+const dwieWartosci = m.parametry.some((p) => p.dwieWartosci);
+const doFormularza = `/?model=${encodeURIComponent(m.nazwa)}#formularz`;
+const katalogBomag = m.marka === 'BOMAG' && !['walce-tandemowe', 'walce-do-gruntu'].includes(m.kategoria) || m.id === 'bmp-8500';
+---
+<Strona tytul={m.nazwa} opis={`${m.nazwa}. ${m.opis} Parametry, karta katalogowa i kontakt do handlowca PHU Probud.`}>
+  <div class="kontener produkt">
+    <Okruszki sciezka={[{ nazwa: 'Strona główna', href: '/' }, { nazwa: 'Maszyny nowe', href: '/oferta/' }, { nazwa: k.nazwa, href: k.href }, { nazwa: m.kod }]} />
+
+    <div class="produkt__uklad">
+      <figure class="produkt__scena kadr">
+        <span class="produkt__kod" aria-hidden="true">{kodTla}</span>
+        <Foto nazwa={m.zdjecie} alt={m.podpisZdjecia ?? m.nazwa} class="produkt__foto" sizes="(min-width: 64rem) 55vw, 100vw" priorytet />
+        {m.podpisZdjecia && <figcaption>{m.podpisZdjecia}</figcaption>}
+      </figure>
+
+      <div class="produkt__opis">
+        <h1>{m.nazwa}</h1>
+        <p class="lead">{sierotki(m.opis)}</p>
+
+        {m.parametry.length > 0 ? (
+          <table class="parametry">
+            <caption class="sr-only">Dane techniczne {m.nazwa}</caption>
+            <tbody>
+              {m.parametry.map((p) => (
+                <tr>
+                  <th scope="row">{p.nazwa}</th>
+                  <td class="numer">{p.wartosc}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p class="parametry__brak">Dane techniczne tej wersji poda handlowiec.</p>
+        )}
+        {dwieWartosci && <p class="przypis drugorzedny">Dwie wartości rozdzielone ukośnikiem to dwie nastawy maszyny, np. wysoka i niska amplituda drgań.</p>}
+        <p class="przypis drugorzedny">Źródło: karta katalogowa producenta i materiały PHU Probud. Parametry zależą od wersji i rocznika.</p>
+
+        <div class="produkt__akcje">
+          <a class="przycisk" href={doFormularza}>Zapytaj o ten model</a>
+          <a class="przycisk przycisk--obrys numer" href={telHref(handlowcy[0].telefon)}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor" /></svg>
+            {telKrotki(handlowcy[0].telefon)}
+          </a>
+        </div>
+
+        {(m.kartaPdf || m.urlProducenta || katalogBomag) && (
+          <ul class="pliki" role="list">
+            {m.kartaPdf && <li><a href={m.kartaPdf} target="_blank" rel="noopener">Karta katalogowa producenta (PDF)</a></li>}
+            {katalogBomag && <li><a href="/dokumenty/katalog-bomag-light-equipment.pdf">Katalog BOMAG Light Equipment (PDF, 2,5 MB)</a></li>}
+            {m.urlProducenta && <li><a href={m.urlProducenta} target="_blank" rel="noopener">Strona modelu u producenta</a></li>}
+          </ul>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {inne.length > 0 && (
+    <section class="kontener inne" aria-labelledby="inne-tytul">
+      <div class="inne__glowa">
+        <h2 id="inne-tytul">Inne: {k.nazwa.toLowerCase()}</h2>
+        <a href={k.href}>Porównaj wszystkie w tabeli</a>
+      </div>
+      <div class="inne__siatka">
+        {inne.map((x) => <KartaModelu model={x} />)}
+      </div>
+    </section>
+  )}
+
+  <ZapytajHandlowca temat={m.kod} model={m.nazwa} />
+</Strona>
+
+<style>
+  .produkt { padding-top: clamp(1.5rem, 3vw, 2.5rem); padding-bottom: clamp(3rem, 6vw, 5rem); }
+  .produkt__uklad { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 2rem clamp(2rem, 5vw, 4.5rem); margin-top: 1.5rem; align-items: start; }
+
+  .produkt__scena {
+    position: sticky;
+    top: 6rem;
+    margin: 0;
+    aspect-ratio: 1 / 0.86;
+    background: var(--probud);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .produkt__kod {
+    position: absolute;
+    left: 0.4rem;
+    top: 0.2rem;
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: clamp(5rem, 13vw, 12rem);
+    line-height: 0.82;
+    color: var(--probud-jasny);
+    white-space: nowrap;
+  }
+  .produkt__foto {
+    position: absolute;
+    left: 8%;
+    bottom: 8%;
+    width: 84%;
+    height: 68%;
+    object-fit: contain;
+    object-position: center bottom;
+    filter: drop-shadow(0 18px 18px #3d0905aa);
+  }
+  .produkt__scena figcaption {
+    position: absolute;
+    left: 1.25rem;
+    bottom: 1rem;
+    color: #ffffffcc;
+    font-size: var(--t-maly);
+  }
+
+  .produkt__opis h1 { font-size: clamp(2.8rem, 5.2vw, 5rem); }
+  .produkt__opis .lead { margin-top: 1rem; }
+  .parametry { width: 100%; margin-top: 1.75rem; border-top: 3px solid var(--grafit); }
+  .parametry th, .parametry td { padding: 0.7rem 0; border-bottom: 1px solid var(--linia); text-align: left; vertical-align: top; }
+  .parametry th { font-weight: 500; color: var(--stal); padding-right: 1rem; }
+  .parametry td { font-weight: 700; text-align: right; }
+  .parametry__brak { margin-top: 1.75rem; padding: 1rem 0; border-top: 3px solid var(--grafit); font-weight: 600; }
+  .przypis { margin-top: 0.6rem; font-size: var(--t-maly); }
+  .produkt__akcje { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.75rem; }
+  .pliki { margin-top: 1.5rem; display: grid; gap: 0.45rem; }
+  .pliki a { font-weight: 600; }
+
+  .inne { padding-bottom: var(--odstep-sekcji); }
+  .inne__glowa { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 1rem 2rem; margin-bottom: 1.5rem; border-top: 3px solid var(--grafit); padding-top: 1.5rem; }
+  .inne__glowa h2 { font-size: clamp(2rem, 3.6vw, 3rem); }
+  .inne__glowa a { font-weight: 650; }
+  .inne__siatka { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr)); gap: 1.5rem; }
+
+  @media (max-width: 63.99rem) {
+    .produkt__uklad { grid-template-columns: 1fr; }
+    .produkt__scena { position: relative; top: 0; }
+  }
+</style>

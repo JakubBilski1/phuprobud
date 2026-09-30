@@ -1,0 +1,89 @@
+---
+import Foto from './Foto.astro';
+import { firma } from '../data/firma';
+import { sierotki } from '../lib/tekst';
+
+const specjalnosci = [
+  { typ: 'Ładowarki teleskopowe obrotowe', marki: 'Merlo w wersji Roto, w nich się specjalizujemy' },
+  { typ: 'Koparki kołowe', marki: 'Atlas, Case, Yanmar' },
+  { typ: 'Koparko-ładowarki', marki: 'Terex, Case, New Holland' },
+];
+---
+<section class="uzywane sekcja" id="uzywane" aria-labelledby="uzywane-tytul">
+  <div class="kontener uzywane__siatka">
+    <div class="uzywane__zdjecia">
+      <Foto nazwa="realizacje/12" alt="Czerwona ładowarka teleskopowa obrotowa Merlo na placu" class="uzywane__duze kadr" sizes="(min-width: 64rem) 52vw, 100vw" />
+      <Foto nazwa="realizacje/10" alt="Zielona ładowarka teleskopowa obrotowa Merlo" class="uzywane__male kadr--prawy" sizes="(min-width: 64rem) 24vw, 55vw" />
+    </div>
+
+    <div class="uzywane__tekst">
+      <h2 id="uzywane-tytul">Maszyny używane</h2>
+      <p class="lead">{sierotki('Sprowadzamy je od partnerów handlowych z całej Europy. Sprzedajemy tylko sprawny sprzęt przeznaczony na rynek UE, z dokumentacją CE.')}</p>
+      <p>{sierotki('Przed sprzedażą każda maszyna przechodzi przegląd, a jeśli trzeba, naprawę. Maszyny można też wziąć w wynajem długoterminowy.')}</p>
+
+      <dl class="uzywane__lista">
+        {specjalnosci.map((s) => (
+          <div>
+            <dt>{s.typ}</dt>
+            <dd>{s.marki}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div class="uzywane__akcje">
+        <a class="przycisk" href={firma.otomoto} target="_blank" rel="noopener">
+          Aktualne ogłoszenia na otomoto
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2" /></svg>
+        </a>
+        <a class="przycisk przycisk--obrys" href="/?temat=skup#formularz">Chcę sprzedać maszynę</a>
+      </div>
+      <p class="uzywane__uwaga drugorzedny">{sierotki('Skupujemy też maszyny budowlane. Opisz swoją maszynę w formularzu albo zadzwoń do handlowca.')}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .uzywane__siatka {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 2rem clamp(1.5rem, 3vw, 3rem);
+    align-items: center;
+  }
+  .uzywane__zdjecia { grid-column: 1 / span 7; position: relative; padding-bottom: clamp(3rem, 8vw, 7rem); }
+  .uzywane__duze { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .uzywane__male {
+    position: absolute;
+    right: clamp(-1rem, -2vw, -2rem);
+    bottom: 0;
+    width: 46%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border: clamp(6px, 0.8vw, 10px) solid var(--papier);
+    box-sizing: content-box;
+  }
+  .uzywane__tekst { grid-column: 8 / -1; }
+  .uzywane__tekst h2 { margin-bottom: 1.25rem; }
+  .uzywane__tekst p + p { margin-top: 0.9rem; }
+
+  .uzywane__lista { margin-top: 1.75rem; border-top: 2px solid var(--grafit); }
+  .uzywane__lista div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 0.25rem 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--beton-ciemny);
+  }
+  .uzywane__lista dt { font-weight: 700; }
+  .uzywane__lista dd { margin: 0; }
+
+  .uzywane__akcje { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+  .uzywane__uwaga { margin-top: 1rem; font-size: var(--t-maly); }
+
+  @media (max-width: 63.99rem) {
+    .uzywane__zdjecia, .uzywane__tekst { grid-column: 1 / -1; }
+    .uzywane__male { right: 0; width: 52%; }
+  }
+  @media (max-width: 30rem) {
+    .uzywane__lista div { grid-template-columns: 1fr; }
+  }
+</style>

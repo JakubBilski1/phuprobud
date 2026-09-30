@@ -1,0 +1,45 @@
+---
+// Blok kontaktu na podstronach katalogu: dwaj handlowcy z numerami i przejscie do formularza
+// z wpisanym modelem.
+import Foto from './Foto.astro';
+import { handlowcy } from '../data/firma';
+import { telHref, telKrotki, sierotki } from '../lib/tekst';
+
+interface Props { temat: string; model?: string }
+const { temat, model } = Astro.props;
+const doFormularza = model ? `/?model=${encodeURIComponent(model)}#formularz` : '/#formularz';
+---
+<section class="zapytaj" aria-labelledby="zapytaj-tytul">
+  <div class="kontener zapytaj__siatka">
+    <div>
+      <h2 id="zapytaj-tytul">Zapytaj o {temat}</h2>
+      <p class="zapytaj__tekst">{sierotki('Cenę, termin dostawy i dostępność podaje handlowiec. Zadzwoń albo zostaw wiadomość, a model będzie już wpisany w formularzu.')}</p>
+      <a class="przycisk" href={doFormularza}>Napisz wiadomość</a>
+    </div>
+    <ul class="zapytaj__osoby" role="list">
+      {handlowcy.map((h) => (
+        <li class="zapytaj__osoba">
+          <Foto nazwa={h.zdjecie} alt="" class="zapytaj__foto" sizes="96px" pozycja={h.kadrMaly} />
+          <div>
+            <p class="zapytaj__imie">{h.imie} {h.nazwisko}</p>
+            <a class="zapytaj__tel numer" href={telHref(h.telefon)}>{telKrotki(h.telefon)}</a>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .zapytaj { background: var(--zolty); padding-block: clamp(3rem, 6vw, 5rem); }
+  .zapytaj__siatka { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 2rem clamp(2rem, 6vw, 6rem); align-items: center; }
+  .zapytaj h2 { font-size: var(--t-h2); }
+  .zapytaj__tekst { margin: 1rem 0 1.5rem; max-width: 44ch; }
+  .zapytaj__osoby { display: grid; gap: 1rem; }
+  .zapytaj__osoba { display: flex; align-items: center; gap: 1.1rem; padding-bottom: 1rem; border-bottom: 1px solid #22222233; }
+  .zapytaj__foto { width: 5.5rem; height: 5.5rem; object-fit: cover; background: #e9c200; border-radius: 0 0 0 18px; flex: none; }
+  .zapytaj__imie { font-weight: 700; }
+  .zapytaj__tel { font-family: var(--kroj-naglowki); font-weight: 800; font-size: clamp(2rem, 3.4vw, 2.8rem); line-height: 1; text-decoration: none; }
+  .zapytaj__tel:hover { text-decoration: underline; text-decoration-thickness: 3px; }
+  @media (max-width: 63.99rem) { .zapytaj__siatka { grid-template-columns: 1fr; } }
+</style>

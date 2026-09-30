@@ -1,0 +1,160 @@
+---
+import Foto from './Foto.astro';
+import { kategorie, modele } from '../data/katalog';
+import { odmiana, sierotki } from '../lib/tekst';
+
+// Maszyna pokazywana w panelu obok listy: najladniejsze zdjecie studyjne z kategorii.
+const REPREZENTANT: Record<string, string> = {
+  'stopy-wibracyjne': 'bt-60',
+  'zageszczarki-jednokierunkowe': 'bp-25-50',
+  'zageszczarki-rewersyjne': 'bpr-60-65-d',
+  'walce-prowadzone': 'bw-71-e-2',
+  'walce-tandemowe': 'bw-100-ad-5',
+  'walce-do-gruntu': 'bw-124-dh-5',
+  schaeff: 'tl80',
+  gehl: 'rt135',
+};
+---
+<section class="oferta sekcja" id="oferta" aria-labelledby="oferta-tytul">
+  <div class="kontener">
+    <div class="oferta__glowa">
+      <h2 id="oferta-tytul">Maszyny nowe</h2>
+      <p class="lead">{sierotki('Stopy wibracyjne, zagęszczarki i walce BOMAG, minikoparki, ładowarki i koparki Schaeff oraz ładowarki gąsienicowe Gehl.')}</p>
+    </div>
+
+    <div class="oferta__uklad" data-oferta>
+      <ul class="oferta__lista" role="list">
+        {kategorie.map((k, i) => (
+          <li>
+            <a class="wiersz" href={k.href} data-podglad={k.id} aria-current={i === 0 ? 'true' : undefined}>
+              <span class="wiersz__picto" style={`--maska:url(/piktogramy/${k.piktogram}.png)`} aria-hidden="true"></span>
+              <span class="wiersz__nazwa">{k.nazwa}</span>
+              <span class="wiersz__dane">
+                <span>{odmiana(k.modele.length, ['model', 'modele', 'modeli'])}</span>
+                {k.zakresMasy && <span class="numer">{k.zakresMasy}</span>}
+              </span>
+              <span class="wiersz__marka">{k.marka}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <div class="oferta__podglad kadr" aria-hidden="true">
+        {kategorie.map((k, i) => {
+          const m = modele.find((x) => x.id === REPREZENTANT[k.id])!;
+          return (
+            <figure class={`podglad ${i === 0 ? 'aktywny' : ''}`} data-podglad-panel={k.id}>
+              <Foto nazwa={m.zdjecie} alt="" sizes="(min-width: 64rem) 38vw, 1px" class="podglad__foto" />
+              <figcaption>
+                <span class="podglad__model">{m.nazwa}</span>
+                {sierotki(k.opis)}
+              </figcaption>
+            </figure>
+          );
+        })}
+      </div>
+    </div>
+
+    <a class="przycisk oferta__wszystko" href="/oferta/">Cały katalog: {odmiana(modele.length, ['model', 'modele', 'modeli'])}</a>
+  </div>
+</section>
+
+<script>
+  // Panel obok listy pokazuje maszyne z kategorii, na ktorej jest kursor albo fokus.
+  document.querySelectorAll<HTMLElement>('[data-oferta]').forEach((uklad) => {
+    const wiersze = uklad.querySelectorAll<HTMLAnchorElement>('[data-podglad]');
+    const panele = uklad.querySelectorAll<HTMLElement>('[data-podglad-panel]');
+    const pokaz = (id: string) => {
+      panele.forEach((p) => p.classList.toggle('aktywny', p.dataset.podgladPanel === id));
+      wiersze.forEach((w) => (w.dataset.podglad === id ? w.setAttribute('aria-current', 'true') : w.removeAttribute('aria-current')));
+    };
+    wiersze.forEach((w) => {
+      w.addEventListener('pointerenter', () => pokaz(w.dataset.podglad!));
+      w.addEventListener('focus', () => pokaz(w.dataset.podglad!));
+    });
+  });
+</script>
+
+<style>
+  .oferta__glowa {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 1rem 3rem;
+    align-items: end;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  }
+  .oferta__uklad {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: start;
+  }
+  .oferta__lista { border-top: 3px solid var(--grafit); }
+  .wiersz {
+    display: grid;
+    grid-template-columns: 3.4rem minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 0.5rem 1.25rem;
+    padding: 1rem 0.25rem;
+    border-bottom: 1px solid var(--linia);
+    text-decoration: none;
+    transition: background-color var(--ruch-szybki), padding var(--ruch-szybki) var(--ruch-wyjscie);
+  }
+  .wiersz__picto {
+    width: 3.2rem;
+    height: 3.2rem;
+    background: var(--grafit);
+    -webkit-mask: var(--maska) center / contain no-repeat;
+    mask: var(--maska) center / contain no-repeat;
+    transition: background-color var(--ruch-szybki);
+  }
+  .wiersz__nazwa { font-family: var(--kroj-naglowki); font-weight: 800; font-size: clamp(1.5rem, 2.3vw, 2.1rem); line-height: 1; }
+  .wiersz__dane { display: flex; gap: 1.25rem; color: var(--stal); font-weight: 600; white-space: nowrap; }
+  .wiersz__marka { font-weight: 700; font-size: var(--t-maly); padding: 0.2rem 0.5rem; border: 1.5px solid currentColor; }
+  .wiersz:hover, .wiersz[aria-current='true'] { background: var(--beton); padding-left: 0.9rem; }
+  .wiersz[aria-current='true'] .wiersz__picto { background: var(--probud); }
+
+  .oferta__podglad {
+    position: sticky;
+    top: 6.5rem;
+    aspect-ratio: 4 / 4.4;
+    background: var(--probud);
+    color: var(--papier);
+  }
+  .podglad {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(1.25rem, 2.5vw, 2rem);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 260ms ease, visibility 0s linear 260ms;
+  }
+  .podglad.aktywny { opacity: 1; visibility: visible; transition: opacity 260ms ease; }
+  .podglad__foto {
+    width: 100%;
+    height: 68%;
+    object-fit: contain;
+    filter: drop-shadow(0 16px 16px #3d0905aa);
+  }
+  .podglad.aktywny .podglad__foto { animation: wjazd 520ms var(--ruch-wyjscie) both; }
+  @keyframes wjazd { from { transform: translateX(6%); opacity: 0.4; } }
+  .podglad figcaption { max-width: 40ch; }
+  .podglad__model { display: block; font-family: var(--kroj-naglowki); font-weight: 800; font-size: 1.6rem; line-height: 1; margin-bottom: 0.5rem; }
+
+  .oferta__wszystko { margin-top: 2rem; }
+
+  @media (max-width: 63.99rem) {
+    .oferta__glowa, .oferta__uklad { grid-template-columns: 1fr; }
+    .oferta__podglad { display: none; }
+    .wiersz { grid-template-columns: 2.6rem minmax(0, 1fr) auto; }
+    .wiersz__picto { width: 2.5rem; height: 2.5rem; }
+    .wiersz__dane { grid-column: 2 / -1; grid-row: 2; }
+    .wiersz__marka { grid-row: 1; grid-column: 3; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .podglad.aktywny .podglad__foto { animation: none; }
+  }
+</style>

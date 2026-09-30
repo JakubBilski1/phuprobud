@@ -1,0 +1,90 @@
+---
+// Mapa dojazdu: prawdziwe ulice z OpenStreetMap (kafle OpenFreeMap, bez klucza API),
+// narysowane wlasnym stylem. MapLibre laduje sie dopiero, gdy sekcja zbliza sie do ekranu;
+// wczesniej i bez JavaScriptu widac karte z adresem i przyciskiem trasy.
+import { firma, trasaHref } from '../data/firma';
+---
+<div class="mapa" id="dojazd">
+  <div class="mapa__plotno" data-mapa data-lat={firma.wspolrzedne.lat} data-lng={firma.wspolrzedne.lng} role="region" aria-label={`Mapa dojazdu do ${firma.nazwa}`}></div>
+  <div class="kontener mapa__nakladka">
+    <div class="mapa__karta">
+      <h3>Dojazd</h3>
+      <p class="mapa__adres">{firma.adres.ulica}<br />{firma.adres.kod} {firma.adres.miasto}</p>
+      <a class="przycisk" href={trasaHref} target="_blank" rel="noopener">
+        Wyznacz trasę w Google Maps
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" fill="none" stroke="currentColor" stroke-width="2" /></svg>
+      </a>
+      <p class="mapa__wspolrzedne drugorzedny numer">{firma.wspolrzedne.lat.toFixed(5)}, {firma.wspolrzedne.lng.toFixed(5)}</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { uruchomMape } from '../scripts/mapa';
+  document.querySelectorAll<HTMLElement>('[data-mapa]').forEach((el) => {
+    const obs = new IntersectionObserver((wpisy) => {
+      if (!wpisy.some((w) => w.isIntersecting)) return;
+      obs.disconnect();
+      uruchomMape(el);
+    }, { rootMargin: '600px 0px' });
+    obs.observe(el);
+  });
+</script>
+
+<style>
+  .mapa {
+    position: relative;
+    height: clamp(30rem, 48vw, 40rem);
+    background:
+      radial-gradient(circle at 70% 52%, var(--probud) 0 9px, transparent 10px),
+      repeating-linear-gradient(118deg, transparent 0 46px, #22222226 46px 50px),
+      repeating-linear-gradient(28deg, transparent 0 88px, #22222238 88px 94px),
+      var(--zolty);
+    overflow: hidden;
+  }
+  .mapa__plotno { position: absolute; inset: 0; }
+  :global(.maplibregl-map) { font-family: var(--kroj-tekst); }
+  .mapa__nakladka { position: relative; height: 100%; display: flex; align-items: flex-end; padding-block: clamp(1.25rem, 3vw, 2.5rem); pointer-events: none; }
+  .mapa__karta {
+    pointer-events: auto;
+    width: min(100%, 23rem);
+    padding: clamp(1.25rem, 2.5vw, 1.75rem);
+    background: var(--papier);
+    border-radius: 0 0 0 var(--rog);
+    box-shadow: 0 0 0 2px var(--grafit);
+  }
+  .mapa__karta h3 { font-size: var(--t-h3); }
+  .mapa__adres { margin: 0.6rem 0 1.1rem; font-size: 1.15rem; font-weight: 600; line-height: 1.35; }
+  .mapa__wspolrzedne { margin-top: 0.8rem; font-size: 0.85rem; }
+
+  :global(.pinezka) {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+  :global(.pinezka__znak) {
+    width: 46px;
+    height: 46px;
+    background: var(--probud);
+    border: 3px solid var(--papier);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    box-shadow: 0 6px 14px #0000004d;
+  }
+  :global(.pinezka__podpis) {
+    padding: 0.2rem 0.5rem;
+    background: var(--grafit);
+    color: var(--papier);
+    font: 700 0.85rem/1.2 var(--kroj-tekst);
+    white-space: nowrap;
+  }
+  :global(.maplibregl-ctrl-attrib) { font-size: 11px; }
+
+  @media (max-width: 40rem) {
+    .mapa { height: auto; min-height: 34rem; display: flex; flex-direction: column; }
+    .mapa__plotno { position: relative; height: 22rem; flex: none; }
+    .mapa__nakladka { height: auto; padding-top: 0; margin-top: -2rem; }
+    .mapa__karta { width: 100%; }
+  }
+</style>

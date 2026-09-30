@@ -1,0 +1,49 @@
+---
+import { finansowanie } from '../data/firma';
+import { sierotki, telHref, telKrotki } from '../lib/tekst';
+---
+<section class="finansowanie" id="finansowanie" aria-labelledby="finansowanie-tytul">
+  <div class="kontener finansowanie__pas">
+    <div class="finansowanie__tekst">
+      <h2 id="finansowanie-tytul">Finansowanie</h2>
+      <p class="lead">{sierotki('Zakup maszyn używanych i sprzętu BOMAG można sfinansować przez BPCE Equipment Solutions Polska. Warunki ustalasz bezpośrednio z opiekunem finansowania.')}</p>
+    </div>
+    <div class="finansowanie__karta">
+      <img src="/marki/bpce.webp" alt="BPCE Equipment Solutions" width="545" height="120" loading="lazy" />
+      <p class="finansowanie__osoba">{finansowanie.osoba}</p>
+      <p class="drugorzedny">{finansowanie.firma}</p>
+      <a class="finansowanie__tel numer" href={telHref(finansowanie.telefon)}>{telKrotki(finansowanie.telefon)}</a>
+      <a class="finansowanie__email" href={`mailto:${finansowanie.email}`}>{finansowanie.email}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .finansowanie { padding-block: clamp(3.5rem, 7vw, 6rem); }
+  .finansowanie__pas {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 2rem clamp(2rem, 6vw, 6rem);
+    align-items: center;
+  }
+  .finansowanie__tekst h2 { margin-bottom: 1rem; }
+  .finansowanie__karta {
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    border: 2px solid var(--grafit);
+    border-radius: 0 0 0 var(--rog);
+  }
+  .finansowanie__karta img { height: 34px; width: auto; margin-bottom: 1.25rem; }
+  .finansowanie__osoba { font-family: var(--kroj-naglowki); font-weight: 800; font-size: var(--t-h3); line-height: 1; }
+  .finansowanie__tel {
+    display: inline-block;
+    margin-top: 1rem;
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    line-height: 1;
+    text-decoration: none;
+  }
+  .finansowanie__tel:hover { color: var(--probud); }
+  .finansowanie__email { display: block; margin-top: 0.5rem; overflow-wrap: anywhere; }
+  @media (max-width: 63.99rem) { .finansowanie__pas { grid-template-columns: 1fr; } }
+</style>

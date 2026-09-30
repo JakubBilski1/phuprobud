@@ -1,0 +1,1502 @@
+{
+ "realizacje/01": {
+  "w": 1280,
+  "h": 720,
+  "kolor": "#282828",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/01-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/01-1200.webp"
+   },
+   {
+    "w": 1280,
+    "src": "/img/realizacje/01-1280.webp"
+   }
+  ]
+ },
+ "realizacje/02": {
+  "w": 1280,
+  "h": 959,
+  "kolor": "#c8c8c8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/02-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/02-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/02-1200.webp"
+   },
+   {
+    "w": 1280,
+    "src": "/img/realizacje/02-1280.webp"
+   }
+  ]
+ },
+ "realizacje/03": {
+  "w": 1280,
+  "h": 852,
+  "kolor": "#f8f8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/03-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/03-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/03-1200.webp"
+   },
+   {
+    "w": 1280,
+    "src": "/img/realizacje/03-1280.webp"
+   }
+  ]
+ },
+ "realizacje/04": {
+  "w": 2304,
+  "h": 1536,
+  "kolor": "#c8e8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/04-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/04-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/04-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/04-1800.webp"
+   }
+  ]
+ },
+ "realizacje/05": {
+  "w": 1280,
+  "h": 720,
+  "kolor": "#f8f8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/05-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/05-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/05-1200.webp"
+   },
+   {
+    "w": 1280,
+    "src": "/img/realizacje/05-1280.webp"
+   }
+  ]
+ },
+ "realizacje/06": {
+  "w": 1224,
+  "h": 1224,
+  "kolor": "#d8d8d8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/06-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/06-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/06-1200.webp"
+   },
+   {
+    "w": 1224,
+    "src": "/img/realizacje/06-1224.webp"
+   }
+  ]
+ },
+ "realizacje/07": {
+  "w": 1600,
+  "h": 1200,
+  "kolor": "#e8e8e8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/07-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/07-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/07-1200.webp"
+   },
+   {
+    "w": 1600,
+    "src": "/img/realizacje/07-1600.webp"
+   }
+  ]
+ },
+ "realizacje/08": {
+  "w": 1280,
+  "h": 960,
+  "kolor": "#d8e8e8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/08-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/08-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/08-1200.webp"
+   },
+   {
+    "w": 1280,
+    "src": "/img/realizacje/08-1280.webp"
+   }
+  ]
+ },
+ "realizacje/09": {
+  "w": 4032,
+  "h": 1960,
+  "kolor": "#d8d8e8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/09-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/09-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/09-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/09-1800.webp"
+   }
+  ]
+ },
+ "realizacje/10": {
+  "w": 4197,
+  "h": 3147,
+  "kolor": "#48a8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/10-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/10-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/10-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/10-1800.webp"
+   }
+  ]
+ },
+ "realizacje/11": {
+  "w": 1280,
+  "h": 959,
+  "kolor": "#f8f8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/11-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/11-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/11-1200.webp"
+   },
+   {
+    "w": 1280,
+    "src": "/img/realizacje/11-1280.webp"
+   }
+  ]
+ },
+ "realizacje/12": {
+  "w": 1024,
+  "h": 768,
+  "kolor": "#f8f8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/12-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/12-720.webp"
+   },
+   {
+    "w": 1024,
+    "src": "/img/realizacje/12-1024.webp"
+   }
+  ]
+ },
+ "realizacje/13": {
+  "w": 3264,
+  "h": 1836,
+  "kolor": "#080808",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/13-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/13-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/13-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/13-1800.webp"
+   }
+  ]
+ },
+ "realizacje/14": {
+  "w": 3264,
+  "h": 1836,
+  "kolor": "#98c8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/14-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/14-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/14-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/14-1800.webp"
+   }
+  ]
+ },
+ "realizacje/15": {
+  "w": 5147,
+  "h": 3431,
+  "kolor": "#987868",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/15-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/15-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/15-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/15-1800.webp"
+   }
+  ]
+ },
+ "realizacje/16": {
+  "w": 4608,
+  "h": 3072,
+  "kolor": "#88c8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/16-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/16-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/16-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/16-1800.webp"
+   }
+  ]
+ },
+ "realizacje/17": {
+  "w": 1280,
+  "h": 853,
+  "kolor": "#f8f8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/17-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/17-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/17-1200.webp"
+   },
+   {
+    "w": 1280,
+    "src": "/img/realizacje/17-1280.webp"
+   }
+  ]
+ },
+ "realizacje/18": {
+  "w": 2262,
+  "h": 1508,
+  "kolor": "#a8a898",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/18-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/18-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/18-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/18-1800.webp"
+   }
+  ]
+ },
+ "ludzie/krzysztof-bilski": {
+  "w": 1600,
+  "h": 1600,
+  "kolor": "#788888",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 420,
+    "src": "/img/ludzie/krzysztof-bilski-420.webp"
+   },
+   {
+    "w": 840,
+    "src": "/img/ludzie/krzysztof-bilski-840.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/ludzie/krzysztof-bilski-1200.webp"
+   }
+  ]
+ },
+ "ludzie/szymon-atraszkiewicz": {
+  "w": 640,
+  "h": 550,
+  "kolor": "#686868",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 420,
+    "src": "/img/ludzie/szymon-atraszkiewicz-420.webp"
+   },
+   {
+    "w": 640,
+    "src": "/img/ludzie/szymon-atraszkiewicz-640.webp"
+   }
+  ]
+ },
+ "maszyny/bmp-8500": {
+  "w": 1664,
+  "h": 1255,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bmp-8500-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bmp-8500-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/bmp-8500-1200.webp"
+   }
+  ]
+ },
+ "maszyny/bp-15-40": {
+  "w": 1147,
+  "h": 1167,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bp-15-40-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bp-15-40-720.webp"
+   },
+   {
+    "w": 1147,
+    "src": "/img/maszyny/bp-15-40-1147.webp"
+   }
+  ]
+ },
+ "maszyny/bp-25-50-d": {
+  "w": 1185,
+  "h": 1195,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bp-25-50-d-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bp-25-50-d-720.webp"
+   },
+   {
+    "w": 1185,
+    "src": "/img/maszyny/bp-25-50-d-1185.webp"
+   }
+  ]
+ },
+ "maszyny/bp-25-50": {
+  "w": 1168,
+  "h": 1189,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bp-25-50-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bp-25-50-720.webp"
+   },
+   {
+    "w": 1168,
+    "src": "/img/maszyny/bp-25-50-1168.webp"
+   }
+  ]
+ },
+ "maszyny/bpr-100-80-d": {
+  "w": 1149,
+  "h": 1186,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bpr-100-80-d-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bpr-100-80-d-720.webp"
+   },
+   {
+    "w": 1149,
+    "src": "/img/maszyny/bpr-100-80-d-1149.webp"
+   }
+  ]
+ },
+ "maszyny/bpr-25-50-d-stoneguard": {
+  "w": 870,
+  "h": 1201,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bpr-25-50-d-stoneguard-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bpr-25-50-d-stoneguard-720.webp"
+   },
+   {
+    "w": 870,
+    "src": "/img/maszyny/bpr-25-50-d-stoneguard-870.webp"
+   }
+  ]
+ },
+ "maszyny/bpr-35-60-d-stoneguard": {
+  "w": 876,
+  "h": 1167,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bpr-35-60-d-stoneguard-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bpr-35-60-d-stoneguard-720.webp"
+   },
+   {
+    "w": 876,
+    "src": "/img/maszyny/bpr-35-60-d-stoneguard-876.webp"
+   }
+  ]
+ },
+ "maszyny/bpr-55-65-d": {
+  "w": 1260,
+  "h": 1274,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bpr-55-65-d-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bpr-55-65-d-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/bpr-55-65-d-1200.webp"
+   }
+  ]
+ },
+ "maszyny/bpr-60-65-d": {
+  "w": 1332,
+  "h": 1283,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bpr-60-65-d-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bpr-60-65-d-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/bpr-60-65-d-1200.webp"
+   }
+  ]
+ },
+ "maszyny/bpr-70-70-d": {
+  "w": 1045,
+  "h": 1245,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bpr-70-70-d-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bpr-70-70-d-720.webp"
+   },
+   {
+    "w": 1045,
+    "src": "/img/maszyny/bpr-70-70-d-1045.webp"
+   }
+  ]
+ },
+ "maszyny/bt-50": {
+  "w": 737,
+  "h": 1250,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bt-50-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bt-50-720.webp"
+   },
+   {
+    "w": 737,
+    "src": "/img/maszyny/bt-50-737.webp"
+   }
+  ]
+ },
+ "maszyny/bt-60-e": {
+  "w": 1304,
+  "h": 1253,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bt-60-e-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bt-60-e-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/bt-60-e-1200.webp"
+   }
+  ]
+ },
+ "maszyny/bt-60": {
+  "w": 737,
+  "h": 1250,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bt-60-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bt-60-720.webp"
+   },
+   {
+    "w": 737,
+    "src": "/img/maszyny/bt-60-737.webp"
+   }
+  ]
+ },
+ "maszyny/bt-65": {
+  "w": 857,
+  "h": 1250,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bt-65-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bt-65-720.webp"
+   },
+   {
+    "w": 857,
+    "src": "/img/maszyny/bt-65-857.webp"
+   }
+  ]
+ },
+ "maszyny/bvp-10-36": {
+  "w": 1103,
+  "h": 1269,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bvp-10-36-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bvp-10-36-720.webp"
+   },
+   {
+    "w": 1103,
+    "src": "/img/maszyny/bvp-10-36-1103.webp"
+   }
+  ]
+ },
+ "maszyny/bvp-18-45": {
+  "w": 989,
+  "h": 1247,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bvp-18-45-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bvp-18-45-720.webp"
+   },
+   {
+    "w": 989,
+    "src": "/img/maszyny/bvp-18-45-989.webp"
+   }
+  ]
+ },
+ "maszyny/bw-100-ac-5": {
+  "w": 1032,
+  "h": 1277,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-100-ac-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-100-ac-5-720.webp"
+   },
+   {
+    "w": 1032,
+    "src": "/img/maszyny/bw-100-ac-5-1032.webp"
+   }
+  ]
+ },
+ "maszyny/bw-100-ad-5": {
+  "w": 941,
+  "h": 1181,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-100-ad-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-100-ad-5-720.webp"
+   },
+   {
+    "w": 941,
+    "src": "/img/maszyny/bw-100-ad-5-941.webp"
+   }
+  ]
+ },
+ "maszyny/bw-120-ac-5": {
+  "w": 814,
+  "h": 896,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-120-ac-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-120-ac-5-720.webp"
+   },
+   {
+    "w": 814,
+    "src": "/img/maszyny/bw-120-ac-5-814.webp"
+   }
+  ]
+ },
+ "maszyny/bw-120-ad-5": {
+  "w": 1081,
+  "h": 1118,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-120-ad-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-120-ad-5-720.webp"
+   },
+   {
+    "w": 1081,
+    "src": "/img/maszyny/bw-120-ad-5-1081.webp"
+   }
+  ]
+ },
+ "maszyny/bw-124-dh-5": {
+  "w": 1172,
+  "h": 1244,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-124-dh-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-124-dh-5-720.webp"
+   },
+   {
+    "w": 1172,
+    "src": "/img/maszyny/bw-124-dh-5-1172.webp"
+   }
+  ]
+ },
+ "maszyny/bw-135-ad-5": {
+  "w": 1090,
+  "h": 1229,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-135-ad-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-135-ad-5-720.webp"
+   },
+   {
+    "w": 1090,
+    "src": "/img/maszyny/bw-135-ad-5-1090.webp"
+   }
+  ]
+ },
+ "maszyny/bw-138-ac-5": {
+  "w": 1256,
+  "h": 1286,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-138-ac-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-138-ac-5-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/bw-138-ac-5-1200.webp"
+   }
+  ]
+ },
+ "maszyny/bw-138-ad-5": {
+  "w": 1173,
+  "h": 1099,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-138-ad-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-138-ad-5-720.webp"
+   },
+   {
+    "w": 1173,
+    "src": "/img/maszyny/bw-138-ad-5-1173.webp"
+   }
+  ]
+ },
+ "maszyny/bw-55": {
+  "w": 1137,
+  "h": 1232,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-55-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-55-720.webp"
+   },
+   {
+    "w": 1137,
+    "src": "/img/maszyny/bw-55-1137.webp"
+   }
+  ]
+ },
+ "maszyny/bw-65": {
+  "w": 1305,
+  "h": 1120,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-65-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-65-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/bw-65-1200.webp"
+   }
+  ]
+ },
+ "maszyny/bw-71-e-2": {
+  "w": 1120,
+  "h": 923,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-71-e-2-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-71-e-2-720.webp"
+   },
+   {
+    "w": 1120,
+    "src": "/img/maszyny/bw-71-e-2-1120.webp"
+   }
+  ]
+ },
+ "maszyny/bw-80-ad-5": {
+  "w": 747,
+  "h": 1250,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-80-ad-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-80-ad-5-720.webp"
+   },
+   {
+    "w": 747,
+    "src": "/img/maszyny/bw-80-ad-5-747.webp"
+   }
+  ]
+ },
+ "maszyny/bw-90-ac-5": {
+  "w": 1051,
+  "h": 1276,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-90-ac-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-90-ac-5-720.webp"
+   },
+   {
+    "w": 1051,
+    "src": "/img/maszyny/bw-90-ac-5-1051.webp"
+   }
+  ]
+ },
+ "maszyny/bw-90-ad-5": {
+  "w": 890,
+  "h": 1113,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/bw-90-ad-5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/bw-90-ad-5-720.webp"
+   },
+   {
+    "w": 890,
+    "src": "/img/maszyny/bw-90-ad-5-890.webp"
+   }
+  ]
+ },
+ "maszyny/rt105": {
+  "w": 2629,
+  "h": 2079,
+  "kolor": "#f8f8f8",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/rt105-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/rt105-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/rt105-1200.webp"
+   }
+  ]
+ },
+ "maszyny/rt135": {
+  "w": 4404,
+  "h": 2692,
+  "kolor": "#f8f8f8",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/rt135-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/rt135-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/rt135-1200.webp"
+   }
+  ]
+ },
+ "maszyny/rt165": {
+  "w": 2749,
+  "h": 2169,
+  "kolor": "#f8f8f8",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/rt165-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/rt165-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/rt165-1200.webp"
+   }
+  ]
+ },
+ "maszyny/rt185": {
+  "w": 211,
+  "h": 122,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 211,
+    "src": "/img/maszyny/rt185-211.webp"
+   }
+  ]
+ },
+ "maszyny/rt215": {
+  "w": 238,
+  "h": 177,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 238,
+    "src": "/img/maszyny/rt215-238.webp"
+   }
+  ]
+ },
+ "maszyny/sv15": {
+  "w": 276,
+  "h": 200,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 276,
+    "src": "/img/maszyny/sv15-276.webp"
+   }
+  ]
+ },
+ "maszyny/sv17": {
+  "w": 291,
+  "h": 186,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 291,
+    "src": "/img/maszyny/sv17-291.webp"
+   }
+  ]
+ },
+ "maszyny/sv22": {
+  "w": 205,
+  "h": 225,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 205,
+    "src": "/img/maszyny/sv22-205.webp"
+   }
+  ]
+ },
+ "maszyny/tl80": {
+  "w": 1617,
+  "h": 874,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/tl80-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/tl80-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/tl80-1200.webp"
+   }
+  ]
+ },
+ "maszyny/tw75": {
+  "w": 1640,
+  "h": 1053,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 360,
+    "src": "/img/maszyny/tw75-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/maszyny/tw75-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/maszyny/tw75-1200.webp"
+   }
+  ]
+ },
+ "hero/bw-138-ac-5": {
+  "w": 1256,
+  "h": 1286,
+  "kolor": "#080808",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 640,
+    "src": "/img/hero/bw-138-ac-5-640.webp"
+   },
+   {
+    "w": 1000,
+    "src": "/img/hero/bw-138-ac-5-1000.webp"
+   },
+   {
+    "w": 1256,
+    "src": "/img/hero/bw-138-ac-5-1256.webp"
+   }
+  ]
+ },
+ "kategorie/jednobebnowe-walce-wibracyjne-01": {
+  "w": 1920,
+  "h": 1280,
+  "kolor": "#e8f8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/jednobebnowe-walce-wibracyjne-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/jednobebnowe-walce-wibracyjne-01-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/jednobebnowe-walce-wibracyjne-01-1800.webp"
+   }
+  ]
+ },
+ "kategorie/koparki-kolowe-01": {
+  "w": 787,
+  "h": 521,
+  "kolor": "#f8f8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/koparki-kolowe-01-720.webp"
+   },
+   {
+    "w": 787,
+    "src": "/img/kategorie/koparki-kolowe-01-787.webp"
+   }
+  ]
+ },
+ "kategorie/ladowarki-gasienicowe-01": {
+  "w": 6000,
+  "h": 4000,
+  "kolor": "#181818",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/ladowarki-gasienicowe-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/ladowarki-gasienicowe-01-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/ladowarki-gasienicowe-01-1800.webp"
+   }
+  ]
+ },
+ "kategorie/ladowarki-kolowe-01": {
+  "w": 4972,
+  "h": 3314,
+  "kolor": "#080808",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/ladowarki-kolowe-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/ladowarki-kolowe-01-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/ladowarki-kolowe-01-1800.webp"
+   }
+  ]
+ },
+ "kategorie/ladowarki-kolowe-02": {
+  "w": 4032,
+  "h": 3024,
+  "kolor": "#080808",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/ladowarki-kolowe-02-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/ladowarki-kolowe-02-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/ladowarki-kolowe-02-1800.webp"
+   }
+  ]
+ },
+ "kategorie/minikoparki-01": {
+  "w": 1280,
+  "h": 420,
+  "kolor": "#d8e8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/minikoparki-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/minikoparki-01-1200.webp"
+   },
+   {
+    "w": 1280,
+    "src": "/img/kategorie/minikoparki-01-1280.webp"
+   }
+  ]
+ },
+ "kategorie/podwojne-walce-wibracyjne-01": {
+  "w": 1920,
+  "h": 1280,
+  "kolor": "#181818",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/podwojne-walce-wibracyjne-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/podwojne-walce-wibracyjne-01-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/podwojne-walce-wibracyjne-01-1800.webp"
+   }
+  ]
+ },
+ "kategorie/ubijaki-01": {
+  "w": 1920,
+  "h": 1280,
+  "kolor": "#181818",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/ubijaki-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/ubijaki-01-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/ubijaki-01-1800.webp"
+   }
+  ]
+ },
+ "kategorie/walce-do-robot-ziemnych-01": {
+  "w": 1920,
+  "h": 1280,
+  "kolor": "#f8f8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/walce-do-robot-ziemnych-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/walce-do-robot-ziemnych-01-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/walce-do-robot-ziemnych-01-1800.webp"
+   }
+  ]
+ },
+ "kategorie/walce-tandemowe-01": {
+  "w": 1920,
+  "h": 1280,
+  "kolor": "#282818",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/walce-tandemowe-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/walce-tandemowe-01-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/walce-tandemowe-01-1800.webp"
+   }
+  ]
+ },
+ "kategorie/walec-uniwersalny-01": {
+  "w": 1920,
+  "h": 1280,
+  "kolor": "#d8e8f8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/walec-uniwersalny-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/walec-uniwersalny-01-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/walec-uniwersalny-01-1800.webp"
+   }
+  ]
+ },
+ "kategorie/zageszczarki-jednokierunkowe-plytowe-01": {
+  "w": 1920,
+  "h": 1280,
+  "kolor": "#c8c8c8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/zageszczarki-jednokierunkowe-plytowe-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/zageszczarki-jednokierunkowe-plytowe-01-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/zageszczarki-jednokierunkowe-plytowe-01-1800.webp"
+   }
+  ]
+ },
+ "kategorie/zageszczarki-rewersyjne-01": {
+  "w": 1920,
+  "h": 1280,
+  "kolor": "#d8d8d8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 720,
+    "src": "/img/kategorie/zageszczarki-rewersyjne-01-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/kategorie/zageszczarki-rewersyjne-01-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/kategorie/zageszczarki-rewersyjne-01-1800.webp"
+   }
+  ]
+ }
+}

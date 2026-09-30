@@ -1,0 +1,153 @@
+---
+import { handlowcy, dzialy } from '../data/firma';
+import { telHref, telKrotki } from '../lib/tekst';
+
+const linki = [
+  { href: '/oferta/', tekst: 'Maszyny nowe' },
+  { href: '/#uzywane', tekst: 'Używane' },
+  { href: '/#finansowanie', tekst: 'Finansowanie' },
+  { href: '/#realizacje', tekst: 'Realizacje' },
+  { href: '/#kontakt', tekst: 'Kontakt' },
+];
+const sciezka = Astro.url.pathname;
+const glowny = handlowcy[0];
+---
+<header class="naglowek" data-naglowek>
+  <div class="naglowek__pas kontener">
+    <a class="naglowek__logo" href="/" aria-label="PHU Probud, strona główna">
+      <img src="/marka/probud-logo-ciemne.webp" alt="" width="489" height="98" />
+    </a>
+
+    <nav class="naglowek__nav" aria-label="Główna">
+      <ul role="list">
+        {linki.map((l) => (
+          <li><a href={l.href} aria-current={sciezka.startsWith('/oferta') && l.href === '/oferta/' ? 'page' : undefined}>{l.tekst}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <a class="naglowek__tel numer" href={telHref(glowny.telefon)}>
+      <span class="naglowek__tel-podpis">Sprzedaż</span>
+      {telKrotki(glowny.telefon)}
+    </a>
+
+    <button class="naglowek__menu" type="button" aria-expanded="false" aria-controls="menu-mobilne" data-menu-przycisk>
+      <span data-menu-podpis>Menu</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="2" /></svg>
+    </button>
+  </div>
+
+  <div class="menu" id="menu-mobilne" hidden data-menu>
+    <nav aria-label="Główna (telefon)">
+      <ul role="list">
+        {linki.map((l) => <li><a href={l.href} data-menu-link>{l.tekst}</a></li>)}
+      </ul>
+    </nav>
+    <ul class="menu__telefony" role="list">
+      {dzialy.map((d) => (
+        <li>
+          <span>{d.nazwa}</span>
+          {d.telefony.map((t) => <a class="numer" href={telHref(t)}>{telKrotki(t)}</a>)}
+        </li>
+      ))}
+    </ul>
+  </div>
+</header>
+
+<script>
+  const przycisk = document.querySelector<HTMLButtonElement>('[data-menu-przycisk]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const podpis = document.querySelector<HTMLElement>('[data-menu-podpis]');
+  const ustaw = (otwarte: boolean) => {
+    if (!przycisk || !menu || !podpis) return;
+    przycisk.setAttribute('aria-expanded', String(otwarte));
+    menu.hidden = !otwarte;
+    podpis.textContent = otwarte ? 'Zamknij' : 'Menu';
+    document.documentElement.classList.toggle('menu-otwarte', otwarte);
+  };
+  przycisk?.addEventListener('click', () => ustaw(przycisk.getAttribute('aria-expanded') !== 'true'));
+  menu?.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => ustaw(false)));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') ustaw(false); });
+  matchMedia('(min-width: 64rem)').addEventListener('change', (e) => { if (e.matches) ustaw(false); });
+</script>
+
+<style>
+  .naglowek {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--papier);
+    border-bottom: 1px solid transparent;
+  }
+  @supports (animation-timeline: scroll()) {
+    .naglowek { animation: linia-naglowka linear both; animation-timeline: scroll(); animation-range: 0 120px; }
+    @keyframes linia-naglowka { to { border-bottom-color: var(--linia); } }
+  }
+  .naglowek__pas {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    min-height: 4.75rem;
+  }
+  .naglowek__logo { flex: none; margin-right: auto; }
+  .naglowek__logo img { height: clamp(28px, 2.6vw, 34px); width: auto; }
+
+  .naglowek__nav ul { display: flex; gap: clamp(1rem, 2vw, 2rem); }
+  .naglowek__nav a {
+    font-weight: 600;
+    text-decoration: none;
+    padding-block: 0.4rem;
+    background: linear-gradient(var(--probud), var(--probud)) no-repeat 0 100% / 0 2px;
+    transition: background-size var(--ruch-szybki) var(--ruch-wyjscie);
+  }
+  .naglowek__nav a:hover, .naglowek__nav a[aria-current='page'] { background-size: 100% 2px; }
+
+  .naglowek__tel {
+    display: grid;
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: 1.55rem;
+    line-height: 1;
+    text-decoration: none;
+    padding: 0.45rem 0.8rem 0.5rem;
+    background: var(--zolty);
+  }
+  .naglowek__tel:hover { background: var(--grafit); color: var(--zolty); }
+  .naglowek__tel-podpis { font-family: var(--kroj-tekst); font-size: 0.72rem; font-weight: 650; letter-spacing: 0.01em; }
+
+  .naglowek__menu {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 650;
+    padding: 0.6rem 0.2rem;
+  }
+  .naglowek__menu svg { width: 1.5rem; height: 1.5rem; }
+
+  .menu {
+    position: fixed;
+    inset: 4.75rem 0 0 0;
+    background: var(--grafit);
+    color: var(--papier);
+    padding: 2rem var(--margines) 6rem;
+    overflow-y: auto;
+  }
+  .menu ul { display: grid; gap: 0.25rem; }
+  .menu nav a {
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: clamp(2.6rem, 11vw, 4rem);
+    line-height: 1.05;
+    text-decoration: none;
+  }
+  .menu__telefony { margin-top: 2.5rem; border-top: 1px solid #ffffff33; padding-top: 1.5rem; gap: 1rem !important; }
+  .menu__telefony li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; }
+  .menu__telefony span { color: #ffffffb3; }
+  .menu__telefony a { font-size: 1.25rem; font-weight: 650; text-decoration: none; }
+
+  @media (max-width: 63.99rem) {
+    .naglowek__nav, .naglowek__tel { display: none; }
+    .naglowek__menu { display: inline-flex; }
+  }
+  :global(html.menu-otwarte) { overflow: hidden; }
+</style>

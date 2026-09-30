@@ -1,0 +1,29 @@
+---
+import Strona from '../layouts/Strona.astro';
+import { kategorie } from '../data/katalog';
+import { handlowcy } from '../data/firma';
+import { telHref, telKrotki } from '../lib/tekst';
+---
+<Strona tytul="Nie ma takiej strony" opis="Strona, której szukasz, nie istnieje albo zmieniła adres.">
+  <section class="kontener brak">
+    <p class="brak__kod numer" aria-hidden="true">404</p>
+    <h1>Nie ma takiej strony</h1>
+    <p class="lead">Adres mógł się zmienić przy przenosinach na nową stronę. Maszyny są teraz w katalogu podzielonym na grupy.</p>
+    <ul class="brak__grupy" role="list">
+      {kategorie.map((k) => <li><a href={k.href}>{k.nazwa}</a></li>)}
+    </ul>
+    <p class="brak__tel">Szybciej będzie zadzwonić: <a class="numer" href={telHref(handlowcy[0].telefon)}>{telKrotki(handlowcy[0].telefon)}</a></p>
+  </section>
+</Strona>
+
+<style>
+  .brak { padding-block: clamp(3rem, 8vw, 7rem); }
+  .brak__kod { font-family: var(--kroj-naglowki); font-weight: 800; font-size: clamp(7rem, 22vw, 18rem); line-height: 0.8; color: var(--beton-ciemny); }
+  .brak h1 { font-size: var(--t-h1); margin-top: 0.5rem; }
+  .brak .lead { margin-top: 1rem; }
+  .brak__grupy { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
+  .brak__grupy a { display: inline-block; padding: 0.6rem 1rem; border: 2px solid var(--grafit); font-weight: 650; text-decoration: none; }
+  .brak__grupy a:hover { background: var(--zolty); }
+  .brak__tel { margin-top: 2rem; font-weight: 600; }
+  .brak__tel a { font-family: var(--kroj-naglowki); font-weight: 800; font-size: 1.6rem; }
+</style>

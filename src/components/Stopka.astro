@@ -1,0 +1,123 @@
+---
+import { firma, pbdevs } from '../data/firma';
+import { kategorie } from '../data/katalog';
+const rok = new Date().getFullYear();
+---
+<footer class="stopka">
+  <div class="kontener">
+    <div class="stopka__gora">
+      <div class="stopka__firma">
+        <img class="stopka__logo" src="/marka/probud-logo-jasne.webp" alt="PHU Probud" width="489" height="98" loading="lazy" />
+        <address>
+          {firma.adres.ulica}<br />
+          {firma.adres.kod} {firma.adres.miasto}
+        </address>
+        <p class="stopka__dane numer">NIP {firma.nip}<br />REGON {firma.regon}</p>
+        <dl class="stopka__konta numer">
+          {firma.konta.map((k) => (<div><dt>Konto {k.waluta}</dt><dd>{k.numer}</dd></div>))}
+        </dl>
+      </div>
+
+      <nav class="stopka__kolumna" aria-label="Oferta">
+        <p class="stopka__tytul">Maszyny nowe</p>
+        <ul role="list">
+          {kategorie.map((k) => <li><a href={`/oferta/${k.id}/`}>{k.nazwa}</a></li>)}
+        </ul>
+      </nav>
+
+      <nav class="stopka__kolumna" aria-label="Firma">
+        <p class="stopka__tytul">Firma</p>
+        <ul role="list">
+          <li><a href={firma.otomoto} rel="noopener" target="_blank">Maszyny używane na otomoto</a></li>
+          <li><a href="/#finansowanie">Finansowanie</a></li>
+          <li><a href="/#realizacje">Realizacje</a></li>
+          <li><a href="/#kontakt">Kontakt i dojazd</a></li>
+        </ul>
+        <p class="stopka__tytul">Dokumenty</p>
+        <ul role="list">
+          <li><a href={firma.dokumenty.polityka}>Polityka prywatności (PDF)</a></li>
+          <li><a href={firma.dokumenty.regulamin}>Regulamin sprzedaży (PDF)</a></li>
+        </ul>
+      </nav>
+
+      <div class="stopka__kolumna">
+        <p class="stopka__tytul">Profil firmy</p>
+        <ul role="list" class="stopka__social">
+          <li><a href={firma.facebook} rel="noopener" target="_blank">Facebook</a></li>
+          <li><a href={firma.instagram} rel="noopener" target="_blank">Instagram</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="stopka__dol">
+      <p>© {rok} {firma.nazwaPrawna}</p>
+      <a class="stopka__pbdevs" href={pbdevs.url} rel="noopener" target="_blank">
+        <span>Wersja demonstracyjna nowej strony. Projekt i wykonanie:</span>
+        <img src="/logo/pbdevs.svg" alt="PB Devs" width="871" height="118" loading="lazy" />
+      </a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .stopka {
+    background: var(--grafit);
+    color: #ffffffd9;
+    padding-block: clamp(3.5rem, 7vw, 6rem) 1.5rem;
+    font-size: 0.98rem;
+  }
+  .stopka a { color: var(--papier); text-decoration-color: #ffffff55; }
+  .stopka a:hover { text-decoration-color: var(--zolty); }
+  .stopka__gora {
+    display: grid;
+    grid-template-columns: minmax(16rem, 1.4fr) repeat(3, minmax(10rem, 1fr));
+    gap: 2.5rem clamp(1.5rem, 4vw, 4rem);
+  }
+  .stopka__logo { height: 36px; width: auto; margin-bottom: 1.5rem; }
+  .stopka address { font-style: normal; }
+  .stopka__dane { margin-top: 1rem; color: #ffffffa6; }
+  .stopka__konta { margin-top: 1rem; display: grid; gap: 0.4rem; }
+  .stopka__konta dt { color: #ffffffa6; font-size: 0.85rem; }
+  .stopka__konta dd { margin: 0; letter-spacing: 0.01em; }
+  .stopka__tytul {
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: 1.35rem;
+    color: var(--papier);
+    margin-bottom: 0.75rem;
+  }
+  .stopka__kolumna ul { display: grid; gap: 0.45rem; margin-bottom: 1.75rem; }
+  .stopka__dol {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem 2rem;
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding-top: 1.25rem;
+    border-top: 1px solid #ffffff26;
+    color: #ffffff99;
+    font-size: 0.88rem;
+  }
+  /* Kredyt PB Devs: przygaszony do polowy, zeby nie konkurowal z marka klienta. */
+  .stopka__pbdevs {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    text-decoration: none;
+    opacity: 0.55;
+    transition: opacity var(--ruch-szybki);
+  }
+  .stopka__pbdevs:hover, .stopka__pbdevs:focus-visible { opacity: 1; }
+  .stopka__pbdevs span { color: var(--papier); }
+  .stopka__pbdevs img { height: 18px; width: auto; }
+
+  @media (max-width: 63.99rem) {
+    .stopka__gora { grid-template-columns: 1fr 1fr; }
+    .stopka__firma { grid-column: 1 / -1; }
+  }
+  @media (max-width: 34rem) {
+    .stopka__gora { grid-template-columns: 1fr; }
+    .stopka { padding-bottom: 6.5rem; }
+  }
+</style>

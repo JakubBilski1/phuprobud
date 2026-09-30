@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+*.log
+.DS_Store
+# oryginaly zdjec (duze); do repozytorium trafiaja tylko wersje zoptymalizowane w public/img
+zrodla/oryginaly/
+# kopiowane z node_modules przed dev/build (scripts/vendor.mjs)
+public/vendor/
+# wyciecia PNG (rembg) - posrednie, odtwarzalne skryptami scripts/wytnij-*.py
+zrodla/wyciecia/

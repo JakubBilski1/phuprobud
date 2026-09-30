@@ -1,0 +1,97 @@
+---
+import Strona from '../../../layouts/Strona.astro';
+import KartaModelu from '../../../components/KartaModelu.astro';
+import ZapytajHandlowca from '../../../components/ZapytajHandlowca.astro';
+import Okruszki from '../../../components/Okruszki.astro';
+import Foto from '../../../components/Foto.astro';
+import { kategorie, type Kategoria } from '../../../data/katalog';
+import { odmiana, sierotki } from '../../../lib/tekst';
+
+export function getStaticPaths() {
+  return kategorie.map((k) => ({ params: { kategoria: k.id }, props: { k } }));
+}
+const { k } = Astro.props as { k: Kategoria };
+
+// Tabela porownania: kolumny, ktore ma co najmniej polowa modeli w grupie (bez silnika i predkosci).
+const POMIJANE = ['silnik', 'predkosc_m_min', 'predkosc_km_h', 'predkosc_wstecz_km_h', 'predkosc_drugi_bieg_km_h', 'predkosc_opcjonalna_km_h'];
+const kolumny = [...new Map(k.modele.flatMap((m) => m.parametry).map((p) => [p.klucz, p.nazwa])).entries()]
+  .filter(([klucz]) => !POMIJANE.includes(klucz))
+  .filter(([klucz]) => k.modele.filter((m) => m.parametry.some((p) => p.klucz === klucz)).length >= Math.ceil(k.modele.length / 2))
+  .slice(0, 6);
+const dwieWartosci = k.modele.some((m) => m.parametry.some((p) => p.dwieWartosci && kolumny.some(([kl]) => kl === p.klucz)));
+---
+<Strona tytul={k.nazwa} opis={`${k.nazwa}: ${odmiana(k.modele.length, ['model', 'modele', 'modeli'])}. ${k.opis}`}>
+  <div class="kontener kat">
+    <Okruszki sciezka={[{ nazwa: 'Strona główna', href: '/' }, { nazwa: 'Maszyny nowe', href: '/oferta/' }, { nazwa: k.nazwa }]} />
+    <div class="kat__glowa">
+      <div class="kat__tekst">
+        <span class="kat__picto" style={`--maska:url(/piktogramy/${k.piktogram}.png)`} aria-hidden="true"></span>
+        <h1>{k.nazwa}</h1>
+        <p class="lead">{sierotki(k.opis)}</p>
+        <p class="kat__liczby numer">{odmiana(k.modele.length, ['model', 'modele', 'modeli'])}{k.zakresMasy && `, masa robocza ${k.zakresMasy}`}</p>
+      </div>
+      {k.zdjecieWPracy && (
+        <Foto nazwa={k.zdjecieWPracy} alt={`${k.nazwa} w pracy`} class="kat__foto kadr" sizes="(min-width: 64rem) 52vw, 100vw" priorytet />
+      )}
+    </div>
+  </div>
+
+  <section class="kontener kat__modele" aria-label="Modele">
+    <div class="kat__siatka">
+      {k.modele.map((m) => <KartaModelu model={m} />)}
+    </div>
+  </section>
+
+  {kolumny.length > 1 && (
+    <section class="kontener porownanie" aria-labelledby="porownanie-tytul">
+      <h2 id="porownanie-tytul">Porównanie modeli</h2>
+      <div class="porownanie__przewijanie" tabindex="0" role="region" aria-labelledby="porownanie-tytul">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Model</th>
+              {kolumny.map(([, nazwa]) => <th scope="col">{nazwa}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {k.modele.map((m) => (
+              <tr>
+                <th scope="row"><a href={m.href}>{m.kod}</a></th>
+                {kolumny.map(([klucz]) => <td class="numer">{m.parametry.find((p) => p.klucz === klucz)?.wartosc ?? '-'}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {dwieWartosci && <p class="porownanie__przypis drugorzedny">Dwie wartości rozdzielone ukośnikiem to dwie nastawy maszyny, np. wysoka i niska amplituda drgań.</p>}
+      <p class="porownanie__przypis drugorzedny">Źródło danych: karty katalogowe producenta i materiały PHU Probud. Parametry zależą od wersji i rocznika maszyny.</p>
+    </section>
+  )}
+
+  <ZapytajHandlowca temat={k.nazwa.toLowerCase()} />
+</Strona>
+
+<style>
+  .kat { padding-top: clamp(1.5rem, 3vw, 2.5rem); }
+  .kat__glowa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 2rem clamp(2rem, 5vw, 5rem); align-items: center; margin-top: 1.5rem; }
+  .kat__picto { display: block; width: 4.5rem; height: 4.5rem; background: var(--probud); -webkit-mask: var(--maska) left center / contain no-repeat; mask: var(--maska) left center / contain no-repeat; margin-bottom: 1rem; }
+  .kat__glowa h1 { font-size: var(--t-h1); }
+  .kat__glowa .lead { margin-top: 1.1rem; }
+  .kat__liczby { margin-top: 1rem; font-weight: 700; }
+  .kat__foto { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+  .kat__modele { padding-block: clamp(3rem, 6vw, 5rem); }
+  .kat__siatka { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: clamp(1.5rem, 3vw, 2.5rem) clamp(1rem, 2vw, 1.75rem); }
+
+  .porownanie { padding-bottom: var(--odstep-sekcji); }
+  .porownanie h2 { font-size: clamp(2.2rem, 4vw, 3.4rem); margin-bottom: 1.25rem; }
+  .porownanie__przewijanie { overflow-x: auto; border-top: 3px solid var(--grafit); }
+  .porownanie table { width: 100%; min-width: 40rem; font-size: 1rem; }
+  .porownanie th, .porownanie td { padding: 0.8rem 1rem 0.8rem 0; text-align: left; border-bottom: 1px solid var(--linia); vertical-align: top; }
+  .porownanie thead th { font-size: var(--t-maly); color: var(--stal); font-weight: 650; }
+  .porownanie tbody th { font-family: var(--kroj-naglowki); font-weight: 800; font-size: 1.35rem; white-space: nowrap; }
+  .porownanie tbody tr:hover { background: var(--beton); }
+  .porownanie td { white-space: nowrap; }
+  .porownanie__przypis { margin-top: 0.75rem; font-size: var(--t-maly); }
+
+  @media (max-width: 63.99rem) { .kat__glowa { grid-template-columns: 1fr; } }
+</style>

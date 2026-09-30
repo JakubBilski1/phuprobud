@@ -1,0 +1,37 @@
+---
+// Zdjecie z manifestu scripts/obrazy.mjs: srcset, wymiary (bez przeskokow ukladu)
+// i kolor dominujacy jako tlo, zanim plik doplynie.
+import manifest from '../data/obrazy.json';
+
+type Wpis = { w: number; h: number; kolor: string; alfa: boolean; warianty: { w: number; src: string }[] };
+interface Props {
+  nazwa: string;
+  alt: string;
+  sizes?: string;
+  class?: string;
+  priorytet?: boolean;
+  pozycja?: string;
+  style?: string;
+  [atrybut: `data-${string}`]: string | undefined;
+}
+const { nazwa, alt, sizes = '100vw', class: klasa, priorytet = false, pozycja, style: stylDodatkowy, ...reszta } = Astro.props;
+const wpis = (manifest as Record<string, Wpis>)[nazwa];
+if (!wpis) throw new Error(`Brak zdjecia „${nazwa}” w src/data/obrazy.json - dopisz je do scripts/obrazy.lista.mjs`);
+const srcset = wpis.warianty.map((v) => `${v.src} ${v.w}w`).join(', ');
+const domyslny = wpis.warianty.find((v) => v.w >= 1000) ?? wpis.warianty.at(-1)!;
+const styl = [wpis.alfa ? '' : `background-color:${wpis.kolor}`, pozycja ? `object-position:${pozycja}` : '', stylDodatkowy ?? ''].filter(Boolean).join(';');
+---
+<img
+  src={domyslny.src}
+  srcset={srcset}
+  sizes={sizes}
+  width={wpis.w}
+  height={wpis.h}
+  alt={alt}
+  class={klasa}
+  style={styl || undefined}
+  loading={priorytet ? 'eager' : 'lazy'}
+  decoding={priorytet ? 'sync' : 'async'}
+  fetchpriority={priorytet ? 'high' : undefined}
+  {...reszta}
+/>

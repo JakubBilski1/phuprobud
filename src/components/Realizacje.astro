@@ -1,0 +1,168 @@
+---
+// Galeria realizacji: jeden duzy kadr zamiast sciany 18 miniatur. Pelne zdjecia
+// dostaja srcset dopiero, gdy sa biezace albo sasiednie (skrypt nizej).
+import manifest from '../data/obrazy.json';
+import { realizacje } from '../data/realizacje';
+
+type Wpis = { w: number; h: number; kolor: string; warianty: { w: number; src: string }[] };
+const m = manifest as Record<string, Wpis>;
+const zdjecia = realizacje.map((r, i) => {
+  const wpis = m[r.plik];
+  if (!wpis) throw new Error(`Brak ${r.plik} w manifescie zdjec`);
+  return {
+    ...r,
+    nr: i + 1,
+    kolor: wpis.kolor,
+    srcset: wpis.warianty.filter((v) => v.w > 320).map((v) => `${v.src} ${v.w}w`).join(', '),
+    src: (wpis.warianty.find((v) => v.w >= 1000) ?? wpis.warianty.at(-1)!).src,
+    miniatura: wpis.warianty[0].src,
+  };
+});
+const razem = zdjecia.length;
+---
+<section class="realizacje sekcja sekcja--grafit" id="realizacje" aria-labelledby="realizacje-tytul">
+  <div class="kontener">
+    <div class="galeria" data-galeria tabindex="-1">
+      <div class="galeria__glowa">
+        <h2 id="realizacje-tytul">Realizacje</h2>
+        <p class="galeria__licznik numer" aria-live="polite">
+          <span class="sr-only">Zdjęcie </span><span data-galeria-nr>1</span><span aria-hidden="true"> / </span><span class="sr-only"> z </span>{razem}
+        </p>
+      </div>
+
+      <div class="galeria__scena kadr" data-galeria-scena>
+        {zdjecia.map((z, i) => (
+          <img
+            data-galeria-zdjecie={i}
+            data-srcset={z.srcset}
+            data-src={z.src}
+            src={i === 0 ? z.src : undefined}
+            srcset={i === 0 ? z.srcset : undefined}
+            sizes="(min-width: 90rem) 1300px, 92vw"
+            alt={z.podpis}
+            style={`background-color:${z.kolor}`}
+            class={i === 0 ? 'aktywne' : undefined}
+            loading={i === 0 ? 'lazy' : undefined}
+            decoding="async"
+          />
+        ))}
+        <button class="galeria__pelny" type="button" data-galeria-pelny hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" /></svg>
+          <span data-galeria-pelny-podpis>Pełny ekran</span>
+        </button>
+      </div>
+
+      <div class="galeria__pasek">
+        <p class="galeria__podpis" data-galeria-podpis>{zdjecia[0].podpis}</p>
+        <div class="galeria__strzalki">
+          <button type="button" data-galeria-krok="-1" aria-label="Poprzednie zdjęcie">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" /></svg>
+          </button>
+          <button type="button" data-galeria-krok="1" aria-label="Następne zdjęcie">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" /></svg>
+          </button>
+        </div>
+      </div>
+
+      <ul class="galeria__miniatury" role="list" data-galeria-miniatury>
+        {zdjecia.map((z, i) => (
+          <li>
+            <button type="button" data-galeria-idz={i} aria-label={`Zdjęcie ${z.nr} z ${razem}: ${z.podpis}`} aria-current={i === 0 ? 'true' : undefined}>
+              <img src={z.miniatura} alt="" width="120" height="80" loading="lazy" decoding="async" style={`background-color:${z.kolor}`} />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { uruchomGalerie } from '../scripts/galeria';
+  document.querySelectorAll<HTMLElement>('[data-galeria]').forEach(uruchomGalerie);
+</script>
+
+<style>
+  .galeria__glowa { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+  .galeria__licznik {
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: var(--t-h2);
+    line-height: 0.85;
+    color: var(--zolty);
+  }
+  .galeria__scena {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    background: var(--grafit-2);
+    touch-action: pan-y;
+    user-select: none;
+  }
+  .galeria__scena img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 420ms var(--ruch-wyjscie), visibility 0s linear 420ms;
+  }
+  .galeria__scena img.aktywne { opacity: 1; visibility: visible; transition: opacity 420ms var(--ruch-wyjscie), visibility 0s; }
+  .galeria__scena:fullscreen { background: #000; border-radius: 0; }
+  .galeria__scena:fullscreen img { object-fit: contain; background-color: transparent !important; }
+
+  .galeria__pelny {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    background: #000000a6;
+    color: var(--papier);
+    font-weight: 600;
+    font-size: var(--t-maly);
+  }
+  .galeria__pelny svg { width: 1.1rem; height: 1.1rem; }
+  .galeria__pelny:hover { background: var(--zolty); color: var(--grafit); }
+
+  .galeria__pasek { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1rem; }
+  .galeria__podpis { font-size: 1.15rem; font-weight: 600; }
+  .galeria__strzalki { display: flex; gap: 0.5rem; flex: none; }
+  .galeria__strzalki button {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border: 2px solid #ffffff66;
+    color: var(--papier);
+  }
+  .galeria__strzalki button:hover { background: var(--zolty); border-color: var(--zolty); color: var(--grafit); }
+  .galeria__strzalki svg { width: 1.4rem; height: 1.4rem; }
+
+  .galeria__miniatury {
+    display: flex;
+    gap: 6px;
+    margin-top: 1.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    scrollbar-color: #ffffff55 transparent;
+    padding-bottom: 6px;
+  }
+  .galeria__miniatury li { flex: none; scroll-snap-align: start; }
+  .galeria__miniatury button { display: block; opacity: 0.5; transition: opacity var(--ruch-szybki); outline-offset: 2px; }
+  .galeria__miniatury button:hover { opacity: 0.85; }
+  .galeria__miniatury button[aria-current='true'] { opacity: 1; box-shadow: 0 0 0 3px var(--zolty); }
+  .galeria__miniatury img { width: 120px; height: 80px; object-fit: cover; }
+
+  @media (max-width: 40rem) {
+    .galeria__scena { aspect-ratio: 4 / 3; }
+    .galeria__miniatury img { width: 92px; height: 64px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .galeria__scena img, .galeria__scena img.aktywne { transition: none; }
+  }
+</style>

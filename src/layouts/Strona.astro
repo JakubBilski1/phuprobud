@@ -1,0 +1,69 @@
+---
+import '@fontsource-variable/big-shoulders/opsz.css';
+import '@fontsource-variable/sofia-sans/index.css';
+import '../styles/global.css';
+import fontNaglowki from '@fontsource-variable/big-shoulders/files/big-shoulders-latin-opsz-normal.woff2?url';
+import fontNaglowkiExt from '@fontsource-variable/big-shoulders/files/big-shoulders-latin-ext-opsz-normal.woff2?url';
+import fontTekst from '@fontsource-variable/sofia-sans/files/sofia-sans-latin-wght-normal.woff2?url';
+import Naglowek from '../components/Naglowek.astro';
+import Stopka from '../components/Stopka.astro';
+import PasekTelefonu from '../components/PasekTelefonu.astro';
+
+interface Props {
+  tytul: string;
+  opis: string;
+  obrazOg?: string;
+}
+const { tytul, opis, obrazOg = '/og.jpg' } = Astro.props;
+const pelnyTytul = tytul === 'PHU Probud' ? 'PHU Probud: maszyny budowlane, Komorniki' : `${tytul} | PHU Probud`;
+const adres = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pelnyTytul}</title>
+    <meta name="description" content={opis} />
+    <!-- Wersja demonstracyjna: poza wyszukiwarkami, zeby nie konkurowala z phuprobud.pl -->
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href={adres.href} />
+    <meta name="theme-color" content="#881810" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href={fontNaglowki} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fontNaglowkiExt} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fontTekst} as="font" type="font/woff2" crossorigin />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:title" content={pelnyTytul} />
+    <meta property="og:description" content={opis} />
+    <meta property="og:image" content={new URL(obrazOg, Astro.site).href} />
+    <meta property="og:url" content={adres.href} />
+    <slot name="glowa" />
+  </head>
+  <body>
+    <a class="przeskocz" href="#tresc">Przejdź do treści</a>
+    <Naglowek />
+    <main id="tresc">
+      <slot />
+    </main>
+    <Stopka />
+    <PasekTelefonu />
+  </body>
+</html>
+
+<style>
+  .przeskocz {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    background: var(--grafit);
+    color: var(--papier);
+    font-weight: 650;
+  }
+  .przeskocz:focus { top: 1rem; }
+</style>

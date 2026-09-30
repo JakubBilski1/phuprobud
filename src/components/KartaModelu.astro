@@ -1,0 +1,74 @@
+---
+// Karta modelu w katalogu: maszyna przed wielkim oznaczeniem modelu, pod spodem 2-3 dane,
+// ktore przy tej kategorii porownuje sie najczesciej.
+import Foto from './Foto.astro';
+import type { Model } from '../data/katalog';
+
+interface Props { model: Model; naglowek?: 'h2' | 'h3' }
+const { model, naglowek = 'h3' } = Astro.props;
+const Naglowek = naglowek;
+// Oznaczenie w tle: sama glowna czesc kodu ("BW 120", "BPR 60/65"), bez wersji.
+const kodTla = model.kod.replace(/\s+STONEGUARD$/i, '').replace(/\s+(AD|AC|DH|D|E)(-\d)?$/i, '');
+---
+<article class="karta">
+  <a class="karta__link" href={model.href}>
+    <div class="karta__scena kadr">
+      <span class="karta__kod" aria-hidden="true">{kodTla}</span>
+      <Foto nazwa={model.zdjecie} alt="" class="karta__foto" sizes="(min-width: 64rem) 26vw, (min-width: 40rem) 45vw, 90vw" />
+    </div>
+    <Naglowek class="karta__nazwa">{model.nazwa}</Naglowek>
+  </a>
+  {model.karta.length > 0 && (
+    <dl class="karta__dane">
+      {model.karta.map((p) => (
+        <div><dt>{p.nazwa}</dt><dd class="numer">{p.wartosc}</dd></div>
+      ))}
+    </dl>
+  )}
+</article>
+
+<style>
+  .karta { display: flex; flex-direction: column; }
+  .karta__link { text-decoration: none; display: block; }
+  .karta__scena {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: var(--beton);
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+  .karta__kod {
+    position: absolute;
+    left: 0.35rem;
+    top: 0.1rem;
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: clamp(4rem, 8.5vw, 7.5rem);
+    line-height: 0.85;
+    color: var(--beton-ciemny);
+    white-space: nowrap;
+    transition: color var(--ruch-szybki);
+  }
+  /* Maszyna stoi na dole kadru, cala widoczna; wielkie oznaczenie zostaje nad nia. */
+  .karta__foto {
+    position: absolute;
+    left: 9%;
+    bottom: 7%;
+    width: 82%;
+    height: 66%;
+    object-fit: contain;
+    object-position: center bottom;
+    filter: drop-shadow(0 12px 12px #0000002e);
+    transition: transform 380ms var(--ruch-wyjscie);
+  }
+  .karta__link:hover .karta__kod, .karta__link:focus-visible .karta__kod { color: #e8c9c5; }
+  .karta__link:hover .karta__foto { transform: translateX(-3%); }
+  .karta__nazwa { font-size: clamp(1.45rem, 2vw, 1.8rem); margin-top: 0.85rem; }
+  .karta__link:hover .karta__nazwa { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.12em; }
+  .karta__dane { margin-top: 0.6rem; border-top: 2px solid var(--grafit); }
+  .karta__dane div { display: flex; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; border-bottom: 1px solid var(--linia); font-size: 0.95rem; }
+  .karta__dane dt { color: var(--stal); }
+  .karta__dane dd { margin: 0; font-weight: 700; text-align: right; }
+  @media (prefers-reduced-motion: reduce) { .karta__foto { transition: none; } }
+</style>
