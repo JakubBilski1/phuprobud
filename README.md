@@ -71,22 +71,22 @@ nie przelicza.
 Szymon Atraszkiewicz jest pokazany jako CEO, bez numeru: prowadzi PHU Probud (polityka
 prywatności), numeru osobistego nie ma w publicznych źródłach. Zdjęcia portretowe: ewpa.pl
 (Krzysztof Bilski, Marcin Maj, Tomasz Jurga), monitorrynkowy.pl (Szymon Atraszkiewicz).
-Zdjęcie Marcina Maja ma na ewpa.pl nazwę pliku , ale strona przypisuje je jego
+Zdjęcie Marcina Maja ma na ewpa.pl nazwę pliku `Mariusz-M.jpg`, ale strona przypisuje je jego
 karcie i przedstawia inną osobę niż Mariusz Kaczorowski; warto potwierdzić w firmie.
 
 ## Przed przejściem z demo na produkcję
 
 - **Zdjęcia osób** pochodzą z publicznych źródeł; na produkcję potrzebna zgoda albo sesja.
-- **Formularz** w demo składa gotową wiadomość w programie pocztowym ( na adres
-  wybranego działu). Wysyłka z serwera: ustawić  na endpoint, który
-  przyjmuje JSON .
+- **Formularz** w demo składa gotową wiadomość w programie pocztowym (`mailto:` na adres
+  wybranego działu). Wysyłka z serwera: ustawić `PUBLIC_FORMULARZ_URL` na endpoint, który
+  przyjmuje JSON `{ dzial, do, temat, tresc }`.
 - **Gehl i Schaeff**: na starej stronie ich podstrony nie były podlinkowane z menu (sieroty w mapie
-  strony). Schaeff ma na  zdanie „Firma PROBUD jest autoryzowanym dealerem Schaeff”, Gehl
+  strony). Schaeff ma na `/v2/` zdanie „Firma PROBUD jest autoryzowanym dealerem Schaeff”, Gehl
   tylko listę modeli z martwymi linkami. Do potwierdzenia, czy to aktualna oferta.
 - **Schaeff SV15, SV17, SV22**: brak potwierdzonych parametrów, zdjęcia 300 px. **Gehl RT185,
   RT215**: brak masy roboczej w dostępnej karcie, małe zdjęcia. BW 65 D pokazuje zdjęcie BW 65
   z podpisem.
-- Zdjąć  (layout i ) i ustawić domenę docelową w .
+- Zdjąć `noindex` (layout i `nginx/naglowki.conf`) i ustawić domenę docelową w `astro.config.mjs`.
 
 ## Wdrożenie
 
