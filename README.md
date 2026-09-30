@@ -90,7 +90,9 @@ karcie i przedstawia inną osobę niż Mariusz Kaczorowski; warto potwierdzić w
 
 ## Wdrożenie
 
-Coolify: projekt `apps`, aplikacja z GitHub App `bilski-github-apps`, build pack **Dockerfile**,
-port **80**, domena `phuprobud.pbdevs.com`. Obraz: `node:24-alpine` (build Astro, ok. 30 s,
-bez przetwarzania obrazów) → `nginx:1.29-alpine`. Serwer dzieli pamięć z innymi aplikacjami,
-więc jeden push naraz.
+Szczegóły: [docs/WDROZENIE.md](docs/WDROZENIE.md). W skrócie: Coolify, projekt `apps`, środowisko
+`production`, aplikacja `phuprobud` z GitHub App `bilski-github-apps`, build pack **Dockerfile**,
+port **80**, domena `https://phuprobud.pbdevs.com` (NoIndex). Push do `main` wdraża automatycznie.
+Build na serwerze trwa ok. 25 s (bez przetwarzania obrazów). Baza `probud` na `pbdevs-postgres`
+i zmienna `DATABASE_URL` jak w pozostałych aplikacjach; strona jest statyczna i z bazy jeszcze
+nie korzysta.
