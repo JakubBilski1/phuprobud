@@ -22,7 +22,7 @@ const doFormularza = model ? `/?model=${encodeURIComponent(model)}#formularz` : 
           <Foto nazwa={h.zdjecie} alt="" class="zapytaj__foto" sizes="96px" pozycja={h.kadrMaly} />
           <div>
             <p class="zapytaj__imie">{h.imie} {h.nazwisko}</p>
-            <a class="zapytaj__tel numer" href={telHref(h.telefon)}>{telKrotki(h.telefon)}</a>
+            <a class="zapytaj__tel numer" href={telHref(h.telefon!)}>{telKrotki(h.telefon!)}</a>
           </div>
         </li>
       ))}

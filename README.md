@@ -58,18 +58,35 @@ nie przelicza.
 - Mapa: dane OpenStreetMap z kafli OpenFreeMap (bez klucza API). Granice województw: Natural
   Earth (domena publiczna).
 
+## Ludzie i numery (stan 30.09.2026)
+
+| Numer | Na stronie | Źródło przypisania |
+| --- | --- | --- |
+| 601 896 689 | Krzysztof Bilski, sprzedaż maszyn | ewpa.pl/kontakt (karta osoby) |
+| 601 416 618 | Marcin Maj, sprzedaż maszyn | ewpa.pl/kontakt (karta osoby) |
+| 693 221 733 | Tomasz Jurga, części zamienne | ewpa.pl/kontakt (karta osoby) |
+| 662 997 955 | dział serwisu (EWPA), bez osoby | phuprobud.pl; brak imiennego przypisania w sieci |
+| 722 223 755 | administracja, bez osoby | phuprobud.pl; katalogi firm podają go jako numer firmy |
+
+Szymon Atraszkiewicz jest pokazany jako CEO, bez numeru: prowadzi PHU Probud (polityka
+prywatności), numeru osobistego nie ma w publicznych źródłach. Zdjęcia portretowe: ewpa.pl
+(Krzysztof Bilski, Marcin Maj, Tomasz Jurga), monitorrynkowy.pl (Szymon Atraszkiewicz).
+Zdjęcie Marcina Maja ma na ewpa.pl nazwę pliku , ale strona przypisuje je jego
+karcie i przedstawia inną osobę niż Mariusz Kaczorowski; warto potwierdzić w firmie.
+
 ## Przed przejściem z demo na produkcję
 
-- **Numer 601 416 618** jest na stronie przypisany Szymonowi Atraszkiewiczowi. Strona ewpa.pl
-  podaje go przy Marcinie Maju. Do potwierdzenia w Probudzie (`src/data/firma.ts`).
-- **Zdjęcia handlowców** pochodzą z publicznych źródeł; na produkcję potrzebna zgoda albo sesja.
-- **Formularz** w demo składa gotową wiadomość w programie pocztowym (`mailto:` na adres
-  wybranego działu). Wysyłka z serwera: ustawić `PUBLIC_FORMULARZ_URL` na endpoint, który
-  przyjmuje JSON `{ dzial, do, temat, tresc }`.
+- **Zdjęcia osób** pochodzą z publicznych źródeł; na produkcję potrzebna zgoda albo sesja.
+- **Formularz** w demo składa gotową wiadomość w programie pocztowym ( na adres
+  wybranego działu). Wysyłka z serwera: ustawić  na endpoint, który
+  przyjmuje JSON .
+- **Gehl i Schaeff**: na starej stronie ich podstrony nie były podlinkowane z menu (sieroty w mapie
+  strony). Schaeff ma na  zdanie „Firma PROBUD jest autoryzowanym dealerem Schaeff”, Gehl
+  tylko listę modeli z martwymi linkami. Do potwierdzenia, czy to aktualna oferta.
 - **Schaeff SV15, SV17, SV22**: brak potwierdzonych parametrów, zdjęcia 300 px. **Gehl RT185,
   RT215**: brak masy roboczej w dostępnej karcie, małe zdjęcia. BW 65 D pokazuje zdjęcie BW 65
   z podpisem.
-- Zdjąć `noindex` (layout i `nginx/naglowki.conf`) i ustawić domenę docelową w `astro.config.mjs`.
+- Zdjąć  (layout i ) i ustawić domenę docelową w .
 
 ## Wdrożenie
 

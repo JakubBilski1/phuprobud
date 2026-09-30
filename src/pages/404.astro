@@ -12,7 +12,7 @@ import { telHref, telKrotki } from '../lib/tekst';
     <ul class="brak__grupy" role="list">
       {kategorie.map((k) => <li><a href={k.href}>{k.nazwa}</a></li>)}
     </ul>
-    <p class="brak__tel">Szybciej będzie zadzwonić: <a class="numer" href={telHref(handlowcy[0].telefon)}>{telKrotki(handlowcy[0].telefon)}</a></p>
+    <p class="brak__tel">Szybciej będzie zadzwonić: <a class="numer" href={telHref(handlowcy[0].telefon!)}>{telKrotki(handlowcy[0].telefon!)}</a></p>
   </section>
 </Strona>
 

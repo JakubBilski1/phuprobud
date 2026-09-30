@@ -11,6 +11,7 @@ const linki = [
 ];
 const sciezka = Astro.url.pathname;
 const glowny = handlowcy[0];
+const telGlowny = glowny.telefon!;
 ---
 <header class="naglowek" data-naglowek>
   <div class="naglowek__pas kontener">
@@ -26,9 +27,9 @@ const glowny = handlowcy[0];
       </ul>
     </nav>
 
-    <a class="naglowek__tel numer" href={telHref(glowny.telefon)}>
+    <a class="naglowek__tel numer" href={telHref(telGlowny)}>
       <span class="naglowek__tel-podpis">Sprzedaż</span>
-      {telKrotki(glowny.telefon)}
+      {telKrotki(telGlowny)}
     </a>
 
     <button class="naglowek__menu" type="button" aria-expanded="false" aria-controls="menu-mobilne" data-menu-przycisk>
@@ -47,7 +48,7 @@ const glowny = handlowcy[0];
       {dzialy.map((d) => (
         <li>
           <span>{d.nazwa}</span>
-          {d.telefony.map((t) => <a class="numer" href={telHref(t)}>{telKrotki(t)}</a>)}
+          {d.telefony.map((t) => <a class="numer" href={telHref(t.numer)}>{telKrotki(t.numer)}</a>)}
         </li>
       ))}
     </ul>

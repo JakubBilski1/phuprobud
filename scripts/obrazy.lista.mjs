@@ -8,6 +8,9 @@ const realizacje = Array.from({ length: 18 }, (_, i) => {
 const ludzie = [
   { zrodlo: 'wyciecia/krzysztof-bilski.png', cel: 'ludzie/krzysztof-bilski', szerokosci: [420, 840, 1200], jakosc: 82 },
   // Kadr od polowy klatki piersiowej w gore; lewa krawedz tnie ramie, jak prawa u Krzysztofa (lustro przy szwie).
+  // Marcin Maj i Tomasz Jurga: male kafelki, wystarcza mniejsze szerokosci.
+  { zrodlo: 'wyciecia/marcin-maj.png', cel: 'ludzie/marcin-maj', szerokosci: [240, 480, 800], jakosc: 82 },
+  { zrodlo: 'wyciecia/tomasz-jurga.png', cel: 'ludzie/tomasz-jurga', szerokosci: [240, 480, 800], jakosc: 82 },
   { zrodlo: 'wyciecia/szymon-atraszkiewicz.png', cel: 'ludzie/szymon-atraszkiewicz', kadr: { left: 560, top: 250, width: 640, height: 550 }, szerokosci: [420, 640], jakosc: 84 },
 ];
 

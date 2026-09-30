@@ -15,7 +15,10 @@ import { telHref, telKrotki } from '../lib/tekst';
         <li class="dzial">
           <h3 class="dzial__nazwa">{d.nazwa}</h3>
           {d.telefony.map((t) => (
-            <a class="dzial__tel numer" href={telHref(t)}>{telKrotki(t)}</a>
+            <div class="dzial__linia">
+              <a class="dzial__tel numer" href={telHref(t.numer)}>{telKrotki(t.numer)}</a>
+              {t.osoba && <span class="dzial__osoba">{t.osoba}</span>}
+            </div>
           ))}
           <a class="dzial__email" href={`mailto:${d.email}`}>{d.email}</a>
           {d.dopisek && <p class="dzial__dopisek drugorzedny">{d.dopisek}</p>}
@@ -54,6 +57,9 @@ import { telHref, telKrotki } from '../lib/tekst';
     white-space: nowrap;
   }
   .dzial__tel:hover { color: var(--probud); }
+  .dzial__linia { display: grid; }
+  .dzial__linia + .dzial__linia { margin-top: 0.4rem; }
+  .dzial__osoba { font-size: var(--t-maly); font-weight: 600; color: var(--stal); }
   .dzial__email { margin-top: 0.4rem; overflow-wrap: anywhere; }
   .dzial__dopisek { font-size: var(--t-maly); }
 

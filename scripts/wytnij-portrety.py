@@ -13,7 +13,8 @@ WEJ = KORZEN / 'zrodla' / 'oryginaly' / 'ludzie'
 WYJ = KORZEN / 'zrodla' / 'wyciecia'
 sesja = new_session('u2net_human_seg')
 # Szerokosc twarzy (od policzka do policzka) zmierzona recznie na oryginalach, w px.
-TWARZE = {'krzysztof-bilski': (470, 1140), 'szymon-atraszkiewicz': (707, 917)}
+TWARZE = {'krzysztof-bilski': (470, 1140), 'szymon-atraszkiewicz': (707, 917),
+          'marcin-maj': (430, 1190), 'tomasz-jurga': (440, 1200)}
 wynik = {}
 for plik in sorted(WEJ.glob('*.jpg')):
     obraz = Image.open(plik).convert('RGB')

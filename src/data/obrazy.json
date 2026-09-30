@@ -447,6 +447,46 @@
    }
   ]
  },
+ "ludzie/marcin-maj": {
+  "w": 1600,
+  "h": 1600,
+  "kolor": "#c8d8d8",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 240,
+    "src": "/img/ludzie/marcin-maj-240.webp"
+   },
+   {
+    "w": 480,
+    "src": "/img/ludzie/marcin-maj-480.webp"
+   },
+   {
+    "w": 800,
+    "src": "/img/ludzie/marcin-maj-800.webp"
+   }
+  ]
+ },
+ "ludzie/tomasz-jurga": {
+  "w": 1600,
+  "h": 1600,
+  "kolor": "#8898b8",
+  "alfa": true,
+  "warianty": [
+   {
+    "w": 240,
+    "src": "/img/ludzie/tomasz-jurga-240.webp"
+   },
+   {
+    "w": 480,
+    "src": "/img/ludzie/tomasz-jurga-480.webp"
+   },
+   {
+    "w": 800,
+    "src": "/img/ludzie/tomasz-jurga-800.webp"
+   }
+  ]
+ },
  "ludzie/szymon-atraszkiewicz": {
   "w": 640,
   "h": 550,

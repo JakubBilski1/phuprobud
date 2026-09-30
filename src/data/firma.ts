@@ -24,12 +24,16 @@ export const firma = {
 
 export const trasaHref = `https://www.google.com/maps/dir/?api=1&destination=${firma.wspolrzedne.lat},${firma.wspolrzedne.lng}`;
 
-export type Handlowiec = {
+export type Osoba = {
   id: string;
   imie: string;
   nazwisko: string;
+  /** dzial albo funkcja, pod nazwiskiem */
   rola: string;
-  telefon: string;
+  /** zamiast numeru: duzy napis (np. CEO), gdy osoba nie ma przypisanego telefonu */
+  tytul?: string;
+  opis?: string;
+  telefon?: string;
   zdjecie: string;
   /** szerokosc twarzy / szerokosc wyciecia - do wyrownania skali portretow */
   twarz: number;
@@ -37,48 +41,58 @@ export type Handlowiec = {
   ucietyZPrawej: boolean;
   /** object-position dla malej, kwadratowej miniatury (twarz na srodku) */
   kadrMaly: string;
+  /** skad wiemy, ze numer i funkcja naleza do tej osoby */
+  zrodlo: string;
 };
 
-// Numer 601 896 689 przypisal Krzysztofowi Jakub; drugi numer dzialu sprzedazy - Szymonowi.
-// Uwaga: strona EWPA podaje 601 416 618 przy Marcinie Maju - do potwierdzenia z firma.
-export const handlowcy: Handlowiec[] = [
-  {
-    id: 'krzysztof-bilski',
-    imie: 'Krzysztof',
-    nazwisko: 'Bilski',
-    rola: 'Sprzedaż maszyn budowlanych',
-    telefon: '+48 601 896 689',
-    zdjecie: 'ludzie/krzysztof-bilski',
-    twarz: 670 / 1600,
-    ucietyZPrawej: true,
-    kadrMaly: '50% 30%',
-  },
-  {
-    id: 'szymon-atraszkiewicz',
-    imie: 'Szymon',
-    nazwisko: 'Atraszkiewicz',
-    rola: 'Sprzedaż maszyn, prowadzi PHU Probud',
-    telefon: '+48 601 416 618',
-    zdjecie: 'ludzie/szymon-atraszkiewicz',
-    twarz: 210 / 640,
-    ucietyZPrawej: false,
-    kadrMaly: '38% 30%',
-  },
-];
+// Numery przypisane imiennie na podstawie https://ewpa.pl/kontakt/ (siostrzana firma pod tym samym
+// adresem; te same numery sa na phuprobud.pl w dzialach sprzedazy i czesci). Stan: 30.09.2026.
+// Szymon Atraszkiewicz prowadzi PHU Probud (polityka prywatnosci) - bez przypisanego numeru.
+// 662 997 955 (serwis) i 722 223 755 (administracja) to numery dzialow, bez osoby.
+const krzysztof: Osoba = {
+  id: 'krzysztof-bilski', imie: 'Krzysztof', nazwisko: 'Bilski', rola: 'Sprzedaż maszyn',
+  telefon: '+48 601 896 689', zdjecie: 'ludzie/krzysztof-bilski',
+  twarz: 670 / 1600, ucietyZPrawej: true, kadrMaly: '50% 30%', zrodlo: 'https://ewpa.pl/kontakt/',
+};
+const szymon: Osoba = {
+  id: 'szymon-atraszkiewicz', imie: 'Szymon', nazwisko: 'Atraszkiewicz', rola: 'Prowadzi PHU Probud',
+  tytul: 'CEO', zdjecie: 'ludzie/szymon-atraszkiewicz',
+  twarz: 210 / 640, ucietyZPrawej: false, kadrMaly: '38% 30%',
+  zrodlo: '/dokumenty/polityka-prywatnosci-phu-probud.pdf',
+};
+const marcin: Osoba = {
+  id: 'marcin-maj', imie: 'Marcin', nazwisko: 'Maj', rola: 'Sprzedaż maszyn',
+  telefon: '+48 601 416 618', zdjecie: 'ludzie/marcin-maj',
+  twarz: 760 / 1600, ucietyZPrawej: true, kadrMaly: '50% 30%', zrodlo: 'https://ewpa.pl/kontakt/',
+};
+const tomasz: Osoba = {
+  id: 'tomasz-jurga', imie: 'Tomasz', nazwisko: 'Jurga', rola: 'Części zamienne',
+  telefon: '+48 693 221 733', zdjecie: 'ludzie/tomasz-jurga',
+  twarz: 760 / 1600, ucietyZPrawej: true, kadrMaly: '50% 30%', zrodlo: 'https://ewpa.pl/kontakt/',
+};
 
+/** Duzy, dwuosobowy element na stronie glownej. */
+export const zespolGlowny: Osoba[] = [krzysztof, szymon];
+/** Mniejsze kafelki pod nim. */
+export const zespolKafelki: Osoba[] = [marcin, tomasz];
+/** Handlowcy z numerami: pasek telefonu, blok „Zapytaj” w katalogu, naglowek. */
+export const handlowcy: Osoba[] = [krzysztof, marcin];
+
+export type Telefon = { numer: string; osoba?: string };
 export type Dzial = {
-  id: 'sprzedaz' | 'serwis' | 'czesci' | 'administracja' | 'finansowanie';
+  id: 'sprzedaz' | 'serwis' | 'czesci' | 'administracja';
   nazwa: string;
-  telefony: string[];
+  telefony: Telefon[];
   email: string;
   dopisek?: string;
 };
 
+const podpis = (o: Osoba) => `${o.imie} ${o.nazwisko}`;
 export const dzialy: Dzial[] = [
-  { id: 'sprzedaz', nazwa: 'Sprzedaż maszyn', telefony: ['+48 601 896 689', '+48 601 416 618'], email: 'sprzedaz@phuprobud.pl' },
-  { id: 'serwis', nazwa: 'Serwis', telefony: ['+48 662 997 955'], email: 'zlecenia@ewpa.pl', dopisek: 'Zlecenia serwisowe przyjmuje EWPA.' },
-  { id: 'czesci', nazwa: 'Części zamienne', telefony: ['+48 693 221 733'], email: 'handel@phuprobud.pl' },
-  { id: 'administracja', nazwa: 'Administracja', telefony: ['+48 722 223 755'], email: 'info@phuprobud.pl' },
+  { id: 'sprzedaz', nazwa: 'Sprzedaż maszyn', telefony: [{ numer: krzysztof.telefon!, osoba: podpis(krzysztof) }, { numer: marcin.telefon!, osoba: podpis(marcin) }], email: 'sprzedaz@phuprobud.pl' },
+  { id: 'serwis', nazwa: 'Serwis', telefony: [{ numer: '+48 662 997 955' }], email: 'zlecenia@ewpa.pl', dopisek: 'Zlecenia serwisowe przyjmuje EWPA.' },
+  { id: 'czesci', nazwa: 'Części zamienne', telefony: [{ numer: tomasz.telefon!, osoba: podpis(tomasz) }], email: 'handel@phuprobud.pl' },
+  { id: 'administracja', nazwa: 'Administracja', telefony: [{ numer: '+48 722 223 755' }], email: 'info@phuprobud.pl' },
 ];
 
 export const finansowanie = {

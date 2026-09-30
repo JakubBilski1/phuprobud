@@ -9,7 +9,7 @@ const wybor = dzialy.map((d) => ({
   id: d.id,
   nazwa: d.nazwa,
   email: d.email,
-  telefon: d.telefony[0],
+  telefon: d.telefony[0].numer,
   przycisk: { sprzedaz: 'Wyślij do działu sprzedaży', serwis: 'Wyślij do serwisu', czesci: 'Wyślij do działu części', administracja: 'Wyślij do administracji', finansowanie: 'Wyślij' }[d.id],
 }));
 const endpoint = import.meta.env.PUBLIC_FORMULARZ_URL ?? '';
