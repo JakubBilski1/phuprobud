@@ -3,6 +3,7 @@
 // Przypisania numerow do osob: src/data/firma.ts (zrodlo: ewpa.pl/kontakt).
 import { szef, zespol, dzialy } from '../data/firma';
 import { sierotki, telHref, telKrotki } from '../lib/tekst';
+import { tresc } from '../data/tresci';
 
 const email = dzialy.find((d) => d.id === 'sprzedaz')!.email;
 const ikonaTelefonu = 'M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z';
@@ -10,21 +11,21 @@ const ikonaTelefonu = 'M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25
 <section class="handlowcy sekcja" id="handlowcy" aria-labelledby="handlowcy-tytul">
   <div class="kontener">
     <div class="handlowcy__glowa">
-      <h2 id="handlowcy-tytul">Z kim rozmawiasz</h2>
-      <p class="lead">{sierotki('Dzwoń bezpośrednio do handlowca: o nowe BOMAG‑i, o maszyny używane i o wycenę maszyny, którą chcesz nam sprzedać.')}</p>
+      <h2 id="handlowcy-tytul" data-tresc="handlowcy.tytul">{tresc('handlowcy.tytul')}</h2>
+      <p class="lead" data-tresc="handlowcy.lead">{sierotki(tresc('handlowcy.lead'))}</p>
     </div>
 
     <article class="szef">
-      {szef.tytul && <p class="szef__tytul">{szef.tytul}</p>}
-      <h3 class="szef__imie">{szef.imie} {szef.nazwisko}</h3>
-      <p class="szef__rola">{szef.rola}</p>
+      {szef.tytul && <p class="szef__tytul" data-osoba-tytul={szef.id}>{szef.tytul}</p>}
+      <h3 class="szef__imie" data-osoba-imie={szef.id}>{szef.imie} {szef.nazwisko}</h3>
+      <p class="szef__rola" data-osoba-rola={szef.id}>{szef.rola}</p>
     </article>
 
     <ul class="zespol" role="list">
       {zespol.map((o) => (
         <li class="osoba">
-          <h3 class="osoba__rola">{o.rola}</h3>
-          <p class="osoba__imie">{o.imie} {o.nazwisko}</p>
+          <h3 class="osoba__rola" data-osoba-rola={o.id}>{o.rola}</h3>
+          <p class="osoba__imie" data-osoba-imie={o.id}>{o.imie} {o.nazwisko}</p>
           {o.telefon && (
             <a class="osoba__tel numer" href={telHref(o.telefon)} aria-label={`Zadzwoń: ${o.imie} ${o.nazwisko}, ${o.rola.toLowerCase()}, ${telKrotki(o.telefon)}`}>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d={ikonaTelefonu} fill="currentColor" /></svg>

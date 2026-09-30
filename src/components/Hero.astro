@@ -3,6 +3,7 @@ import Foto from './Foto.astro';
 import { firma } from '../data/firma';
 import { modele } from '../data/katalog';
 import { sierotki } from '../lib/tekst';
+import { tresc } from '../data/tresci';
 
 const walec = modele.find((m) => m.id === 'bw-138-ac-5')!;
 const masa = walec.parametry.find((p) => p.klucz === 'masa_robocza_kg')?.wartosc;
@@ -11,8 +12,8 @@ const masa = walec.parametry.find((p) => p.klucz === 'masa_robocza_kg')?.wartosc
   <div class="hero__scena">
     <div class="hero__pas" aria-hidden="true"></div>
     <h1 class="hero__tytul" id="hero-tytul">
-      <span class="hero__wiersz hero__wiersz--gora"><span>Maszyny</span></span>
-      <span class="hero__wiersz hero__wiersz--dol"><span>budowlane</span></span>
+      <span class="hero__wiersz hero__wiersz--gora"><span data-tresc="hero.tytul1">{tresc('hero.tytul1')}</span></span>
+      <span class="hero__wiersz hero__wiersz--dol"><span data-tresc="hero.tytul2">{tresc('hero.tytul2')}</span></span>
     </h1>
     <div class="hero__maszyna">
       <Foto
@@ -28,10 +29,10 @@ const masa = walec.parametry.find((p) => p.klucz === 'masa_robocza_kg')?.wartosc
   <div class="hero__dol">
     <div class="kontener hero__dol-siatka">
       <div class="hero__tekst">
-      <p class="hero__lead">{sierotki(`${firma.adres.miasto} pod Poznaniem, od ${firma.od} roku. Sprzedajemy nowe maszyny BOMAG, Schaeff i Gehl, sprowadzamy używane z całej Europy i skupujemy maszyny budowlane.`)}</p>
+      <p class="hero__lead" data-tresc="hero.lead">{sierotki(tresc('hero.lead'))}</p>
       <div class="hero__akcje">
-        <a class="przycisk przycisk--jasny" href="/oferta/">Zobacz maszyny nowe</a>
-        <a class="przycisk przycisk--obrys-jasny" href={firma.otomoto} target="_blank" rel="noopener">Używane na otomoto</a>
+        <a class="przycisk przycisk--jasny" href="/oferta/" data-tresc="hero.przycisk1">{tresc('hero.przycisk1')}</a>
+        <a class="przycisk przycisk--obrys-jasny" href={firma.otomoto} target="_blank" rel="noopener" data-tresc="hero.przycisk2">{tresc('hero.przycisk2')}</a>
       </div>
       </div>
       <a class="hero__podpis" href={walec.href}>Na zdjęciu: {walec.nazwa}, walec kombinowany, {masa}</a>

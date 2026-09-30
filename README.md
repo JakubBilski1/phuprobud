@@ -15,8 +15,28 @@ Założenia projektu, paleta, typografia i decyzje: [docs/PROJEKT.md](docs/PROJE
 - **`/oferta/`**: katalog 41 modeli BOMAG, Schaeff i Gehl.
 - **`/oferta/<grupa>/`**: grupa z tabelą porównania modeli.
 - **`/oferta/<grupa>/<model>/`**: karta modelu z parametrami i kartą katalogową producenta.
+- **`/admin/`**: panel strony (demo), patrz niżej.
 - **Przekierowania 301** ze wszystkich adresów starej strony, generowane z danych katalogu
   (`src/pages/przekierowania.conf.ts` → konfiguracja nginx w obrazie).
+
+## Panel `/admin/` (demo)
+
+Logowanie z wpisanymi danymi (`admin` / `probud2026`, bez serwera). W panelu:
+
+- **Oferta i maszyny**: widoczność każdego z 41 modeli i każdej z 8 grup, nazwa i opis grupy,
+  opis modelu, etykieta (np. „Nowość”) i cena na karcie i podstronie modelu. Ukrycie przelicza
+  liczby modeli i zakresy masy w ofercie i katalogu.
+- **Teksty strony**: nagłówki, opisy sekcji i przyciski (`src/data/tresci.ts`).
+- **Ludzie i kontakt**: imię i nazwisko, rola, telefon osób, telefony i e-maile działów,
+  finansowanie. Nowy numer albo adres zastępuje stary w każdym miejscu strony, także w formularzu.
+- **Ogłoszenie**: pasek z komunikatem nad nagłówkiem każdej strony.
+- **Pulpit**: liczniki, lista zapisanych zmian z cofaniem pojedynczo albo wszystkich naraz.
+
+Zmiany zapisują się w `localStorage` tej przeglądarki (`src/lib/nadpisania.ts`): panel zapisuje
+tylko różnicę względem oryginału, a skrypt w layoucie (`src/components/DemoTresci.astro`) nanosi
+ją na elementy oznaczone atrybutami `data-tresc`, `data-model`, `data-kategoria`, `data-osoba-*`.
+Inni odwiedzający widzą oryginał. Nowy tekst do edycji: wpis w `src/data/tresci.ts` i
+`data-tresc="klucz"` na elemencie w komponencie.
 
 ## Uruchomienie
 
@@ -74,6 +94,9 @@ blok, pod nim pozostałe osoby z rolą i numerem. Zdjęć osób nie pokazujemy.
 
 ## Przed przejściem z demo na produkcję
 
+- **Panel `/admin/`** zapisuje zmiany w przeglądarce, a logowanie nic nie chroni (dane są jawne
+  w kodzie strony). Na produkcję: zapis na serwerze (baza `probud`), logowanie z hasłem po stronie
+  serwera i strona budowana albo renderowana z danych z bazy.
 - **Formularz** w demo składa gotową wiadomość w programie pocztowym (`mailto:` na adres
   wybranego działu). Wysyłka z serwera: ustawić `PUBLIC_FORMULARZ_URL` na endpoint, który
   przyjmuje JSON `{ dzial, do, temat, tresc }`.

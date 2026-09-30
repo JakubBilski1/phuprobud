@@ -4,6 +4,7 @@ import KartaModelu from '../../../components/KartaModelu.astro';
 import ZapytajHandlowca from '../../../components/ZapytajHandlowca.astro';
 import Okruszki from '../../../components/Okruszki.astro';
 import Foto from '../../../components/Foto.astro';
+import KatalogDemo from '../../../components/KatalogDemo.astro';
 import { kategorie, type Kategoria } from '../../../data/katalog';
 import { odmiana, sierotki } from '../../../lib/tekst';
 
@@ -21,14 +22,14 @@ const kolumny = [...new Map(k.modele.flatMap((m) => m.parametry).map((p) => [p.k
 const dwieWartosci = k.modele.some((m) => m.parametry.some((p) => p.dwieWartosci && kolumny.some(([kl]) => kl === p.klucz)));
 ---
 <Strona tytul={k.nazwa} opis={`${k.nazwa}: ${odmiana(k.modele.length, ['model', 'modele', 'modeli'])}. ${k.opis}`}>
-  <div class="kontener kat">
+  <div class="kontener kat" data-strona-kategorii={k.id}>
     <Okruszki sciezka={[{ nazwa: 'Strona główna', href: '/' }, { nazwa: 'Maszyny nowe', href: '/oferta/' }, { nazwa: k.nazwa }]} />
     <div class="kat__glowa">
       <div class="kat__tekst">
         <span class="kat__picto" style={`--maska:url(/piktogramy/${k.piktogram}.png)`} aria-hidden="true"></span>
-        <h1>{k.nazwa}</h1>
-        <p class="lead">{sierotki(k.opis)}</p>
-        <p class="kat__liczby numer">{odmiana(k.modele.length, ['model', 'modele', 'modeli'])}{k.zakresMasy && `, masa robocza ${k.zakresMasy}`}</p>
+        <h1 data-kategoria-nazwa={k.id}>{k.nazwa}</h1>
+        <p class="lead" data-kategoria-opis={k.id}>{sierotki(k.opis)}</p>
+        <p class="kat__liczby numer"><span data-licznik-kategorii={k.id}>{odmiana(k.modele.length, ['model', 'modele', 'modeli'])}</span>{k.zakresMasy && <span data-zakres-masy-opis>, masa robocza <span data-zakres-masy={k.id}>{k.zakresMasy}</span></span>}</p>
       </div>
       {k.zdjecieWPracy && (
         <Foto nazwa={k.zdjecieWPracy} alt={`${k.nazwa} w pracy`} class="kat__foto kadr" sizes="(min-width: 64rem) 52vw, 100vw" priorytet />
@@ -55,7 +56,7 @@ const dwieWartosci = k.modele.some((m) => m.parametry.some((p) => p.dwieWartosci
           </thead>
           <tbody>
             {k.modele.map((m) => (
-              <tr>
+              <tr data-model={m.id}>
                 <th scope="row"><a href={m.href}>{m.kod}</a></th>
                 {kolumny.map(([klucz]) => <td class="numer">{m.parametry.find((p) => p.klucz === klucz)?.wartosc ?? '-'}</td>)}
               </tr>
@@ -69,6 +70,7 @@ const dwieWartosci = k.modele.some((m) => m.parametry.some((p) => p.dwieWartosci
   )}
 
   <ZapytajHandlowca temat={k.nazwa.toLowerCase()} />
+  <KatalogDemo />
 </Strona>
 
 <style>

@@ -1,0 +1,8 @@
+---
+// Lista modeli [id, grupa, masa] dla skryptu zmian z panelu demo: po ukryciu modeli
+// przelicza liczby modeli i zakresy masy. Wstawiana tylko tam, gdzie sa takie liczby.
+import { modele } from '../data/katalog';
+
+const lista = modele.map((m) => [m.id, m.kategoria, m.masa]);
+---
+<script type="application/json" data-katalog-demo set:html={JSON.stringify(lista)} />

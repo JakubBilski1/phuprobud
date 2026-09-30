@@ -5,6 +5,7 @@
 import teren from '../data/teren.json';
 import { firma } from '../data/firma';
 import { sierotki } from '../lib/tekst';
+import { tresc } from '../data/tresci';
 
 type Woj = { kod: string; nazwa: string; nasz: boolean; obrys: [number, number][] };
 const woj = teren.wojewodztwa as Woj[];
@@ -16,8 +17,8 @@ const PODPISANE = ['Poznań', 'Bydgoszcz', 'Toruń', 'Kalisz'];
 <section class="teren sekcja sekcja--beton" aria-labelledby="teren-tytul">
   <div class="kontener teren__siatka">
     <div class="teren__tekst">
-      <h2 id="teren-tytul">Dealer BOMAG na Wielkopolskę i Kujawy</h2>
-      <p class="lead">{sierotki('Maszyny BOMAG Light Equipment sprzedajemy jako autoryzowany dystrybutor na dwa województwa: wielkopolskie i kujawsko-pomorskie.')}</p>
+      <h2 id="teren-tytul" data-tresc="teren.tytul">{tresc('teren.tytul')}</h2>
+      <p class="lead" data-tresc="teren.lead">{sierotki(tresc('teren.lead'))}</p>
       <p>{sierotki(`Siedziba: ${firma.adres.miasto} pod Poznaniem, ${firma.adres.ulica}.`)}</p>
       <dl class="teren__legenda">
         <div><dt><span class="kolor kolor--zolty"></span>Teren dystrybucji</dt><dd>wielkopolskie, kujawsko-pomorskie</dd></div>

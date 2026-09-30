@@ -17,7 +17,7 @@ import { telHref, telKrotki } from '../lib/tekst';
           {d.telefony.map((t) => (
             <div class="dzial__linia">
               <a class="dzial__tel numer" href={telHref(t.numer)}>{telKrotki(t.numer)}</a>
-              {t.osoba && <span class="dzial__osoba">{t.osoba}</span>}
+              {t.osoba && <span class="dzial__osoba" data-osoba-imie={t.osobaId}>{t.osoba}</span>}
             </div>
           ))}
           <a class="dzial__email" href={`mailto:${d.email}`}>{d.email}</a>

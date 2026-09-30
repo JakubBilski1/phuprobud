@@ -11,6 +11,9 @@ co dotyczy tej strony.
 - **Katalog**: `src/data/zrodla/katalog-astra.json` to dane ze źródłami, nie edytuj ich ręcznie.
   Redakcja (grupy, opisy, kolejność, etykiety) jest w `src/data/katalog.ts`. Build padnie,
   jeśli model nie ma grupy albo opisu.
+- **Panel `/admin/`** (demo, localStorage): teksty do edycji są w `src/data/tresci.ts`, element na
+  stronie dostaje `data-tresc="klucz"`. Nowy tekst na stronie, który ma być edytowalny, idzie przez
+  ten plik. Zdjęć osób na stronie nie pokazujemy.
 - **Zdjęcia**: tylko przez `scripts/obrazy.lista.mjs` + `npm run obrazy`. Komponent `Foto`
   rzuca błąd, gdy zdjęcia nie ma w manifeście.
 - **Grafika generowana** (Codex `image_gen`) tylko do rzeczy, które nie udają faktów

@@ -8,6 +8,7 @@ import fontTekst from '@fontsource-variable/sofia-sans/files/sofia-sans-latin-wg
 import Naglowek from '../components/Naglowek.astro';
 import Stopka from '../components/Stopka.astro';
 import PasekTelefonu from '../components/PasekTelefonu.astro';
+import DemoTresci from '../components/DemoTresci.astro';
 
 interface Props {
   tytul: string;
@@ -45,6 +46,7 @@ const adres = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <a class="przeskocz" href="#tresc">Przejdź do treści</a>
+    <DemoTresci />
     <Naglowek />
     <main id="tresc">
       <slot />

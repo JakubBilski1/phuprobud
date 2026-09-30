@@ -20,7 +20,7 @@ const doFormularza = `/?model=${encodeURIComponent(m.nazwa)}#formularz`;
 const katalogBomag = m.marka === 'BOMAG' && !['walce-tandemowe', 'walce-do-gruntu'].includes(m.kategoria) || m.id === 'bmp-8500';
 ---
 <Strona tytul={m.nazwa} opis={`${m.nazwa}. ${m.opis} Parametry, karta katalogowa i kontakt do handlowca PHU Probud.`}>
-  <div class="kontener produkt">
+  <div class="kontener produkt" data-strona-modelu={m.id} data-strona-kategorii={k.id}>
     <Okruszki sciezka={[{ nazwa: 'Strona główna', href: '/' }, { nazwa: 'Maszyny nowe', href: '/oferta/' }, { nazwa: k.nazwa, href: k.href }, { nazwa: m.kod }]} />
 
     <div class="produkt__uklad">
@@ -31,8 +31,10 @@ const katalogBomag = m.marka === 'BOMAG' && !['walce-tandemowe', 'walce-do-grunt
       </figure>
 
       <div class="produkt__opis">
+        <p class="produkt__etykieta" data-model-etykieta={m.id} hidden></p>
         <h1>{m.nazwa}</h1>
-        <p class="lead">{sierotki(m.opis)}</p>
+        <p class="lead" data-model-opis={m.id}>{sierotki(m.opis)}</p>
+        <p class="produkt__cena numer" data-model-cena={m.id} hidden></p>
 
         {m.parametry.length > 0 ? (
           <table class="parametry">
@@ -131,6 +133,10 @@ const katalogBomag = m.marka === 'BOMAG' && !['walce-tandemowe', 'walce-do-grunt
 
   .produkt__opis h1 { font-size: clamp(2.8rem, 5.2vw, 5rem); }
   .produkt__opis .lead { margin-top: 1rem; }
+  /* Etykieta i cena pojawiaja sie tylko, gdy ustawi je panel demo. */
+  .produkt__etykieta { display: inline-block; margin-bottom: 0.75rem; padding: 0.35rem 0.75rem; background: var(--probud); color: var(--papier); font-weight: 700; }
+  .produkt__etykieta[hidden], .produkt__cena[hidden] { display: none; }
+  .produkt__cena { margin-top: 1rem; font-family: var(--kroj-naglowki); font-weight: 800; font-size: var(--t-h3); color: var(--probud); }
   .parametry { width: 100%; margin-top: 1.75rem; border-top: 3px solid var(--grafit); }
   .parametry th, .parametry td { padding: 0.7rem 0; border-bottom: 1px solid var(--linia); text-align: left; vertical-align: top; }
   .parametry th { font-weight: 500; color: var(--stal); padding-right: 1rem; }

@@ -3,6 +3,7 @@
 // z wpisanym modelem.
 import { handlowcy } from '../data/firma';
 import { telHref, telKrotki, sierotki } from '../lib/tekst';
+import { tresc } from '../data/tresci';
 
 interface Props { temat: string; model?: string }
 const { temat, model } = Astro.props;
@@ -12,13 +13,13 @@ const doFormularza = model ? `/?model=${encodeURIComponent(model)}#formularz` : 
   <div class="kontener zapytaj__siatka">
     <div>
       <h2 id="zapytaj-tytul">Zapytaj o {temat}</h2>
-      <p class="zapytaj__tekst">{sierotki('Cenę, termin dostawy i dostępność podaje handlowiec. Zadzwoń albo zostaw wiadomość, a model będzie już wpisany w formularzu.')}</p>
+      <p class="zapytaj__tekst" data-tresc="zapytaj.tekst">{sierotki(tresc('zapytaj.tekst'))}</p>
       <a class="przycisk" href={doFormularza}>Napisz wiadomość</a>
     </div>
     <ul class="zapytaj__osoby" role="list">
       {handlowcy.map((h) => (
         <li class="zapytaj__osoba">
-          <p class="zapytaj__imie">{h.imie} {h.nazwisko}</p>
+          <p class="zapytaj__imie" data-osoba-imie={h.id}>{h.imie} {h.nazwisko}</p>
           <a class="zapytaj__tel numer" href={telHref(h.telefon!)}>{telKrotki(h.telefon!)}</a>
         </li>
       ))}

@@ -1,0 +1,488 @@
+---
+// Panel strony (demo). Logowanie bez serwera, z wpisanymi danymi; edycja oferty, tekstow,
+// ludzi i kontaktu. Zmiany trafiaja do localStorage i skrypt w layoucie nanosi je na strone
+// (src/lib/nadpisania.ts). Wersja produkcyjna zapisze to samo na serwerze.
+import '@fontsource-variable/big-shoulders/opsz.css';
+import '@fontsource-variable/sofia-sans/index.css';
+import '../../styles/global.css';
+import Foto from '../../components/Foto.astro';
+import Pole from '../../components/panel/Pole.astro';
+import Przelacznik from '../../components/panel/Przelacznik.astro';
+import { kategorie, modele } from '../../data/katalog';
+import { tresci, grupyTresci, type KluczTresci } from '../../data/tresci';
+import { szef, zespol, dzialy, finansowanie } from '../../data/firma';
+import { odmiana } from '../../lib/tekst';
+
+const polaTresci = Object.entries(tresci) as [KluczTresci, (typeof tresci)[KluczTresci]][];
+const MODEL: [string, string, string] = ['model', 'modele', 'modeli'];
+const osoby = [szef, ...zespol];
+const imie = (o: { imie: string; nazwisko: string }) => `${o.imie} ${o.nazwisko}`;
+const szukaj = (s: string) => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
+
+const sekcje = [
+  { id: 'pulpit', nazwa: 'Pulpit' },
+  { id: 'oferta', nazwa: 'Oferta i maszyny' },
+  { id: 'teksty', nazwa: 'Teksty strony' },
+  { id: 'kontakt', nazwa: 'Ludzie i kontakt' },
+  { id: 'ogloszenie', nazwa: 'Ogłoszenie' },
+];
+const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki', 'Na zamówienie'];
+---
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel strony | PHU Probud</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#222222" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  </head>
+  <body class="panel-strona">
+    <!-- Logowanie -->
+    <div class="logowanie" data-logowanie>
+      <form class="logowanie__karta" data-form-logowania novalidate>
+        <img class="logowanie__logo" src="/marka/probud-logo-ciemne.webp" alt="PHU Probud" width="489" height="98" />
+        <h1>Panel strony</h1>
+        <p class="logowanie__wstep">Zaloguj się, żeby zmienić ofertę, teksty i dane kontaktowe na stronie.</p>
+        <div class="pole">
+          <label for="l-login">Login</label>
+          <input id="l-login" name="login" type="text" value="admin" autocomplete="username" required />
+        </div>
+        <div class="pole">
+          <label for="l-haslo">Hasło</label>
+          <input id="l-haslo" name="haslo" type="password" value="probud2026" autocomplete="current-password" required />
+        </div>
+        <p class="logowanie__blad" data-blad-logowania role="alert" hidden></p>
+        <button class="przycisk logowanie__przycisk" type="submit" data-przycisk-logowania>Zaloguj się</button>
+        <p class="logowanie__demo">Wersja demonstracyjna: login i hasło są już wpisane. Zmiany zapisują się tylko w tej przeglądarce, strona na serwerze się nie zmienia.</p>
+      </form>
+      <a class="logowanie__powrot" href="/">Wróć na stronę</a>
+    </div>
+
+    <!-- Panel -->
+    <div class="panel" data-panel hidden>
+      <header class="panel__gora">
+        <a class="panel__marka" href="#pulpit">
+          <img src="/marka/probud-logo-jasne.webp" alt="PHU Probud" width="489" height="98" />
+          <span>Panel strony</span>
+        </a>
+        <div class="panel__konto">
+          <a href="/" target="_blank" rel="noopener">Zobacz stronę</a>
+          <span class="panel__uzytkownik">admin</span>
+          <button type="button" data-wyloguj>Wyloguj</button>
+        </div>
+      </header>
+
+      <nav class="panel__menu" aria-label="Sekcje panelu">
+        <ul role="list">
+          {sekcje.map((s) => (
+            <li><a href={`#${s.id}`} data-link-sekcji={s.id}>{s.nazwa}<span class="znaczek" data-znaczek={s.id} hidden></span></a></li>
+          ))}
+        </ul>
+      </nav>
+
+      <main class="panel__tresc">
+        <!-- Pulpit -->
+        <section class="sekcja-panelu" data-sekcja="pulpit" aria-labelledby="s-pulpit">
+          <div class="sekcja-panelu__glowa">
+            <h1 id="s-pulpit">Pulpit</h1>
+            <p>Stan strony po zapisanych zmianach. <span data-ostatni-zapis></span></p>
+          </div>
+
+          <ul class="liczniki" role="list">
+            <li><span>Modele w ofercie</span><strong data-stat="modele">{modele.length}</strong><small>z {modele.length}</small></li>
+            <li><span>Grupy w ofercie</span><strong data-stat="grupy">{kategorie.length}</strong><small>z {kategorie.length}</small></li>
+            <li><span>Zmienione pola</span><strong data-stat="zmiany">0</strong><small>względem oryginału</small></li>
+            <li><span>Ogłoszenie</span><strong data-stat="ogloszenie">wyłączone</strong><small>pasek na górze strony</small></li>
+          </ul>
+
+          <div class="karta-panelu">
+            <div class="karta-panelu__glowa">
+              <h2>Zapisane zmiany</h2>
+              <button type="button" class="przycisk-maly przycisk-maly--ostrzezenie" data-przywroc-wszystko hidden>Przywróć całą stronę do oryginału</button>
+            </div>
+            <ul class="zmiany" role="list" data-lista-zmian></ul>
+            <p class="pusto" data-brak-zmian>Brak zmian. Strona wygląda jak oryginał.</p>
+            <template data-szablon-zmiany>
+              <li class="zmiana">
+                <div>
+                  <p class="zmiana__co" data-co></p>
+                  <p class="zmiana__roznica"><del data-bylo></del> <span aria-hidden="true">→</span> <ins data-jest></ins></p>
+                </div>
+                <div class="zmiana__akcje">
+                  <button type="button" class="przycisk-maly" data-edytuj>Edytuj</button>
+                  <button type="button" class="przycisk-maly" data-cofnij>Cofnij</button>
+                </div>
+              </li>
+            </template>
+          </div>
+
+          <div class="skroty">
+            <a class="skrot" href="#oferta"><strong>Oferta i maszyny</strong><span>Widoczność {odmiana(modele.length, MODEL)} i {kategorie.length} grup, opisy, etykiety i ceny.</span></a>
+            <a class="skrot" href="#teksty"><strong>Teksty strony</strong><span>{polaTresci.length} tekstów: nagłówki, opisy sekcji, przyciski.</span></a>
+            <a class="skrot" href="#kontakt"><strong>Ludzie i kontakt</strong><span>Osoby, role, numery telefonów i adresy e-mail działów.</span></a>
+            <a class="skrot" href="#ogloszenie"><strong>Ogłoszenie</strong><span>Pasek z komunikatem na górze każdej strony.</span></a>
+          </div>
+
+          <p class="uwaga-demo">Panel pokazuje, jak będzie wyglądała edycja strony. W wersji demonstracyjnej zmiany zapisują się w tej przeglądarce: widzisz je na stronie od razu po zapisaniu, inni odwiedzający widzą oryginał. W wersji produkcyjnej panel zapisze je na serwerze.</p>
+        </section>
+
+        <!-- Oferta -->
+        <section class="sekcja-panelu" data-sekcja="oferta" aria-labelledby="s-oferta" hidden>
+          <div class="sekcja-panelu__glowa">
+            <h1 id="s-oferta">Oferta i maszyny</h1>
+            <p>Ukryty model znika z katalogu, ze strony grupy i z porównań. Ukryta grupa znika z oferty na stronie głównej, z katalogu i ze stopki. Etykieta i cena pokazują się na karcie modelu i na jego podstronie.</p>
+          </div>
+
+          <div class="narzedzia">
+            <div class="pole">
+              <label for="szukaj-modelu">Szukaj modelu</label>
+              <input id="szukaj-modelu" type="search" placeholder="np. BW 120, BPR, RT135" data-szukaj-modelu autocomplete="off" />
+            </div>
+            <div class="pole">
+              <label for="filtr-modeli">Pokaż</label>
+              <select id="filtr-modeli" data-filtr-modeli>
+                <option value="wszystkie">Wszystkie modele</option>
+                <option value="widoczne">Widoczne w ofercie</option>
+                <option value="ukryte">Ukryte</option>
+                <option value="zmienione">Zmienione</option>
+              </select>
+            </div>
+          </div>
+          <p class="pusto" data-brak-modeli hidden>Żaden model nie pasuje do wyszukiwania.</p>
+
+          <datalist id="etykiety-modeli">
+            {ETYKIETY.map((e) => <option value={e} />)}
+          </datalist>
+
+          {kategorie.map((k) => (
+            <section class="grupa-panelu" data-grupa={k.id} aria-labelledby={`g-${k.id}`}>
+              <div class="grupa-panelu__glowa">
+                <span class="grupa-panelu__picto" style={`--maska:url(/piktogramy/${k.piktogram}.png)`} aria-hidden="true"></span>
+                <div class="grupa-panelu__tytul">
+                  <h2 id={`g-${k.id}`} data-nazwa-grupy={k.id}>{k.nazwa}</h2>
+                  <p><span data-licznik-grupy={k.id}>{k.modele.length} z {k.modele.length}</span> w ofercie · {k.marka} · <a href={k.href} target="_blank" rel="noopener">strona grupy</a></p>
+                </div>
+                <Przelacznik klucz={`kategoria:${k.id}:widoczna`} etykieta="Grupa w ofercie" sciezka={`Grupa ${k.nazwa} · widoczność`} zaznaczony tak="widoczna" nie="ukryta" />
+                <button type="button" class="przycisk-maly" aria-expanded="false" aria-controls={`o-${k.id}`} data-rozwin>Nazwa i opis grupy</button>
+              </div>
+              <div class="grupa-panelu__opis" id={`o-${k.id}`} hidden>
+                <Pole klucz={`kategoria:${k.id}:nazwa`} etykieta="Nazwa grupy" sciezka={`Grupa ${k.nazwa} · nazwa`} wartosc={k.nazwa} wymagane max={50} />
+                <Pole klucz={`kategoria:${k.id}:opis`} etykieta="Opis grupy" sciezka={`Grupa ${k.nazwa} · opis`} wartosc={k.opis} typ="dlugi" wymagane max={400} />
+              </div>
+
+              <ul class="modele-panelu" role="list">
+                {k.modele.map((m) => (
+                  <li class="model-panelu" data-wiersz-modelu={m.id} data-szukaj={szukaj(`${m.nazwa} ${m.marka}`)}>
+                    <div class="model-panelu__foto"><Foto nazwa={m.zdjecie} alt="" sizes="88px" /></div>
+                    <div class="model-panelu__nazwa">
+                      <h3>{m.nazwa}</h3>
+                      <p>{m.masa !== null ? `${m.parametry.find((p) => p.klucz === 'masa_robocza_kg')?.wartosc}` : 'masa: brak danych'} · <a href={m.href} target="_blank" rel="noopener">podstrona</a></p>
+                    </div>
+                    <Pole klucz={`model:${m.id}:etykieta`} etykieta="Etykieta" sciezka={`${m.nazwa} · etykieta`} wartosc="" lista="etykiety-modeli" placeholder="brak" max={24} bezPrzywracania />
+                    <Pole klucz={`model:${m.id}:cena`} etykieta="Cena" sciezka={`${m.nazwa} · cena`} wartosc="" placeholder="np. od 12 900 zł netto" max={40} bezPrzywracania />
+                    <Przelacznik klucz={`model:${m.id}:widoczny`} etykieta="W ofercie" sciezka={`${m.nazwa} · widoczność`} zaznaczony tak="widoczny" nie="ukryty" />
+                    <div class="model-panelu__akcje">
+                      <button type="button" class="przycisk-maly" aria-expanded="false" aria-controls={`opis-${m.id}`} data-rozwin>Opis</button>
+                      <button type="button" class="przycisk-maly" data-przywroc-wiersz hidden>Przywróć</button>
+                    </div>
+                    <div class="model-panelu__opis" id={`opis-${m.id}`} hidden>
+                      <Pole klucz={`model:${m.id}:opis`} etykieta={`Opis ${m.kod} (podstrona modelu)`} sciezka={`${m.nazwa} · opis`} wartosc={m.opis} typ="dlugi" wymagane max={400} bezPrzywracania />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </section>
+
+        <!-- Teksty -->
+        <section class="sekcja-panelu" data-sekcja="teksty" aria-labelledby="s-teksty" hidden>
+          <div class="sekcja-panelu__glowa">
+            <h1 id="s-teksty">Teksty strony</h1>
+            <p>Nagłówki i opisy sekcji w kolejności, w jakiej są na stronie. Spójniki na końcu wiersza i liczby z jednostkami strona układa sama.</p>
+          </div>
+          {grupyTresci.map((g) => {
+            const pola = polaTresci.filter(([, p]) => p.grupa === g);
+            return (
+              <section class="karta-panelu">
+                <div class="karta-panelu__glowa">
+                  <h2>{g}</h2>
+                  <a class="przycisk-maly" href={pola[0][1].gdzie} target="_blank" rel="noopener">Pokaż na stronie</a>
+                </div>
+                <div class="siatka-pol">
+                  {pola.map(([klucz, p]) => (
+                    <Pole klucz={`tekst:${klucz}`} etykieta={p.etykieta} sciezka={`${p.grupa} · ${p.etykieta.toLowerCase()}`} wartosc={p.wartosc} typ={p.dlugi ? 'dlugi' : 'tekst'} wymagane max={p.max ?? 400} />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </section>
+
+        <!-- Ludzie i kontakt -->
+        <section class="sekcja-panelu" data-sekcja="kontakt" aria-labelledby="s-kontakt" hidden>
+          <div class="sekcja-panelu__glowa">
+            <h1 id="s-kontakt">Ludzie i kontakt</h1>
+            <p>Nowy numer albo adres zastępuje stary wszędzie: w sekcji „Z kim rozmawiasz”, w nagłówku, w pasku na telefonie, w katalogu, w kontakcie i w formularzu.</p>
+          </div>
+
+          <div class="osoby-panelu">
+            {osoby.map((o) => (
+              <section class:list={['karta-panelu', { 'karta-panelu--szef': o === szef }]}>
+                <h2>{o === szef ? 'Blok główny' : o.rola}</h2>
+                <Pole klucz={`osoba:${o.id}:imie`} etykieta="Imię i nazwisko" sciezka={`${imie(o)} · imię i nazwisko`} wartosc={imie(o)} wymagane max={60} />
+                <Pole klucz={`osoba:${o.id}:rola`} etykieta="Rola" sciezka={`${imie(o)} · rola`} wartosc={o.rola} wymagane max={40} />
+                {o.tytul && <Pole klucz={`osoba:${o.id}:tytul`} etykieta="Tytuł" sciezka={`${imie(o)} · tytuł`} wartosc={o.tytul} wymagane max={20} />}
+                {o.telefon && <Pole klucz={`osoba:${o.id}:telefon`} etykieta="Telefon" sciezka={`${imie(o)} · telefon`} wartosc={o.telefon} typ="telefon" wymagane max={20} />}
+              </section>
+            ))}
+          </div>
+
+          <section class="karta-panelu">
+            <h2>Działy</h2>
+            <div class="siatka-pol">
+              {dzialy.map((d) => (
+                <>
+                  {d.telefony.filter((t) => !t.osobaId).map((t) => (
+                    <Pole klucz={`dzial:${d.id}:telefon`} etykieta={`${d.nazwa}: telefon`} sciezka={`Dział ${d.nazwa.toLowerCase()} · telefon`} wartosc={t.numer} typ="telefon" wymagane max={20} />
+                  ))}
+                  <Pole klucz={`dzial:${d.id}:email`} etykieta={`${d.nazwa}: e-mail`} sciezka={`Dział ${d.nazwa.toLowerCase()} · e-mail`} wartosc={d.email} typ="email" wymagane max={80} />
+                </>
+              ))}
+            </div>
+            <p class="pole__podpowiedz">Telefony działu sprzedaży i działu części to numery osób powyżej.</p>
+          </section>
+
+          <section class="karta-panelu">
+            <h2>Finansowanie</h2>
+            <div class="siatka-pol">
+              <Pole klucz="finansowanie:osoba" etykieta="Opiekun finansowania" sciezka="Finansowanie · opiekun" wartosc={finansowanie.osoba} wymagane max={60} />
+              <Pole klucz="finansowanie:telefon" etykieta="Telefon" sciezka="Finansowanie · telefon" wartosc={finansowanie.telefon} typ="telefon" wymagane max={20} />
+              <Pole klucz="finansowanie:email" etykieta="E-mail" sciezka="Finansowanie · e-mail" wartosc={finansowanie.email} typ="email" wymagane max={80} />
+            </div>
+          </section>
+        </section>
+
+        <!-- Ogloszenie -->
+        <section class="sekcja-panelu" data-sekcja="ogloszenie" aria-labelledby="s-ogloszenie" hidden>
+          <div class="sekcja-panelu__glowa">
+            <h1 id="s-ogloszenie">Ogłoszenie</h1>
+            <p>Pasek nad nagłówkiem, na każdej stronie. Do krótkich komunikatów: godziny otwarcia w święta, dostawa nowych maszyn, targi.</p>
+          </div>
+          <div class="karta-panelu">
+            <Przelacznik klucz="ogloszenie:wlaczone" etykieta="Pokaż ogłoszenie na stronie" sciezka="Ogłoszenie · widoczność" zaznaczony={false} />
+            <Pole klucz="ogloszenie:tekst" etykieta="Treść" sciezka="Ogłoszenie · treść" wartosc="" typ="dlugi" max={160} placeholder="np. 24 i 31 grudnia pracujemy do 12:00." />
+            <Pole klucz="ogloszenie:link" etykieta="Link (opcjonalnie)" sciezka="Ogłoszenie · link" wartosc="" typ="link" max={200} placeholder="np. /oferta/walce-tandemowe/" podpowiedz="Adres na tej stronie zaczyna się od /, adres innej strony od https://." />
+            <div class="podglad-ogloszenia">
+              <p class="pole__podpowiedz">Podgląd</p>
+              <div class="podglad-ogloszenia__pasek" data-podglad-ogloszenia><span data-podglad-tekst>Wpisz treść ogłoszenia.</span> <u data-podglad-link hidden>Szczegóły</u></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <div class="zapis" data-pasek-zapisu hidden>
+        <p data-licznik-zmian></p>
+        <div>
+          <button type="button" class="przycisk przycisk--obrys-jasny" data-odrzuc>Odrzuć</button>
+          <button type="button" class="przycisk przycisk--jasny" data-zapisz>Zapisz zmiany</button>
+        </div>
+      </div>
+      <div class="komunikat" data-komunikat role="status" aria-live="polite" hidden></div>
+    </div>
+
+    <script>
+      import { uruchomPanel } from '../../scripts/panel';
+      uruchomPanel();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .panel-strona { background: var(--beton); min-height: 100vh; }
+  .panel-strona [hidden] { display: none !important; }
+
+  /* Pola formularzy wspolne dla logowania i panelu */
+  .panel-strona .pole { display: grid; gap: 0.35rem; min-width: 0; }
+  .panel-strona .pole__glowa { display: flex; justify-content: space-between; align-items: baseline; gap: 0.75rem; }
+  .panel-strona label { font-weight: 650; font-size: 0.95rem; }
+  .panel-strona input:not([type='checkbox']), .panel-strona textarea, .panel-strona select {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    background: var(--papier);
+    border: 1px solid #b9b9b1;
+    border-radius: 0;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+  .panel-strona textarea { resize: vertical; min-height: 5.5rem; }
+  .panel-strona input:focus-visible, .panel-strona textarea:focus-visible, .panel-strona select:focus-visible { outline: 3px solid var(--zolty); outline-offset: 0; box-shadow: none; border-color: var(--grafit); }
+  .panel-strona .pole.zmienione input, .panel-strona .pole.zmienione textarea { border-color: var(--grafit); box-shadow: inset 4px 0 0 var(--zolty-ciemny); }
+  .panel-strona [aria-invalid='true'] { border-color: var(--probud) !important; box-shadow: inset 4px 0 0 var(--probud) !important; }
+  .pole__przywroc { font-size: var(--t-maly); font-weight: 650; text-decoration: underline; text-underline-offset: 0.18em; color: var(--probud); }
+  .pole__podpowiedz { font-size: var(--t-maly); color: var(--stal); }
+  .pole__blad { font-size: var(--t-maly); font-weight: 650; color: var(--probud); }
+
+  .przycisk-maly {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--grafit);
+    background: var(--papier);
+    font-size: var(--t-maly);
+    font-weight: 650;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .przycisk-maly:hover { background: var(--grafit); color: var(--papier); }
+  .przycisk-maly[aria-expanded='true'] { background: var(--grafit); color: var(--papier); }
+  .przycisk-maly--ostrzezenie { border-color: var(--probud); color: var(--probud); }
+  .przycisk-maly--ostrzezenie:hover { background: var(--probud); color: var(--papier); }
+
+  /* Przelacznik */
+  .przelacznik { display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-weight: 650; font-size: 0.95rem; }
+  .przelacznik input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .przelacznik__tor { position: relative; flex: none; width: 2.75rem; height: 1.5rem; background: #b9b9b1; border-radius: 1rem; transition: background-color var(--ruch-szybki); }
+  .przelacznik__tor::after { content: ''; position: absolute; top: 3px; left: 3px; width: calc(1.5rem - 6px); height: calc(1.5rem - 6px); background: var(--papier); border-radius: 50%; transition: transform var(--ruch-szybki) var(--ruch-wyjscie); }
+  .przelacznik input:checked + .przelacznik__tor { background: var(--grafit); }
+  .przelacznik input:checked + .przelacznik__tor::after { transform: translateX(1.25rem); background: var(--zolty); }
+  .przelacznik input:focus-visible + .przelacznik__tor { outline: 3px solid var(--zolty); outline-offset: 2px; box-shadow: 0 0 0 5px var(--grafit); }
+
+  /* Logowanie */
+  .logowanie { min-height: 100vh; display: grid; place-content: center; justify-items: center; gap: 1.25rem; padding: 2rem 1rem; background: var(--grafit); }
+  .logowanie__karta { display: grid; gap: 1rem; width: min(26rem, 100%); padding: clamp(1.5rem, 5vw, 2.5rem); background: var(--papier); border-radius: 0 0 0 var(--rog); border-top: 6px solid var(--zolty); }
+  .logowanie__logo { width: 9.5rem; height: auto; }
+  .logowanie h1 { font-size: clamp(2.4rem, 6vw, 3.2rem); margin-top: 0.5rem; }
+  .logowanie__wstep { color: var(--stal); }
+  .logowanie__blad { padding: 0.6rem 0.8rem; background: #f7e3e1; color: var(--probud); font-weight: 650; }
+  .logowanie__przycisk { justify-content: center; width: 100%; margin-top: 0.25rem; }
+  .logowanie__przycisk[disabled] { opacity: 0.75; cursor: progress; }
+  .logowanie__demo { font-size: var(--t-maly); color: var(--stal); padding-top: 0.75rem; border-top: 1px solid var(--linia); }
+  .logowanie__powrot { color: var(--papier); font-weight: 600; }
+
+  /* Uklad panelu */
+  /* --gora: wysokosc gornego paska; na niej opieraja sie przyklejone menu i wyszukiwarka. */
+  .panel { --gora: 3.5rem; display: grid; grid-template-columns: 15rem minmax(0, 1fr); grid-template-rows: auto 1fr; min-height: 100vh; }
+  .panel__gora { grid-column: 1 / -1; position: sticky; top: 0; z-index: 20; display: flex; justify-content: space-between; align-items: center; gap: 1rem; height: var(--gora); padding: 0 clamp(1rem, 3vw, 1.75rem); background: var(--grafit); color: var(--papier); }
+  .panel__marka { display: flex; align-items: center; gap: 1rem; color: inherit; text-decoration: none; }
+  .panel__marka img { width: 7.5rem; height: auto; }
+  .panel__marka span { font-family: var(--kroj-naglowki); font-weight: 800; font-size: 1.5rem; line-height: 1; padding-left: 1rem; border-left: 1px solid #ffffff40; }
+  .panel__konto { display: flex; align-items: center; gap: 1.25rem; font-size: 0.95rem; font-weight: 600; }
+  .panel__konto a, .panel__konto button { color: inherit; text-decoration: underline; text-underline-offset: 0.2em; }
+  .panel__uzytkownik { padding: 0.2rem 0.6rem; background: #ffffff1a; }
+
+  .panel__menu { background: var(--papier); border-right: 1px solid var(--linia); }
+  .panel__menu ul { position: sticky; top: var(--gora); display: grid; padding: 1rem 0; }
+  .panel__menu a { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.8rem 1.25rem; font-weight: 650; text-decoration: none; border-left: 4px solid transparent; }
+  .panel__menu a:hover { background: var(--beton); }
+  .panel__menu a[aria-current='page'] { border-left-color: var(--zolty); background: var(--beton); }
+  .znaczek { min-width: 1.6rem; padding: 0.1rem 0.45rem; background: var(--zolty); font-size: 0.8rem; font-weight: 800; text-align: center; }
+
+  .panel__tresc { padding: clamp(1.25rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2.5rem) 8rem; }
+  .sekcja-panelu { display: grid; gap: 1.25rem; max-width: 72rem; }
+  .sekcja-panelu__glowa { display: grid; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .sekcja-panelu__glowa h1 { font-size: clamp(2.4rem, 4.5vw, 3.6rem); }
+  .sekcja-panelu__glowa p { color: var(--stal); }
+
+  .karta-panelu { display: grid; gap: 1rem; padding: clamp(1rem, 2.5vw, 1.5rem); min-width: 0; background: var(--papier); border: 1px solid var(--linia); border-radius: 0 0 0 var(--rog-maly); }
+  .karta-panelu__glowa { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .karta-panelu h2 { font-size: clamp(1.6rem, 2.4vw, 2rem); }
+  .karta-panelu--szef { border-top: 6px solid var(--zolty); }
+  .siatka-pol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 1rem 1.25rem; }
+  .siatka-pol .pole--dlugie { grid-column: 1 / -1; }
+  .pusto { color: var(--stal); }
+
+  /* Pulpit */
+  .liczniki { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 1rem; }
+  .liczniki li { display: grid; gap: 0.2rem; padding: 1.1rem 1.25rem; background: var(--papier); border: 1px solid var(--linia); border-radius: 0 0 0 var(--rog-maly); }
+  .liczniki span { font-weight: 650; color: var(--stal); font-size: 0.95rem; }
+  .liczniki strong { font-family: var(--kroj-naglowki); font-weight: 800; font-size: 2.6rem; line-height: 1; }
+  .liczniki small { color: var(--stal); }
+  .zmiany { display: grid; }
+  .zmiana { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.8rem 0; border-top: 1px solid var(--linia); }
+  .zmiana__co { font-weight: 700; }
+  .zmiana__roznica { font-size: 0.95rem; overflow-wrap: anywhere; }
+  .zmiana__roznica del { color: var(--stal); }
+  .zmiana__roznica ins { text-decoration: none; background: #f6cf0059; padding: 0 0.2rem; }
+  .zmiana__akcje { display: flex; gap: 0.5rem; flex: none; }
+  .skroty { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 1rem; }
+  .skrot { display: grid; gap: 0.35rem; padding: 1.1rem 1.25rem; background: var(--grafit); color: var(--papier); text-decoration: none; border-radius: 0 0 0 var(--rog-maly); }
+  .skrot strong { font-family: var(--kroj-naglowki); font-size: 1.6rem; line-height: 1; color: var(--zolty); }
+  .skrot span { font-size: 0.95rem; }
+  .skrot:hover { background: var(--probud); }
+  .uwaga-demo { max-width: none; padding: 1rem 1.25rem; border-left: 6px solid var(--zolty); background: var(--papier); }
+
+  /* Oferta */
+  .narzedzia { position: sticky; top: var(--gora); z-index: 5; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 0.5rem 1rem; padding: 0.75rem 1rem; background: var(--beton-ciemny); }
+  .grupa-panelu { background: var(--papier); border: 1px solid var(--linia); border-radius: 0 0 0 var(--rog-maly); }
+  .grupa-panelu__glowa { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 0.75rem 1.25rem; padding: 1rem 1.25rem; border-bottom: 3px solid var(--grafit); }
+  .grupa-panelu__picto { width: 2.75rem; height: 2.75rem; background: var(--grafit); -webkit-mask: var(--maska) center / contain no-repeat; mask: var(--maska) center / contain no-repeat; }
+  .grupa-panelu__tytul h2 { font-size: clamp(1.6rem, 2.4vw, 2.1rem); }
+  .grupa-panelu__tytul p { font-size: 0.95rem; color: var(--stal); }
+  .grupa-panelu.ukryta .grupa-panelu__glowa { background: repeating-linear-gradient(135deg, #0000 0 10px, #0000000a 10px 20px); }
+  .grupa-panelu.ukryta .modele-panelu { opacity: 0.55; }
+  .grupa-panelu__opis { display: grid; gap: 1rem; padding: 1rem 1.25rem; background: #fbfbf8; border-bottom: 1px solid var(--linia); }
+
+  .model-panelu {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(10rem, 1.3fr) minmax(8rem, 1fr) minmax(9rem, 1fr) auto auto;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid var(--linia);
+  }
+  .model-panelu:first-child { border-top: 0; }
+  .model-panelu__foto { width: 5.5rem; height: 4.125rem; display: grid; place-items: center; background: var(--beton); overflow: hidden; }
+  .model-panelu__foto img { width: auto; height: auto; max-width: 88%; max-height: 82%; object-fit: contain; }
+  .model-panelu__nazwa h3 { font-size: 1.35rem; }
+  .model-panelu__nazwa p { font-size: var(--t-maly); color: var(--stal); }
+  .model-panelu .pole label { font-size: 0.8rem; color: var(--stal); }
+  .model-panelu .pole input { padding: 0.45rem 0.6rem; font-size: 0.95rem; }
+  .model-panelu__akcje { display: flex; gap: 0.4rem; }
+  .model-panelu__opis { grid-column: 2 / -1; }
+  .model-panelu.ukryty .model-panelu__foto, .model-panelu.ukryty .model-panelu__nazwa { opacity: 0.45; }
+  .model-panelu.ukryty .model-panelu__nazwa h3 { text-decoration: line-through; }
+  .model-panelu.zmieniony { box-shadow: inset 4px 0 0 var(--zolty-ciemny); }
+
+  /* Ogloszenie */
+  .podglad-ogloszenia { display: grid; gap: 0.35rem; }
+  .podglad-ogloszenia__pasek { padding: 0.7rem 1rem; background: var(--probud); color: var(--papier); font-weight: 600; text-align: center; }
+  .podglad-ogloszenia__pasek.wylaczone { background: #b9b9b1; color: var(--grafit); }
+
+  /* Pasek zapisu i komunikaty */
+  .zapis { position: fixed; left: 50%; bottom: 1rem; z-index: 30; transform: translateX(-50%); display: flex; align-items: center; gap: 1.25rem; width: min(40rem, calc(100vw - 2rem)); padding: 0.75rem 0.75rem 0.75rem 1.25rem; background: var(--grafit); color: var(--papier); box-shadow: 0 12px 34px #00000055; }
+  .zapis p { flex: 1; font-weight: 650; }
+  .zapis div { display: flex; gap: 0.5rem; }
+  .zapis .przycisk { min-height: 2.75rem; padding: 0.55rem 1rem; }
+  .komunikat { position: fixed; right: 1rem; top: 4.5rem; z-index: 40; max-width: min(24rem, calc(100vw - 2rem)); padding: 0.9rem 1.1rem; background: var(--papier); border-left: 6px solid var(--zolty-ciemny); box-shadow: 0 10px 28px #00000033; font-weight: 600; }
+  .komunikat.blad { border-left-color: var(--probud); }
+  .komunikat a { display: inline-block; margin-top: 0.3rem; }
+
+  @media (max-width: 71.99rem) {
+    .model-panelu { grid-template-columns: 5.5rem minmax(0, 1fr) minmax(0, 1fr) auto; }
+    .model-panelu__nazwa { grid-column: 2 / -1; }
+    .model-panelu__foto { grid-row: span 2; }
+    .model-panelu__akcje { grid-column: 2 / -1; }
+  }
+  @media (max-width: 55.99rem) {
+    .panel { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; }
+    .panel__menu { position: sticky; top: var(--gora); z-index: 15; border-right: 0; border-bottom: 1px solid var(--linia); overflow-x: auto; }
+    .panel__menu ul { position: static; display: flex; padding: 0; }
+    .panel__menu a { white-space: nowrap; border-left: 0; border-bottom: 4px solid transparent; padding: 0.75rem 1rem; }
+    .panel__menu a[aria-current='page'] { border-bottom-color: var(--zolty); }
+    .panel__marka span, .panel__uzytkownik { display: none; }
+    .narzedzia { position: static; grid-template-columns: 1fr; }
+    .grupa-panelu__glowa { grid-template-columns: auto minmax(0, 1fr); }
+    .grupa-panelu__glowa > .przelacznik, .grupa-panelu__glowa > .przycisk-maly { grid-column: 1 / -1; justify-self: start; }
+    .model-panelu { grid-template-columns: 4.5rem minmax(0, 1fr); padding-inline: 1rem; }
+    .model-panelu__foto { width: 4.5rem; height: 3.4rem; grid-row: auto; }
+    .model-panelu__nazwa, .model-panelu__akcje, .model-panelu__opis, .model-panelu .pole { grid-column: 2 / -1; }
+    .model-panelu > .przelacznik { grid-column: 2 / -1; }
+    .zmiana { flex-direction: column; align-items: flex-start; }
+    .zapis { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  }
+</style>

@@ -3,6 +3,8 @@ import Strona from '../../layouts/Strona.astro';
 import KartaModelu from '../../components/KartaModelu.astro';
 import ZapytajHandlowca from '../../components/ZapytajHandlowca.astro';
 import Okruszki from '../../components/Okruszki.astro';
+import KatalogDemo from '../../components/KatalogDemo.astro';
+import { tresc } from '../../data/tresci';
 import { kategorie, modele } from '../../data/katalog';
 import { odmiana, sierotki } from '../../lib/tekst';
 ---
@@ -14,16 +16,16 @@ import { odmiana, sierotki } from '../../lib/tekst';
     <Okruszki sciezka={[{ nazwa: 'Strona główna', href: '/' }, { nazwa: 'Maszyny nowe' }]} />
     <div class="katalog__glowa">
       <h1>Maszyny nowe</h1>
-      <p class="lead">{sierotki(`${odmiana(modele.length, ['model', 'modele', 'modeli'])} w ${kategorie.length} grupach. BOMAG Light Equipment sprzedajemy jako autoryzowany dystrybutor na województwa wielkopolskie i kujawsko-pomorskie.`)}</p>
+      <p class="lead"><span data-licznik-modeli>{odmiana(modele.length, ['model', 'modele', 'modeli'])}</span> <span data-licznik-grup>w {kategorie.length} grupach</span>. <span data-tresc="katalog.lead">{sierotki(tresc('katalog.lead'))}</span></p>
     </div>
 
     <nav class="skoki" aria-label="Grupy maszyn">
       <ul role="list">
         {kategorie.map((k) => (
-          <li>
+          <li data-kategoria={k.id}>
             <a href={`#${k.id}`}>
               <span class="skoki__picto" style={`--maska:url(/piktogramy/${k.piktogram}.png)`} aria-hidden="true"></span>
-              {k.nazwa}
+              <span data-kategoria-nazwa={k.id}>{k.nazwa}</span>
             </a>
           </li>
         ))}
@@ -32,11 +34,11 @@ import { odmiana, sierotki } from '../../lib/tekst';
   </div>
 
   {kategorie.map((k, i) => (
-    <section class={`grupa kontener ${i === kategorie.length - 1 ? 'grupa--ostatnia' : ''}`} id={k.id} aria-labelledby={`t-${k.id}`}>
+    <section class={`grupa kontener ${i === kategorie.length - 1 ? 'grupa--ostatnia' : ''}`} id={k.id} aria-labelledby={`t-${k.id}`} data-kategoria={k.id}>
       <div class="grupa__glowa">
-        <h2 id={`t-${k.id}`}>{k.nazwa}</h2>
-        <p>{sierotki(k.opis)}</p>
-        <a class="grupa__link" href={k.href}>Porównaj {odmiana(k.modele.length, ['model', 'modele', 'modeli'])} w tabeli</a>
+        <h2 id={`t-${k.id}`} data-kategoria-nazwa={k.id}>{k.nazwa}</h2>
+        <p data-kategoria-opis={k.id}>{sierotki(k.opis)}</p>
+        <a class="grupa__link" href={k.href}>Porównaj <span data-licznik-kategorii={k.id}>{odmiana(k.modele.length, ['model', 'modele', 'modeli'])}</span> w tabeli</a>
       </div>
       <div class="grupa__siatka">
         {k.modele.map((m) => <KartaModelu model={m} />)}
@@ -45,6 +47,7 @@ import { odmiana, sierotki } from '../../lib/tekst';
   ))}
 
   <ZapytajHandlowca temat="maszynę" />
+  <KatalogDemo />
 </Strona>
 
 <style>

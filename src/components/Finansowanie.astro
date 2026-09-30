@@ -1,16 +1,17 @@
 ---
 import { finansowanie } from '../data/firma';
 import { sierotki, telHref, telKrotki } from '../lib/tekst';
+import { tresc } from '../data/tresci';
 ---
 <section class="finansowanie" id="finansowanie" aria-labelledby="finansowanie-tytul">
   <div class="kontener finansowanie__pas">
     <div class="finansowanie__tekst">
-      <h2 id="finansowanie-tytul">Finansowanie</h2>
-      <p class="lead">{sierotki('Zakup maszyn używanych i sprzętu BOMAG można sfinansować przez BPCE Equipment Solutions Polska. Warunki ustalasz bezpośrednio z opiekunem finansowania.')}</p>
+      <h2 id="finansowanie-tytul" data-tresc="finansowanie.tytul">{tresc('finansowanie.tytul')}</h2>
+      <p class="lead" data-tresc="finansowanie.lead">{sierotki(tresc('finansowanie.lead'))}</p>
     </div>
     <div class="finansowanie__karta">
       <img src="/marki/bpce.webp" alt="BPCE Equipment Solutions" width="545" height="120" loading="lazy" />
-      <p class="finansowanie__osoba">{finansowanie.osoba}</p>
+      <p class="finansowanie__osoba" data-finansowanie-osoba>{finansowanie.osoba}</p>
       <p class="drugorzedny">{finansowanie.firma}</p>
       <a class="finansowanie__tel numer" href={telHref(finansowanie.telefon)}>{telKrotki(finansowanie.telefon)}</a>
       <a class="finansowanie__email" href={`mailto:${finansowanie.email}`}>{finansowanie.email}</a>

@@ -2,12 +2,12 @@
 import Foto from './Foto.astro';
 import { firma } from '../data/firma';
 import { sierotki } from '../lib/tekst';
+import { tresc } from '../data/tresci';
 
-const specjalnosci = [
-  { typ: 'Ładowarki teleskopowe obrotowe', marki: 'Merlo w wersji Roto, w nich się specjalizujemy' },
-  { typ: 'Koparki kołowe', marki: 'Atlas, Case, Yanmar' },
-  { typ: 'Koparko-ładowarki', marki: 'Terex, Case, New Holland' },
-];
+const specjalnosci = (['1', '2', '3'] as const).map((n) => ({
+  typ: `uzywane.typ${n}` as const,
+  marki: `uzywane.marki${n}` as const,
+}));
 ---
 <section class="uzywane sekcja" id="uzywane" aria-labelledby="uzywane-tytul">
   <div class="kontener uzywane__siatka">
@@ -17,15 +17,15 @@ const specjalnosci = [
     </div>
 
     <div class="uzywane__tekst">
-      <h2 id="uzywane-tytul">Maszyny używane</h2>
-      <p class="lead">{sierotki('Sprowadzamy je od partnerów handlowych z całej Europy. Sprzedajemy tylko sprawny sprzęt przeznaczony na rynek UE, z dokumentacją CE.')}</p>
-      <p>{sierotki('Przed sprzedażą każda maszyna przechodzi przegląd, a jeśli trzeba, naprawę. Maszyny można też wziąć w wynajem długoterminowy.')}</p>
+      <h2 id="uzywane-tytul" data-tresc="uzywane.tytul">{tresc('uzywane.tytul')}</h2>
+      <p class="lead" data-tresc="uzywane.lead">{sierotki(tresc('uzywane.lead'))}</p>
+      <p data-tresc="uzywane.tekst">{sierotki(tresc('uzywane.tekst'))}</p>
 
       <dl class="uzywane__lista">
         {specjalnosci.map((s) => (
           <div>
-            <dt>{s.typ}</dt>
-            <dd>{s.marki}</dd>
+            <dt data-tresc={s.typ}>{tresc(s.typ)}</dt>
+            <dd data-tresc={s.marki}>{tresc(s.marki)}</dd>
           </div>
         ))}
       </dl>
@@ -37,7 +37,7 @@ const specjalnosci = [
         </a>
         <a class="przycisk przycisk--obrys" href="/?temat=skup#formularz">Chcę sprzedać maszynę</a>
       </div>
-      <p class="uzywane__uwaga drugorzedny">{sierotki('Skupujemy też maszyny budowlane. Opisz swoją maszynę w formularzu albo zadzwoń do handlowca.')}</p>
+      <p class="uzywane__uwaga drugorzedny" data-tresc="uzywane.uwaga">{sierotki(tresc('uzywane.uwaga'))}</p>
     </div>
   </div>
 </section>

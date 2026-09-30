@@ -66,7 +66,7 @@ export const zespol: Osoba[] = [krzysztof, marcin, tomasz];
 /** Handlowcy z numerami: pasek telefonu, blok „Zapytaj” w katalogu, naglowek. */
 export const handlowcy: Osoba[] = [krzysztof, marcin];
 
-export type Telefon = { numer: string; osoba?: string };
+export type Telefon = { numer: string; osoba?: string; osobaId?: string };
 export type Dzial = {
   id: 'sprzedaz' | 'serwis' | 'czesci' | 'administracja';
   nazwa: string;
@@ -75,11 +75,11 @@ export type Dzial = {
   dopisek?: string;
 };
 
-const podpis = (o: Osoba) => `${o.imie} ${o.nazwisko}`;
+const telefonOsoby = (o: Osoba): Telefon => ({ numer: o.telefon!, osoba: `${o.imie} ${o.nazwisko}`, osobaId: o.id });
 export const dzialy: Dzial[] = [
-  { id: 'sprzedaz', nazwa: 'Sprzedaż maszyn', telefony: [{ numer: krzysztof.telefon!, osoba: podpis(krzysztof) }, { numer: marcin.telefon!, osoba: podpis(marcin) }], email: 'sprzedaz@phuprobud.pl' },
+  { id: 'sprzedaz', nazwa: 'Sprzedaż maszyn', telefony: [telefonOsoby(krzysztof), telefonOsoby(marcin)], email: 'sprzedaz@phuprobud.pl' },
   { id: 'serwis', nazwa: 'Serwis', telefony: [{ numer: '+48 662 997 955' }], email: 'zlecenia@ewpa.pl', dopisek: 'Zlecenia serwisowe przyjmuje EWPA.' },
-  { id: 'czesci', nazwa: 'Części zamienne', telefony: [{ numer: tomasz.telefon!, osoba: podpis(tomasz) }], email: 'handel@phuprobud.pl' },
+  { id: 'czesci', nazwa: 'Części zamienne', telefony: [telefonOsoby(tomasz)], email: 'handel@phuprobud.pl' },
   { id: 'administracja', nazwa: 'Administracja', telefony: [{ numer: '+48 722 223 755' }], email: 'info@phuprobud.pl' },
 ];
 

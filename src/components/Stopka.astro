@@ -21,7 +21,7 @@ const rok = new Date().getFullYear();
       <nav class="stopka__kolumna" aria-label="Oferta">
         <p class="stopka__tytul">Maszyny nowe</p>
         <ul role="list">
-          {kategorie.map((k) => <li><a href={`/oferta/${k.id}/`}>{k.nazwa}</a></li>)}
+          {kategorie.map((k) => <li data-kategoria={k.id}><a href={`/oferta/${k.id}/`} data-kategoria-nazwa={k.id}>{k.nazwa}</a></li>)}
         </ul>
       </nav>
 

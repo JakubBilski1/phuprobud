@@ -1,0 +1,43 @@
+---
+// Pole formularza w panelu /admin/. Wartosc domyslna w HTML (value / tresc textarea) jest
+// oryginalem: skrypt porownuje z nia to, co wpisano, i zapisuje tylko roznice.
+interface Props {
+  klucz: string;
+  etykieta: string;
+  /** opis pola na liscie zmian, np. „BT 60 · opis” */
+  sciezka: string;
+  wartosc: string;
+  typ?: 'tekst' | 'dlugi' | 'telefon' | 'email' | 'link';
+  wymagane?: boolean;
+  max?: number;
+  placeholder?: string;
+  lista?: string;
+  podpowiedz?: string;
+  /** w wierszu modelu przywracanie jest jedno dla calego wiersza */
+  bezPrzywracania?: boolean;
+}
+const { klucz, etykieta, sciezka, wartosc, typ = 'tekst', wymagane = false, max, placeholder, lista, podpowiedz, bezPrzywracania = false } = Astro.props;
+const id = `p-${klucz.replace(/[^a-z0-9]+/gi, '-')}`;
+const TYPY = { tekst: 'text', telefon: 'tel', email: 'email', link: 'text' } as const;
+const wspolne = {
+  id,
+  'data-pole': klucz,
+  'data-etykieta': sciezka,
+  'data-typ': typ,
+  maxlength: max,
+  required: wymagane,
+  placeholder,
+  'aria-describedby': `${id}-blad`,
+};
+---
+<div class:list={['pole', { 'pole--dlugie': typ === 'dlugi' }]} data-pole-ramka>
+  <div class="pole__glowa">
+    <label for={id}>{etykieta}</label>
+    {!bezPrzywracania && <button type="button" class="pole__przywroc" data-przywroc={klucz} hidden>Przywróć oryginał</button>}
+  </div>
+  {typ === 'dlugi'
+    ? <textarea {...wspolne} rows="3">{wartosc}</textarea>
+    : <input {...wspolne} type={TYPY[typ]} value={wartosc} list={lista} autocomplete="off" inputmode={typ === 'telefon' ? 'tel' : undefined} />}
+  {podpowiedz && <p class="pole__podpowiedz">{podpowiedz}</p>}
+  <p class="pole__blad" id={`${id}-blad`} data-blad-pola={klucz} hidden></p>
+</div>

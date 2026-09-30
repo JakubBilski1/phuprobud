@@ -10,14 +10,16 @@ const Naglowek = naglowek;
 // Oznaczenie w tle: sama glowna czesc kodu ("BW 120", "BPR 60/65"), bez wersji.
 const kodTla = model.kod.replace(/\s+STONEGUARD$/i, '').replace(/\s+(AD|AC|DH|D|E)(-\d)?$/i, '');
 ---
-<article class="karta">
+<article class="karta" data-model={model.id}>
   <a class="karta__link" href={model.href}>
     <div class="karta__scena kadr">
       <span class="karta__kod" aria-hidden="true">{kodTla}</span>
+      <span class="karta__etykieta" data-model-etykieta={model.id} hidden></span>
       <Foto nazwa={model.zdjecie} alt="" class="karta__foto" sizes="(min-width: 64rem) 26vw, (min-width: 40rem) 45vw, 90vw" />
     </div>
     <Naglowek class="karta__nazwa">{model.nazwa}</Naglowek>
   </a>
+  <p class="karta__cena numer" data-model-cena={model.id} hidden></p>
   {model.karta.length > 0 && (
     <dl class="karta__dane">
       {model.karta.map((p) => (
@@ -65,6 +67,19 @@ const kodTla = model.kod.replace(/\s+STONEGUARD$/i, '').replace(/\s+(AD|AC|DH|D|
   .karta__link:hover .karta__kod, .karta__link:focus-visible .karta__kod { color: #e8c9c5; }
   .karta__link:hover .karta__foto { transform: translateX(-3%); }
   .karta__nazwa { font-size: clamp(1.45rem, 2vw, 1.8rem); margin-top: 0.85rem; }
+  /* Etykieta i cena pojawiaja sie tylko, gdy ustawi je panel. */
+  .karta__etykieta {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
+    padding: 0.35rem 0.7rem;
+    background: var(--probud);
+    color: var(--papier);
+    font-weight: 700;
+    font-size: var(--t-maly);
+  }
+  .karta__cena { margin-top: 0.3rem; font-weight: 700; color: var(--probud); }
   .karta__link:hover .karta__nazwa { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.12em; }
   .karta__dane { margin-top: 0.6rem; border-top: 2px solid var(--grafit); }
   .karta__dane div { display: flex; justify-content: space-between; gap: 1rem; padding: 0.4rem 0; border-bottom: 1px solid var(--linia); font-size: 0.95rem; }

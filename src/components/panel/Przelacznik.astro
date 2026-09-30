@@ -1,0 +1,19 @@
+---
+// Przelacznik tak/nie w panelu /admin/ (checkbox z rola switch). Stan w HTML to oryginal.
+interface Props {
+  klucz: string;
+  etykieta: string;
+  sciezka: string;
+  zaznaczony: boolean;
+  /** jak opisac stan na liscie zmian */
+  tak?: string;
+  nie?: string;
+  ukryjEtykiete?: boolean;
+}
+const { klucz, etykieta, sciezka, zaznaczony, tak = 'włączone', nie = 'wyłączone', ukryjEtykiete = false } = Astro.props;
+---
+<label class="przelacznik" data-pole-ramka>
+  <input type="checkbox" role="switch" data-pole={klucz} data-etykieta={sciezka} data-tak={tak} data-nie={nie} checked={zaznaczony} />
+  <span class="przelacznik__tor" aria-hidden="true"></span>
+  <span class:list={['przelacznik__tekst', { 'sr-only': ukryjEtykiete }]}>{etykieta}</span>
+</label>
