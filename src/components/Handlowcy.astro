@@ -1,8 +1,7 @@
 ---
-// Ludzie z numerami: duzy pas z dwoma osobami (sprzedaz i CEO) i mniejsze kafelki pod nim.
+// Ludzie, bez zdjec: centralny blok CEO, pod nim rola i numer kazdej osoby.
 // Przypisania numerow do osob: src/data/firma.ts (zrodlo: ewpa.pl/kontakt).
-import Foto from './Foto.astro';
-import { zespolGlowny, zespolKafelki, dzialy } from '../data/firma';
+import { szef, zespol, dzialy } from '../data/firma';
 import { sierotki, telHref, telKrotki } from '../lib/tekst';
 
 const email = dzialy.find((d) => d.id === 'sprzedaz')!.email;
@@ -15,49 +14,23 @@ const ikonaTelefonu = 'M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25
       <p class="lead">{sierotki('Dzwoń bezpośrednio do handlowca: o nowe BOMAG‑i, o maszyny używane i o wycenę maszyny, którą chcesz nam sprzedać.')}</p>
     </div>
 
-    <div class="handlowcy__pas">
-      {zespolGlowny.map((o, i) => (
-        <article class={`osoba ${i === 0 ? 'osoba--lewa' : 'osoba--prawa'}`}>
-          <div class="osoba__tekst">
-            <h3 class="osoba__imie">{o.imie}<br />{o.nazwisko}</h3>
-            <p class="osoba__rola">{o.rola}</p>
-            {o.telefon ? (
-              <a class="osoba__tel numer" href={telHref(o.telefon)} aria-label={`Zadzwoń: ${o.imie} ${o.nazwisko}, ${telKrotki(o.telefon)}`}>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d={ikonaTelefonu} fill="currentColor" /></svg>
-                {telKrotki(o.telefon)}
-              </a>
-            ) : (
-              o.tytul && <p class="osoba__tytul">{o.tytul}</p>
-            )}
-          </div>
-          <Foto
-            nazwa={o.zdjecie}
-            alt={`${o.imie} ${o.nazwisko}`}
-            class="osoba__foto"
-            sizes="(min-width: 64rem) 34vw, 80vw"
-            style={`--udzial:${o.twarz}`}
-            data-strona={i === 0 ? 'lewa' : 'prawa'}
-          />
-        </article>
-      ))}
-    </div>
+    <article class="szef">
+      {szef.tytul && <p class="szef__tytul">{szef.tytul}</p>}
+      <h3 class="szef__imie">{szef.imie} {szef.nazwisko}</h3>
+      <p class="szef__rola">{szef.rola}</p>
+    </article>
 
-    <ul class="kafelki" role="list">
-      {zespolKafelki.map((o) => (
-        <li class="kafelek">
-          <div class="kafelek__foto">
-            <Foto nazwa={o.zdjecie} alt={`${o.imie} ${o.nazwisko}`} sizes="9rem" pozycja={o.kadrMaly} />
-          </div>
-          <div class="kafelek__tekst">
-            <h3 class="kafelek__imie">{o.imie} {o.nazwisko}</h3>
-            <p class="kafelek__rola">{o.rola}</p>
-            {o.telefon && (
-              <a class="kafelek__tel numer" href={telHref(o.telefon)} aria-label={`Zadzwoń: ${o.imie} ${o.nazwisko}, ${telKrotki(o.telefon)}`}>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d={ikonaTelefonu} fill="currentColor" /></svg>
-                {telKrotki(o.telefon)}
-              </a>
-            )}
-          </div>
+    <ul class="zespol" role="list">
+      {zespol.map((o) => (
+        <li class="osoba">
+          <h3 class="osoba__rola">{o.rola}</h3>
+          <p class="osoba__imie">{o.imie} {o.nazwisko}</p>
+          {o.telefon && (
+            <a class="osoba__tel numer" href={telHref(o.telefon)} aria-label={`Zadzwoń: ${o.imie} ${o.nazwisko}, ${o.rola.toLowerCase()}, ${telKrotki(o.telefon)}`}>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d={ikonaTelefonu} fill="currentColor" /></svg>
+              {telKrotki(o.telefon)}
+            </a>
+          )}
         </li>
       ))}
     </ul>
@@ -76,97 +49,61 @@ const ikonaTelefonu = 'M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25
   }
   .handlowcy__glowa .lead { max-width: 46ch; }
 
-  .handlowcy__pas {
-    --twarz: clamp(88px, 9.5vw, 138px);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    background: var(--zolty);
-    border-radius: 0 0 0 var(--rog);
-    overflow: hidden;
-  }
-  .osoba {
-    position: relative;
+  /* Centralny blok: sam tekst na zoltym, wysrodkowany. */
+  .szef {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    min-height: clamp(27rem, 40vw, 36rem);
-    padding: clamp(1.5rem, 3vw, 2.75rem);
-  }
-  .osoba--prawa { align-items: flex-end; text-align: right; box-shadow: inset 1px 0 0 #2222222e; }
-  .osoba__tekst { position: relative; z-index: 1; max-width: 25rem; }
-  .osoba__imie { font-size: clamp(2.5rem, 4vw, 3.8rem); line-height: 0.9; }
-  .osoba__rola { margin-top: 0.75rem; font-weight: 600; max-width: 14rem; }
-  .osoba--prawa .osoba__rola { margin-left: auto; }
-  .osoba__tel, .osoba__tytul {
-    display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
-    margin-top: 1.25rem;
+    text-align: center;
+    padding: clamp(2.5rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem);
+    background: var(--zolty);
+    border-radius: 0 0 0 var(--rog);
+  }
+  .szef__tytul {
     font-family: var(--kroj-naglowki);
     font-weight: 800;
     font-size: var(--t-numer);
+    line-height: 1;
+  }
+  .szef__imie { margin-top: 0.75rem; font-size: clamp(2.8rem, 6.4vw, 6rem); line-height: 0.9; }
+  .szef__rola { margin-top: 1rem; font-weight: 600; font-size: var(--t-lead); }
+
+  /* Pod spodem: rola, osoba i numer, rowne kolumny na szerokosc bloku. */
+  .zespol {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: clamp(0.75rem, 1.5vw, 1.25rem);
+    margin-top: clamp(0.75rem, 1.5vw, 1.25rem);
+  }
+  .osoba {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: clamp(1.5rem, 3vw, 2.25rem) 1rem;
+    background: var(--beton);
+    border-radius: 0 0 0 var(--rog-maly);
+  }
+  .osoba__rola { font-size: clamp(1.6rem, 2.2vw, 2rem); line-height: 0.95; }
+  .osoba__imie { margin-top: 0.35rem; font-weight: 600; }
+  .osoba__tel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.75rem;
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: clamp(1.9rem, 2.8vw, 2.5rem);
     line-height: 1;
     text-decoration: none;
     white-space: nowrap;
   }
   .osoba__tel svg { width: 0.55em; height: 0.55em; }
-  .osoba__tel:hover { text-decoration: underline; text-decoration-thickness: 3px; }
+  .osoba__tel:hover { color: var(--probud); }
 
-  /* Szerokosc zdjecia liczona z udzialu twarzy w kadrze, wiec twarze wychodza rowne. */
-  .osoba__foto {
-    position: absolute;
-    bottom: 0;
-    width: calc(var(--twarz) / var(--udzial));
-    max-width: none;
-    height: auto;
-  }
-  .osoba__foto[data-strona='lewa'] { right: 0; }
-  .osoba__foto[data-strona='prawa'] { left: 0; }
-
-  /* Mniejsze kafelki: ten sam jezyk (portret na zoltym, numer krojem naglowkow), mniejsza skala. */
-  .kafelki {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 21rem), 1fr));
-    gap: clamp(0.75rem, 1.5vw, 1.25rem);
-    margin-top: clamp(0.75rem, 1.5vw, 1.25rem);
-  }
-  .kafelek {
-    display: flex;
-    align-items: stretch;
-    gap: clamp(1rem, 2vw, 1.5rem);
-    background: var(--beton);
-    border-radius: 0 0 0 var(--rog-maly);
-    overflow: hidden;
-  }
-  .kafelek__foto { flex: none; width: clamp(7rem, 11vw, 9rem); aspect-ratio: 1; background: var(--zolty); }
-  .kafelek__foto :global(img) { width: 100%; height: 100%; object-fit: cover; }
-  .kafelek__tekst { align-self: center; padding: 1rem 1rem 1rem 0; }
-  .kafelek__imie { font-size: clamp(1.6rem, 2.2vw, 2rem); line-height: 0.95; }
-  .kafelek__rola { margin-top: 0.3rem; font-weight: 600; font-size: 0.95rem; }
-  .kafelek__tel {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    margin-top: 0.5rem;
-    font-family: var(--kroj-naglowki);
-    font-weight: 800;
-    font-size: clamp(1.7rem, 2.4vw, 2.1rem);
-    line-height: 1;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-  .kafelek__tel svg { width: 0.55em; height: 0.55em; }
-  .kafelek__tel:hover { color: var(--probud); }
-
-  .handlowcy__email { margin-top: 1.25rem; font-weight: 600; }
+  .handlowcy__email { margin: 1.25rem auto 0; font-weight: 600; text-align: center; }
 
   @media (max-width: 63.99rem) {
     .handlowcy__glowa { grid-template-columns: 1fr; }
-    .handlowcy__pas { grid-template-columns: 1fr; --twarz: clamp(72px, 19vw, 118px); }
-    .osoba { min-height: 30rem; }
-    .osoba--prawa { box-shadow: inset 0 1px 0 #2222222e; }
-  }
-  @media (max-width: 30rem) {
-    .osoba__tekst { max-width: 12rem; }
   }
 </style>

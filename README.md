@@ -9,7 +9,8 @@ Założenia projektu, paleta, typografia i decyzje: [docs/PROJEKT.md](docs/PROJE
 ## Co jest na stronie
 
 - **Strona główna**: hero, maszyny nowe (indeks ośmiu grup), teren dealera BOMAG (scena 3D),
-  maszyny używane (odsyłacz do otomoto), dwóch handlowców z numerami, finansowanie BPCE,
+  maszyny używane (odsyłacz do otomoto), ludzie bez zdjęć (CEO w centralnym bloku, pod nim
+  rola i numer każdej osoby), finansowanie BPCE,
   realizacje (18 zdjęć w jednym kadrze), kontakt: działy, formularz, mapa dojazdu.
 - **`/oferta/`**: katalog 41 modeli BOMAG, Schaeff i Gehl.
 - **`/oferta/<grupa>/`**: grupa z tabelą porównania modeli.
@@ -37,7 +38,6 @@ i na produkcji działa. Scena 3D i reszta strony działają też w `dev`.
 | --- | --- |
 | `npm run obrazy` | WebP w kilku szerokościach + `src/data/obrazy.json`. Wymaga oryginałów w `zrodla/oryginaly/` i wycięć w `zrodla/wyciecia/` (poza gitem). |
 | `npm run marka` | Logo Probud w wersji na jasne tło i logotypy producentów do `public/`. |
-| `python scripts/wytnij-portrety.py` | Wycięcie tła z portretów handlowców (`rembg`, `u2net_human_seg`). |
 | `python scripts/wytnij-maszyny.py` | Wycięcie tła ze zdjęć maszyn bez przezroczystości (`rembg`, `isnet-general-use`). |
 | `scripts/vendor.mjs` | Kopiuje MapLibre do `public/vendor/`; uruchamia się sam przed `dev` i `build`. |
 | `scripts/teren.mjs` | Granice województw (Natural Earth) → `src/data/teren.json`; jednorazowo. |
@@ -53,7 +53,7 @@ nie przelicza.
   (PDF-y hostowane przez Probud, karty producentów). **Nie edytować ręcznie.** Nazwy grup,
   opisy i kolejność są w `src/data/katalog.ts`.
 - Zdjęcia: stara strona phuprobud.pl (realizacje), zdjęcia producentów (BOMAG, Schaeff/Yanmar,
-  Gehl/Manitou), portrety: ewpa.pl (Krzysztof Bilski) i monitorrynkowy.pl (Szymon Atraszkiewicz).
+  Gehl/Manitou). Zdjęć osób na stronie nie ma.
 - Piktogramy maszyn: wygenerowane (Codex, `image_gen`), `public/piktogramy/`.
 - Mapa: dane OpenStreetMap z kafli OpenFreeMap (bez klucza API). Granice województw: Natural
   Earth (domena publiczna).
@@ -69,14 +69,11 @@ nie przelicza.
 | 722 223 755 | administracja, bez osoby | phuprobud.pl; katalogi firm podają go jako numer firmy |
 
 Szymon Atraszkiewicz jest pokazany jako CEO, bez numeru: prowadzi PHU Probud (polityka
-prywatności), numeru osobistego nie ma w publicznych źródłach. Zdjęcia portretowe: ewpa.pl
-(Krzysztof Bilski, Marcin Maj, Tomasz Jurga), monitorrynkowy.pl (Szymon Atraszkiewicz).
-Zdjęcie Marcina Maja ma na ewpa.pl nazwę pliku `Mariusz-M.jpg`, ale strona przypisuje je jego
-karcie i przedstawia inną osobę niż Mariusz Kaczorowski; warto potwierdzić w firmie.
+prywatności), numeru osobistego nie ma w publicznych źródłach. Na stronie głównej ma centralny
+blok, pod nim pozostałe osoby z rolą i numerem. Zdjęć osób nie pokazujemy.
 
 ## Przed przejściem z demo na produkcję
 
-- **Zdjęcia osób** pochodzą z publicznych źródeł; na produkcję potrzebna zgoda albo sesja.
 - **Formularz** w demo składa gotową wiadomość w programie pocztowym (`mailto:` na adres
   wybranego działu). Wysyłka z serwera: ustawić `PUBLIC_FORMULARZ_URL` na endpoint, który
   przyjmuje JSON `{ dzial, do, temat, tresc }`.

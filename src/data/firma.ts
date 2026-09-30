@@ -34,13 +34,6 @@ export type Osoba = {
   tytul?: string;
   opis?: string;
   telefon?: string;
-  zdjecie: string;
-  /** szerokosc twarzy / szerokosc wyciecia - do wyrownania skali portretow */
-  twarz: number;
-  /** portret uciety kadrem z prawej: dosuwamy go do krawedzi panelu */
-  ucietyZPrawej: boolean;
-  /** object-position dla malej, kwadratowej miniatury (twarz na srodku) */
-  kadrMaly: string;
   /** skad wiemy, ze numer i funkcja naleza do tej osoby */
   zrodlo: string;
 };
@@ -51,30 +44,25 @@ export type Osoba = {
 // 662 997 955 (serwis) i 722 223 755 (administracja) to numery dzialow, bez osoby.
 const krzysztof: Osoba = {
   id: 'krzysztof-bilski', imie: 'Krzysztof', nazwisko: 'Bilski', rola: 'Sprzedaż maszyn',
-  telefon: '+48 601 896 689', zdjecie: 'ludzie/krzysztof-bilski',
-  twarz: 670 / 1600, ucietyZPrawej: true, kadrMaly: '50% 30%', zrodlo: 'https://ewpa.pl/kontakt/',
+  telefon: '+48 601 896 689', zrodlo: 'https://ewpa.pl/kontakt/',
 };
 const szymon: Osoba = {
   id: 'szymon-atraszkiewicz', imie: 'Szymon', nazwisko: 'Atraszkiewicz', rola: 'Prowadzi PHU Probud',
-  tytul: 'CEO', zdjecie: 'ludzie/szymon-atraszkiewicz',
-  twarz: 210 / 640, ucietyZPrawej: false, kadrMaly: '38% 30%',
-  zrodlo: '/dokumenty/polityka-prywatnosci-phu-probud.pdf',
+  tytul: 'CEO', zrodlo: '/dokumenty/polityka-prywatnosci-phu-probud.pdf',
 };
 const marcin: Osoba = {
   id: 'marcin-maj', imie: 'Marcin', nazwisko: 'Maj', rola: 'Sprzedaż maszyn',
-  telefon: '+48 601 416 618', zdjecie: 'ludzie/marcin-maj',
-  twarz: 760 / 1600, ucietyZPrawej: true, kadrMaly: '50% 30%', zrodlo: 'https://ewpa.pl/kontakt/',
+  telefon: '+48 601 416 618', zrodlo: 'https://ewpa.pl/kontakt/',
 };
 const tomasz: Osoba = {
   id: 'tomasz-jurga', imie: 'Tomasz', nazwisko: 'Jurga', rola: 'Części zamienne',
-  telefon: '+48 693 221 733', zdjecie: 'ludzie/tomasz-jurga',
-  twarz: 760 / 1600, ucietyZPrawej: true, kadrMaly: '50% 30%', zrodlo: 'https://ewpa.pl/kontakt/',
+  telefon: '+48 693 221 733', zrodlo: 'https://ewpa.pl/kontakt/',
 };
 
-/** Duzy, dwuosobowy element na stronie glownej. */
-export const zespolGlowny: Osoba[] = [krzysztof, szymon];
-/** Mniejsze kafelki pod nim. */
-export const zespolKafelki: Osoba[] = [marcin, tomasz];
+/** Centralny blok na stronie glownej. */
+export const szef: Osoba = szymon;
+/** Pod nim: rola i numer kazdej osoby. */
+export const zespol: Osoba[] = [krzysztof, marcin, tomasz];
 /** Handlowcy z numerami: pasek telefonu, blok „Zapytaj” w katalogu, naglowek. */
 export const handlowcy: Osoba[] = [krzysztof, marcin];
 
