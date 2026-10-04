@@ -15,9 +15,21 @@ const WYS_NASZE = 26;
 const WYS_INNE = 7;
 const WYS_SLUPKA = 64;
 const PODPISANE = ['Poznań', 'Bydgoszcz', 'Toruń', 'Kalisz'];
+// Kolejnosc etykiet przy kolizji: wczesniejsza zostaje, pozniejsza znika. Poznan jest ostatni,
+// bo tuz obok stoi pinezka „Komorniki: PHU Probud”.
+const PRIORYTET = ['Komorniki', 'Bydgoszcz', 'Toruń', 'Kalisz', 'Poznań'];
+// gora-lewo: nad punktem, ale wysunieta w lewo (punkt pod prawym koncem etykiety).
+type Strona = 'lewo' | 'prawo' | 'gora' | 'gora-lewo';
 // Po ktorej stronie punktu stoi etykieta: sasiednie miasta (Bydgoszcz i Torun) rozsuwamy na boki.
-const STRONA: Record<string, 'lewo' | 'prawo' | 'gora'> = { Bydgoszcz: 'lewo', 'Toruń': 'prawo', Komorniki: 'lewo' };
-const PRZESUNIECIE = { gora: 'translate(-50%, -100%)', lewo: 'translate(calc(-100% - 8px), -50%)', prawo: 'translate(8px, -50%)' };
+// Na telefonie etykieta siedziby idzie nad pinezke (z lewej nie miesci sie w kadrze), Bydgoszcz
+// nad punkt i w lewo (z prawej jest Torun), a Poznan na prawo od punktu, obok slupka pinezki.
+const STRONA: Record<string, Strona> = { Bydgoszcz: 'lewo', 'Toruń': 'prawo', Komorniki: 'lewo' };
+const STRONA_WASKI: Record<string, Strona> = { Bydgoszcz: 'gora-lewo', 'Toruń': 'prawo', Komorniki: 'gora', 'Poznań': 'prawo' };
+// Odstep etykiety siedziby od glowki pinezki, gdy stoi nad nia (px).
+const ODSTEP_SIEDZIBY = 14;
+// Na telefonie kamera przybliza teren (zoom bez zmiany perspektywy), zeby wypelnial kadr,
+// zamiast plywac w malym rozmiarze na tle reszty kraju.
+const ZOOM_WASKI = 1.75;
 // Wspolrzedne mapy: x na wschod, y na polnoc (km). W scenie polnoc to -z, wysokosc to +y.
 const doSceny = ([x, y]: [number, number], h = 0) => new Vector3(x, h, -y);
 
@@ -87,6 +99,7 @@ export function uruchomTeren(el: HTMLElement, { spokoj }: { spokoj: boolean }) {
   nasze.forEach((m) => pudlo.expandByObject(m));
   const cel = pudlo.getCenter(new Vector3()).setY(0);
   const kamera = new PerspectiveCamera(waski ? 34 : 27, 1, 10, 5000);
+  kamera.zoom = waski ? ZOOM_WASKI : 1;
   const odleglosc = waski ? 1180 : 1320;
   let obrot = 0.18;
 
@@ -97,8 +110,10 @@ export function uruchomTeren(el: HTMLElement, { spokoj }: { spokoj: boolean }) {
 
   // Etykiety miast jako HTML nad plotnem: ostre na kazdym ekranie i czytelne dla tlumaczy stron.
   const warstwa = el.querySelector<HTMLElement>('[data-teren-etykiety]');
+  const strony = waski ? STRONA_WASKI : STRONA;
   const etykiety = miejsca
     .filter((m) => m.siedziba || PODPISANE.includes(m.nazwa))
+    .sort((a, b) => PRIORYTET.indexOf(a.nazwa) - PRIORYTET.indexOf(b.nazwa))
     .map((m) => {
       const span = document.createElement('span');
       span.textContent = m.siedziba ? 'Komorniki: PHU Probud' : m.nazwa;
@@ -106,15 +121,28 @@ export function uruchomTeren(el: HTMLElement, { spokoj }: { spokoj: boolean }) {
       warstwa?.append(span);
       // Wszystkie podpisane miasta leza na naszym terenie, wiec etykieta stoi nad wyzsza plyta.
       const h = m.siedziba ? WYS_NASZE + WYS_SLUPKA + 18 : WYS_NASZE + 2;
-      return { span, punkt: doSceny(m.xy, h), przesuniecie: PRZESUNIECIE[STRONA[m.nazwa] ?? 'gora'] };
+      return { span, punkt: doSceny(m.xy, h), strona: strony[m.nazwa] ?? 'gora', odstep: m.siedziba ? ODSTEP_SIEDZIBY : 0 };
     });
 
+  // Etykiety zostaja w kadrze (dosuniete do krawedzi), a ta, ktora wchodzi na wczesniejsza, znika.
   let szer = 1, wys = 1;
+  const MARGINES = 4;
   const rysuj = () => {
     renderer.render(scena, kamera);
-    for (const { span, punkt, przesuniecie } of etykiety) {
+    const zajete: { l: number; t: number; w: number; h: number }[] = [];
+    for (const { span, punkt, strona, odstep } of etykiety) {
       const p = punkt.clone().project(kamera);
-      span.style.transform = `translate(${((p.x + 1) / 2) * szer}px, ${((1 - p.y) / 2) * wys}px) ${przesuniecie}`;
+      const x = ((p.x + 1) / 2) * szer;
+      const y = ((1 - p.y) / 2) * wys;
+      const w = span.offsetWidth;
+      const h = span.offsetHeight;
+      let l = strona === 'lewo' ? x - w - 8 : strona === 'prawo' ? x + 8 : strona === 'gora-lewo' ? x - w + 12 : x - w / 2;
+      const t = strona === 'gora' || strona === 'gora-lewo' ? y - h - odstep : y - h / 2;
+      l = Math.max(MARGINES, Math.min(szer - w - MARGINES, l));
+      const kolizja = zajete.some((r) => l < r.l + r.w + MARGINES && l + w + MARGINES > r.l && t < r.t + r.h + MARGINES && t + h + MARGINES > r.t);
+      span.style.visibility = kolizja ? 'hidden' : '';
+      if (!kolizja) zajete.push({ l, t, w, h });
+      span.style.transform = `translate(${l}px, ${t}px)`;
     }
   };
 
