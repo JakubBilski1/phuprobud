@@ -1227,15 +1227,15 @@
    }
   ]
  },
- "tlo/krajobraz": {
+ "tlo/przekroj": {
   "w": 1024,
   "h": 1536,
-  "kolor": "#e8e8e8",
+  "kolor": "#f8f8f8",
   "alfa": false,
   "warianty": [
    {
     "w": 1024,
-    "src": "/img/tlo/krajobraz-1024.webp"
+    "src": "/img/tlo/przekroj-1024.webp"
    }
   ]
  }

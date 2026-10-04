@@ -38,6 +38,6 @@ const kategorie = fs.readdirSync(path.join(K, 'zrodla', 'oryginaly', 'kategorie'
 
 // Tlo strony glownej (scena wygenerowana przez Codex, bez maszyn i ludzi): jeden wariant w rozmiarze
 // oryginalu, bo na telefonie i tak jest powiekszane (kadr wyzszy niz ekran, patrz TloStrony.astro).
-const tlo = [{ zrodlo: 'oryginaly/tlo/krajobraz.png', cel: 'tlo/krajobraz', szerokosci: [1024], jakosc: 72 }];
+const tlo = [{ zrodlo: 'oryginaly/tlo/przekroj.png', cel: 'tlo/przekroj', szerokosci: [1024], jakosc: 72 }];
 
 lista.push(...maszyny, ...hero, ...kategorie, ...tlo);

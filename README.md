@@ -77,8 +77,9 @@ nie przelicza.
   Zdjęć osób na stronie nie ma.
 - Piktogramy maszyn i ikona telefonu: wygenerowane (Codex, `image_gen`), `public/piktogramy/`,
   `public/ikony/`.
-- Tło strony głównej: scena budowy drogi o świcie, wygenerowana (Codex, `image_gen`, bez maszyn
-  i ludzi), przypięta za treścią i przesuwana przy przewijaniu (`TloStrony.astro`).
+- Tło strony głównej: przekrój drogi (niebo, asfalt, kruszywo, piasek, grunt), wygenerowany
+  (Codex, `image_gen`, bez maszyn i ludzi), przypięty za treścią i przesuwany przy przewijaniu
+  (`TloStrony.astro`).
 - Mapa: dane OpenStreetMap z kafli OpenFreeMap (bez klucza API). Granice województw: Natural
   Earth (domena publiczna).
 
