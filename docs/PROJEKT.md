@@ -49,7 +49,8 @@ prostokątne. Bez cieni pod kartami.
 - Teren dealera: scena 3D (Three.js) z wojewódzkimi płytami; wielkopolskie i kujawsko-pomorskie
   podniesione. Ładowana, gdy sekcja wchodzi w ekran; bez WebGL rysunek SVG.
 - Handlowcy: dwa portrety na żółtych polach, wielkie numery jako `tel:`.
-- Realizacje: jeden kadr na ciemnym module, licznik, strzałki, pasek miniatur, przeciąganie.
+- Realizacje: jeden kadr na ciemnym module, licznik, strzałki, miniatury, przeciąganie. Kadr bierze
+  wysokość ekranu pod nagłówkiem; na szerokim ekranie poziomo panel z miniaturami stoi obok kadru.
 - Kontakt w trzech pasach, nie „tekst z lewej, formularz z prawej” (ten układ mają już Karta
   Pola, Dutkiewicz i CartBot): centrala działów z dużymi numerami, formularz na całą szerokość
   z wyborem działu (wiadomość trafia na właściwy adres), autorska mapa MapLibre (prawdziwe

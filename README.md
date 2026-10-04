@@ -11,7 +11,7 @@ Założenia projektu, paleta, typografia i decyzje: [docs/PROJEKT.md](docs/PROJE
 - **Strona główna**: hero, maszyny nowe (indeks ośmiu grup), teren dealera BOMAG (scena 3D),
   maszyny używane (odsyłacz do otomoto), ludzie bez zdjęć (CEO w centralnym bloku, pod nim
   rola i numer każdej osoby), finansowanie BPCE,
-  realizacje (18 zdjęć w jednym kadrze), kontakt: działy, formularz, mapa dojazdu.
+  realizacje (19 zdjęć w jednym kadrze, cała galeria mieści się na ekranie), kontakt: działy, formularz, mapa dojazdu.
 - **`/oferta/`**: katalog 41 modeli BOMAG, Schaeff i Gehl.
 - **`/oferta/<grupa>/`**: grupa z tabelą porównania modeli.
 - **`/oferta/<grupa>/<model>/`**: karta modelu z parametrami i kartą katalogową producenta.
@@ -72,7 +72,8 @@ nie przelicza.
 - `src/data/zrodla/katalog-astra.json`: katalog maszyn z parametrami i źródłem każdej wartości
   (PDF-y hostowane przez Probud, karty producentów). **Nie edytować ręcznie.** Nazwy grup,
   opisy i kolejność są w `src/data/katalog.ts`.
-- Zdjęcia: stara strona phuprobud.pl (realizacje), zdjęcia producentów (BOMAG, Schaeff/Yanmar,
+- Zdjęcia: od Probudu (realizacje i maszyny używane, październik 2026), stara strona
+  phuprobud.pl (7 realizacji), zdjęcia producentów (BOMAG, Schaeff/Yanmar,
   Gehl/Manitou). Zdjęć osób na stronie nie ma.
 - Piktogramy maszyn: wygenerowane (Codex, `image_gen`), `public/piktogramy/`.
 - Mapa: dane OpenStreetMap z kafli OpenFreeMap (bez klucza API). Granice województw: Natural

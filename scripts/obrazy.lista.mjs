@@ -1,9 +1,13 @@
 // Lista zdjec do przygotowania przez scripts/obrazy.mjs.
 // zrodlo: sciezka w zrodla/ (oryginaly/ albo wyciecia/), cel: klucz w manifescie i sciezka w public/img/.
-const realizacje = Array.from({ length: 18 }, (_, i) => {
-  const n = String(i + 1).padStart(2, '0');
-  return { zrodlo: `oryginaly/realizacje/${n}.jpg`, cel: `realizacje/${n}`, szerokosci: [320, 720, 1200, 1800] };
-});
+// Realizacje: kolejnosc i podpisy sa w src/data/realizacje.ts. Numerowane pliki to zdjecia
+// ze starej strony, nazwane opisowo przyszly od Probudu w pazdzierniku 2026.
+const realizacje = [
+  '02', '08', '09', '13', '14', '16', '17',
+  'jcb-8025-zts', 'case-821g', 'case-koparko-ladowarka-1', 'case-koparko-ladowarka-2', 'merlo-roto-widly',
+  'merlo-roto-45-21-kosz', 'merlo-roto-bok', 'bomag-bw-120-ad', 'bomag-bmp-8500', 'liugong',
+  'atlas-150w', 'ladowarka-v80',
+].map((n) => ({ zrodlo: `oryginaly/realizacje/${n}.jpg`, cel: `realizacje/${n}`, szerokosci: [320, 720, 1200, 1800] }));
 
 export const lista = [...realizacje];
 

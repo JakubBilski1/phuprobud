@@ -1,6 +1,9 @@
 ---
-// Galeria realizacji: jeden duzy kadr zamiast sciany 18 miniatur. Pelne zdjecia
-// dostaja srcset dopiero, gdy sa biezace albo sasiednie (skrypt nizej).
+// Galeria realizacji: jeden duzy kadr, a obok niego (szeroki ekran poziomo) albo pod nim
+// (telefon, tablet pionowo) tytul, licznik, podpis i miniatury. Kadr bierze tyle wysokosci,
+// zeby cala galeria miescila sie na ekranie pod przyklejonym naglowkiem. Zdjecie jest
+// wpisane w kadr w calosci (bez przycinania), bo maszyny maja wysiegniki pod sama krawedz.
+// Pelne zdjecia dostaja srcset dopiero, gdy sa biezace albo sasiednie (skrypt nizej).
 import manifest from '../data/obrazy.json';
 import { realizacje } from '../data/realizacje';
 
@@ -20,48 +23,45 @@ const zdjecia = realizacje.map((r, i) => {
 });
 const razem = zdjecia.length;
 ---
-<section class="realizacje sekcja sekcja--grafit" id="realizacje" aria-labelledby="realizacje-tytul">
+<section class="realizacje sekcja sekcja--grafit" aria-labelledby="realizacje-tytul">
   <div class="kontener">
-    <div class="galeria" data-galeria tabindex="-1">
-      <div class="galeria__glowa">
-        <h2 id="realizacje-tytul">Realizacje</h2>
-        <p class="galeria__licznik numer" aria-live="polite">
-          <span class="sr-only">Zdjęcie </span><span data-galeria-nr>1</span><span aria-hidden="true"> / </span><span class="sr-only"> z </span>{razem}
-        </p>
-      </div>
+    <div class="galeria" id="realizacje" data-galeria tabindex="-1">
+      <h2 class="galeria__tytul" id="realizacje-tytul">Realizacje</h2>
+      <p class="galeria__licznik numer" aria-live="polite">
+        <span class="sr-only">Zdjęcie </span><span data-galeria-nr>1</span><span aria-hidden="true"> / </span><span class="sr-only"> z </span>{razem}
+      </p>
 
-      <div class="galeria__scena kadr" data-galeria-scena>
-        {zdjecia.map((z, i) => (
-          <img
-            data-galeria-zdjecie={i}
-            data-srcset={z.srcset}
-            data-src={z.src}
-            src={i === 0 ? z.src : undefined}
-            srcset={i === 0 ? z.srcset : undefined}
-            sizes="(min-width: 90rem) 1300px, 92vw"
-            alt={z.podpis}
-            style={`background-color:${z.kolor}`}
-            class={i === 0 ? 'aktywne' : undefined}
-            loading={i === 0 ? 'lazy' : undefined}
-            decoding="async"
-          />
-        ))}
-        <button class="galeria__pelny" type="button" data-galeria-pelny hidden>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" /></svg>
-          <span data-galeria-pelny-podpis>Pełny ekran</span>
-        </button>
-      </div>
-
-      <div class="galeria__pasek">
-        <p class="galeria__podpis" data-galeria-podpis>{zdjecia[0].podpis}</p>
-        <div class="galeria__strzalki">
-          <button type="button" data-galeria-krok="-1" aria-label="Poprzednie zdjęcie">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" /></svg>
-          </button>
-          <button type="button" data-galeria-krok="1" aria-label="Następne zdjęcie">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" /></svg>
+      <div class="galeria__kadr">
+        <div class="galeria__scena kadr" data-galeria-scena>
+          {zdjecia.map((z, i) => (
+            <img
+              data-galeria-zdjecie={i}
+              data-srcset={z.srcset}
+              data-src={z.src}
+              src={i === 0 ? z.src : undefined}
+              srcset={i === 0 ? z.srcset : undefined}
+              sizes="(min-width: 90rem) 960px, (min-width: 60rem) and (orientation: landscape) 68vw, 92vw"
+              alt={z.podpis}
+              class={i === 0 ? 'aktywne' : undefined}
+              loading={i === 0 ? 'lazy' : undefined}
+              decoding="async"
+            />
+          ))}
+          <button class="galeria__pelny" type="button" data-galeria-pelny hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" /></svg>
+            <span data-galeria-pelny-podpis>Pełny ekran</span>
           </button>
         </div>
+      </div>
+
+      <p class="galeria__podpis" data-galeria-podpis>{zdjecia[0].podpis}</p>
+      <div class="galeria__strzalki">
+        <button type="button" data-galeria-krok="-1" aria-label="Poprzednie zdjęcie">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" /></svg>
+        </button>
+        <button type="button" data-galeria-krok="1" aria-label="Następne zdjęcie">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" /></svg>
+        </button>
       </div>
 
       <ul class="galeria__miniatury" role="list" data-galeria-miniatury>
@@ -83,17 +83,45 @@ const razem = zdjecia.length;
 </script>
 
 <style>
-  .galeria__glowa { display: flex; justify-content: space-between; align-items: end; gap: 1rem; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+  /*
+    Wysokosc kadru = min(szerokosc / proporcja, ekran - --zajete). --zajete to wszystko, co musi
+    zmiescic sie na ekranie oprocz kadru: przyklejony naglowek strony (--gora = scroll-padding-top
+    5.5rem + 1rem odstepu, ten sam co scroll-margin-top nizej), dolny odstep i - w ukladzie
+    pionowym - tytul, pasek z podpisem i miniatury.
+  */
+  .galeria {
+    --gora: 6.5rem;
+    --dol: 1rem;
+    --miniatura: 80px;
+    --proporcja: calc(4 / 3);
+    --zajete: calc(var(--gora) + var(--dol) + var(--t-h2) * 0.92 + 3rem + 3.25rem + 1rem + var(--miniatura) + 16px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'tytul licznik'
+      'scena scena'
+      'podpis strzalki'
+      'miniatury miniatury';
+    column-gap: 1rem;
+    align-items: end;
+    scroll-margin-top: 1rem;
+  }
+  .galeria__tytul { grid-area: tytul; }
   .galeria__licznik {
+    grid-area: licznik;
     font-family: var(--kroj-naglowki);
     font-weight: 800;
     font-size: var(--t-h2);
     line-height: 0.85;
     color: var(--zolty);
+    white-space: nowrap;
   }
+
+  /* Kontener zapytan: kadr liczy wysokosc ze swojej szerokosci (100cqw), niezaleznie od ukladu. */
+  .galeria__kadr { grid-area: scena; container-type: inline-size; margin-block: clamp(1.25rem, 3vw, 2rem) 1rem; }
   .galeria__scena {
     position: relative;
-    aspect-ratio: 3 / 2;
+    height: min(100cqw / var(--proporcja), max(14rem, 100svh - var(--zajete)));
     background: var(--grafit-2);
     touch-action: pan-y;
     user-select: none;
@@ -103,14 +131,13 @@ const razem = zdjecia.length;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     opacity: 0;
     visibility: hidden;
     transition: opacity 420ms var(--ruch-wyjscie), visibility 0s linear 420ms;
   }
   .galeria__scena img.aktywne { opacity: 1; visibility: visible; transition: opacity 420ms var(--ruch-wyjscie), visibility 0s; }
   .galeria__scena:fullscreen { background: #000; border-radius: 0; }
-  .galeria__scena:fullscreen img { object-fit: contain; background-color: transparent !important; }
 
   .galeria__pelny {
     position: absolute;
@@ -128,9 +155,8 @@ const razem = zdjecia.length;
   .galeria__pelny svg { width: 1.1rem; height: 1.1rem; }
   .galeria__pelny:hover { background: var(--zolty); color: var(--grafit); }
 
-  .galeria__pasek { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1rem; }
-  .galeria__podpis { font-size: 1.15rem; font-weight: 600; }
-  .galeria__strzalki { display: flex; gap: 0.5rem; flex: none; }
+  .galeria__podpis { grid-area: podpis; align-self: center; font-size: 1.15rem; font-weight: 600; line-height: 1.3; }
+  .galeria__strzalki { grid-area: strzalki; align-self: center; display: flex; gap: 0.5rem; }
   .galeria__strzalki button {
     display: grid;
     place-items: center;
@@ -142,26 +168,71 @@ const razem = zdjecia.length;
   .galeria__strzalki button:hover { background: var(--zolty); border-color: var(--zolty); color: var(--grafit); }
   .galeria__strzalki svg { width: 1.4rem; height: 1.4rem; }
 
+  /* Padding: obwodka biezacej miniatury (3px) nie moze byc ucieta przez przewijany kontener. */
   .galeria__miniatury {
+    grid-area: miniatury;
     display: flex;
     gap: 6px;
-    margin-top: 1.25rem;
+    margin-top: 1rem;
+    padding: 4px;
     overflow-x: auto;
+    overscroll-behavior: contain;
     scroll-snap-type: x proximity;
+    scroll-padding: 4px;
     scrollbar-width: thin;
     scrollbar-color: #ffffff55 transparent;
-    padding-bottom: 6px;
   }
   .galeria__miniatury li { flex: none; scroll-snap-align: start; }
   .galeria__miniatury button { display: block; opacity: 0.5; transition: opacity var(--ruch-szybki); outline-offset: 2px; }
   .galeria__miniatury button:hover { opacity: 0.85; }
   .galeria__miniatury button[aria-current='true'] { opacity: 1; box-shadow: 0 0 0 3px var(--zolty); }
-  .galeria__miniatury img { width: 120px; height: 80px; object-fit: cover; }
+  .galeria__miniatury img { width: calc(var(--miniatura) * 1.5); height: var(--miniatura); object-fit: cover; }
 
-  @media (max-width: 40rem) {
-    .galeria__scena { aspect-ratio: 4 / 3; }
-    .galeria__miniatury img { width: 92px; height: 64px; }
+  /* Ponizej 64rem na dole ekranu stoi pasek z telefonem (PasekTelefonu.astro). */
+  @media (max-width: 63.99rem) {
+    .galeria { --dol: calc(1rem + 3.4rem + env(safe-area-inset-bottom, 0px)); }
   }
+  @media (max-width: 40rem) {
+    .galeria { --miniatura: 61px; }
+  }
+
+  /*
+    Szeroki ekran poziomo (komputer, iPad poziomo): kadr po lewej na cala wysokosc, po prawej
+    panel z tytulem, licznikiem, strzalkami, podpisem i siatka miniatur przewijana w pionie.
+    Kadr wyznacza wysokosc wierszy; miniatury (contain: size) tylko wypelniaja to, co zostaje.
+  */
+  @media (min-width: 60rem) and (orientation: landscape) {
+    .galeria {
+      --zajete: calc(var(--gora) + var(--dol));
+      grid-template-columns: minmax(0, 1fr) clamp(17rem, 27%, 23rem);
+      grid-template-rows: auto auto auto minmax(0, 1fr);
+      grid-template-areas:
+        'scena tytul'
+        'scena licznik'
+        'scena podpis'
+        'scena miniatury';
+      column-gap: clamp(1.25rem, 2.2vw, 2rem);
+      align-items: start;
+    }
+    .galeria__kadr { margin: 0; }
+    .galeria__licznik, .galeria__strzalki { grid-area: licznik; align-self: center; margin-top: 1.25rem; }
+    .galeria__licznik { justify-self: start; font-size: var(--t-numer); }
+    .galeria__strzalki { justify-self: end; }
+    .galeria__podpis { align-self: start; margin-top: 1rem; min-height: 2.6em; }
+    .galeria__miniatury {
+      contain: size;
+      align-self: stretch;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-content: start;
+      margin-top: 1rem;
+      overflow: hidden auto;
+      scroll-snap-type: y proximity;
+    }
+    .galeria__miniatury button { width: 100%; }
+    .galeria__miniatury img { width: 100%; height: auto; aspect-ratio: 3 / 2; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .galeria__scena img, .galeria__scena img.aktywne { transition: none; }
   }

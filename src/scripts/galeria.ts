@@ -4,6 +4,7 @@
 export function uruchomGalerie(korzen: HTMLElement) {
   const zdjecia = [...korzen.querySelectorAll<HTMLImageElement>('[data-galeria-zdjecie]')];
   const miniatury = [...korzen.querySelectorAll<HTMLButtonElement>('[data-galeria-idz]')];
+  const listaMiniatur = korzen.querySelector<HTMLElement>('[data-galeria-miniatury]');
   const scena = korzen.querySelector<HTMLElement>('[data-galeria-scena]');
   const nr = korzen.querySelector<HTMLElement>('[data-galeria-nr]');
   const podpis = korzen.querySelector<HTMLElement>('[data-galeria-podpis]');
@@ -12,6 +13,19 @@ export function uruchomGalerie(korzen: HTMLElement) {
   if (!zdjecia.length || !scena) return;
 
   let biezace = 0;
+  const spokojnie = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // Przewija tylko liste miniatur (poziomy pasek albo pionowa siatka), nigdy strony:
+  // scrollIntoView potrafilo przesunac caly ekran, gdy galeria byla widoczna czesciowo.
+  const odslonMiniature = (b: HTMLElement | undefined) => {
+    if (!b || !listaMiniatur) return;
+    const l = listaMiniatur.getBoundingClientRect();
+    const m = b.getBoundingClientRect();
+    const zapas = 8;
+    const dx = m.left < l.left ? m.left - l.left - zapas : m.right > l.right ? m.right - l.right + zapas : 0;
+    const dy = m.top < l.top ? m.top - l.top - zapas : m.bottom > l.bottom ? m.bottom - l.bottom + zapas : 0;
+    if (dx || dy) listaMiniatur.scrollBy({ left: dx, top: dy, behavior: spokojnie.matches ? 'auto' : 'smooth' });
+  };
 
   const zaladuj = (i: number) => {
     const img = zdjecia[(i + zdjecia.length) % zdjecia.length];
@@ -28,7 +42,7 @@ export function uruchomGalerie(korzen: HTMLElement) {
     zdjecia[nastepne].classList.add('aktywne');
     miniatury[biezace]?.removeAttribute('aria-current');
     miniatury[nastepne]?.setAttribute('aria-current', 'true');
-    if (zPrzewinieciem) miniatury[nastepne]?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+    if (zPrzewinieciem) odslonMiniature(miniatury[nastepne]);
     biezace = nastepne;
     if (nr) nr.textContent = String(biezace + 1);
     if (podpis) podpis.textContent = zdjecia[biezace].alt;

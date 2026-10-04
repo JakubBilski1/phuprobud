@@ -1,28 +1,4 @@
 {
- "realizacje/01": {
-  "w": 1280,
-  "h": 720,
-  "kolor": "#282828",
-  "alfa": false,
-  "warianty": [
-   {
-    "w": 320,
-    "src": "/img/realizacje/01-320.webp"
-   },
-   {
-    "w": 720,
-    "src": "/img/realizacje/01-720.webp"
-   },
-   {
-    "w": 1200,
-    "src": "/img/realizacje/01-1200.webp"
-   },
-   {
-    "w": 1280,
-    "src": "/img/realizacje/01-1280.webp"
-   }
-  ]
- },
  "realizacje/02": {
   "w": 1280,
   "h": 959,
@@ -44,126 +20,6 @@
    {
     "w": 1280,
     "src": "/img/realizacje/02-1280.webp"
-   }
-  ]
- },
- "realizacje/03": {
-  "w": 1280,
-  "h": 852,
-  "kolor": "#f8f8f8",
-  "alfa": false,
-  "warianty": [
-   {
-    "w": 320,
-    "src": "/img/realizacje/03-320.webp"
-   },
-   {
-    "w": 720,
-    "src": "/img/realizacje/03-720.webp"
-   },
-   {
-    "w": 1200,
-    "src": "/img/realizacje/03-1200.webp"
-   },
-   {
-    "w": 1280,
-    "src": "/img/realizacje/03-1280.webp"
-   }
-  ]
- },
- "realizacje/04": {
-  "w": 2304,
-  "h": 1536,
-  "kolor": "#c8e8f8",
-  "alfa": false,
-  "warianty": [
-   {
-    "w": 320,
-    "src": "/img/realizacje/04-320.webp"
-   },
-   {
-    "w": 720,
-    "src": "/img/realizacje/04-720.webp"
-   },
-   {
-    "w": 1200,
-    "src": "/img/realizacje/04-1200.webp"
-   },
-   {
-    "w": 1800,
-    "src": "/img/realizacje/04-1800.webp"
-   }
-  ]
- },
- "realizacje/05": {
-  "w": 1280,
-  "h": 720,
-  "kolor": "#f8f8f8",
-  "alfa": false,
-  "warianty": [
-   {
-    "w": 320,
-    "src": "/img/realizacje/05-320.webp"
-   },
-   {
-    "w": 720,
-    "src": "/img/realizacje/05-720.webp"
-   },
-   {
-    "w": 1200,
-    "src": "/img/realizacje/05-1200.webp"
-   },
-   {
-    "w": 1280,
-    "src": "/img/realizacje/05-1280.webp"
-   }
-  ]
- },
- "realizacje/06": {
-  "w": 1224,
-  "h": 1224,
-  "kolor": "#d8d8d8",
-  "alfa": false,
-  "warianty": [
-   {
-    "w": 320,
-    "src": "/img/realizacje/06-320.webp"
-   },
-   {
-    "w": 720,
-    "src": "/img/realizacje/06-720.webp"
-   },
-   {
-    "w": 1200,
-    "src": "/img/realizacje/06-1200.webp"
-   },
-   {
-    "w": 1224,
-    "src": "/img/realizacje/06-1224.webp"
-   }
-  ]
- },
- "realizacje/07": {
-  "w": 1600,
-  "h": 1200,
-  "kolor": "#e8e8e8",
-  "alfa": false,
-  "warianty": [
-   {
-    "w": 320,
-    "src": "/img/realizacje/07-320.webp"
-   },
-   {
-    "w": 720,
-    "src": "/img/realizacje/07-720.webp"
-   },
-   {
-    "w": 1200,
-    "src": "/img/realizacje/07-1200.webp"
-   },
-   {
-    "w": 1600,
-    "src": "/img/realizacje/07-1600.webp"
    }
   ]
  },
@@ -215,74 +71,6 @@
    }
   ]
  },
- "realizacje/10": {
-  "w": 4197,
-  "h": 3147,
-  "kolor": "#48a8f8",
-  "alfa": false,
-  "warianty": [
-   {
-    "w": 320,
-    "src": "/img/realizacje/10-320.webp"
-   },
-   {
-    "w": 720,
-    "src": "/img/realizacje/10-720.webp"
-   },
-   {
-    "w": 1200,
-    "src": "/img/realizacje/10-1200.webp"
-   },
-   {
-    "w": 1800,
-    "src": "/img/realizacje/10-1800.webp"
-   }
-  ]
- },
- "realizacje/11": {
-  "w": 1280,
-  "h": 959,
-  "kolor": "#f8f8f8",
-  "alfa": false,
-  "warianty": [
-   {
-    "w": 320,
-    "src": "/img/realizacje/11-320.webp"
-   },
-   {
-    "w": 720,
-    "src": "/img/realizacje/11-720.webp"
-   },
-   {
-    "w": 1200,
-    "src": "/img/realizacje/11-1200.webp"
-   },
-   {
-    "w": 1280,
-    "src": "/img/realizacje/11-1280.webp"
-   }
-  ]
- },
- "realizacje/12": {
-  "w": 1024,
-  "h": 768,
-  "kolor": "#f8f8f8",
-  "alfa": false,
-  "warianty": [
-   {
-    "w": 320,
-    "src": "/img/realizacje/12-320.webp"
-   },
-   {
-    "w": 720,
-    "src": "/img/realizacje/12-720.webp"
-   },
-   {
-    "w": 1024,
-    "src": "/img/realizacje/12-1024.webp"
-   }
-  ]
- },
  "realizacje/13": {
   "w": 3264,
   "h": 1836,
@@ -328,30 +116,6 @@
    {
     "w": 1800,
     "src": "/img/realizacje/14-1800.webp"
-   }
-  ]
- },
- "realizacje/15": {
-  "w": 5147,
-  "h": 3431,
-  "kolor": "#987868",
-  "alfa": false,
-  "warianty": [
-   {
-    "w": 320,
-    "src": "/img/realizacje/15-320.webp"
-   },
-   {
-    "w": 720,
-    "src": "/img/realizacje/15-720.webp"
-   },
-   {
-    "w": 1200,
-    "src": "/img/realizacje/15-1200.webp"
-   },
-   {
-    "w": 1800,
-    "src": "/img/realizacje/15-1800.webp"
    }
   ]
  },
@@ -403,27 +167,283 @@
    }
   ]
  },
- "realizacje/18": {
-  "w": 2262,
-  "h": 1508,
-  "kolor": "#a8a898",
+ "realizacje/jcb-8025-zts": {
+  "w": 4000,
+  "h": 3000,
+  "kolor": "#b8a898",
   "alfa": false,
   "warianty": [
    {
     "w": 320,
-    "src": "/img/realizacje/18-320.webp"
+    "src": "/img/realizacje/jcb-8025-zts-320.webp"
    },
    {
     "w": 720,
-    "src": "/img/realizacje/18-720.webp"
+    "src": "/img/realizacje/jcb-8025-zts-720.webp"
    },
    {
     "w": 1200,
-    "src": "/img/realizacje/18-1200.webp"
+    "src": "/img/realizacje/jcb-8025-zts-1200.webp"
    },
    {
     "w": 1800,
-    "src": "/img/realizacje/18-1800.webp"
+    "src": "/img/realizacje/jcb-8025-zts-1800.webp"
+   }
+  ]
+ },
+ "realizacje/case-821g": {
+  "w": 1280,
+  "h": 853,
+  "kolor": "#b8b8c8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/case-821g-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/case-821g-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/case-821g-1200.webp"
+   },
+   {
+    "w": 1280,
+    "src": "/img/realizacje/case-821g-1280.webp"
+   }
+  ]
+ },
+ "realizacje/case-koparko-ladowarka-1": {
+  "w": 2256,
+  "h": 1386,
+  "kolor": "#080808",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/case-koparko-ladowarka-1-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/case-koparko-ladowarka-1-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/case-koparko-ladowarka-1-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/case-koparko-ladowarka-1-1800.webp"
+   }
+  ]
+ },
+ "realizacje/case-koparko-ladowarka-2": {
+  "w": 2489,
+  "h": 1386,
+  "kolor": "#181818",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/case-koparko-ladowarka-2-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/case-koparko-ladowarka-2-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/case-koparko-ladowarka-2-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/case-koparko-ladowarka-2-1800.webp"
+   }
+  ]
+ },
+ "realizacje/merlo-roto-widly": {
+  "w": 1000,
+  "h": 750,
+  "kolor": "#b8b8b8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/merlo-roto-widly-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/merlo-roto-widly-720.webp"
+   },
+   {
+    "w": 1000,
+    "src": "/img/realizacje/merlo-roto-widly-1000.webp"
+   }
+  ]
+ },
+ "realizacje/merlo-roto-45-21-kosz": {
+  "w": 2742,
+  "h": 1243,
+  "kolor": "#6888c8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/merlo-roto-45-21-kosz-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/merlo-roto-45-21-kosz-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/merlo-roto-45-21-kosz-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/merlo-roto-45-21-kosz-1800.webp"
+   }
+  ]
+ },
+ "realizacje/merlo-roto-bok": {
+  "w": 1841,
+  "h": 943,
+  "kolor": "#989888",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/merlo-roto-bok-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/merlo-roto-bok-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/merlo-roto-bok-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/merlo-roto-bok-1800.webp"
+   }
+  ]
+ },
+ "realizacje/bomag-bw-120-ad": {
+  "w": 1600,
+  "h": 1200,
+  "kolor": "#68a8e8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/bomag-bw-120-ad-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/bomag-bw-120-ad-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/bomag-bw-120-ad-1200.webp"
+   },
+   {
+    "w": 1600,
+    "src": "/img/realizacje/bomag-bw-120-ad-1600.webp"
+   }
+  ]
+ },
+ "realizacje/bomag-bmp-8500": {
+  "w": 1600,
+  "h": 1200,
+  "kolor": "#282828",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/bomag-bmp-8500-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/bomag-bmp-8500-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/bomag-bmp-8500-1200.webp"
+   },
+   {
+    "w": 1600,
+    "src": "/img/realizacje/bomag-bmp-8500-1600.webp"
+   }
+  ]
+ },
+ "realizacje/liugong": {
+  "w": 2860,
+  "h": 1906,
+  "kolor": "#989898",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/liugong-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/liugong-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/liugong-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/liugong-1800.webp"
+   }
+  ]
+ },
+ "realizacje/atlas-150w": {
+  "w": 2000,
+  "h": 1500,
+  "kolor": "#b8b8b8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/atlas-150w-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/atlas-150w-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/img/realizacje/atlas-150w-1200.webp"
+   },
+   {
+    "w": 1800,
+    "src": "/img/realizacje/atlas-150w-1800.webp"
+   }
+  ]
+ },
+ "realizacje/ladowarka-v80": {
+  "w": 1024,
+  "h": 768,
+  "kolor": "#b8b8b8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 320,
+    "src": "/img/realizacje/ladowarka-v80-320.webp"
+   },
+   {
+    "w": 720,
+    "src": "/img/realizacje/ladowarka-v80-720.webp"
+   },
+   {
+    "w": 1024,
+    "src": "/img/realizacje/ladowarka-v80-1024.webp"
    }
   ]
  },
