@@ -12,6 +12,9 @@ const linki = [
 const sciezka = Astro.url.pathname;
 const glowny = handlowcy[0];
 const telGlowny = glowny.telefon!;
+// Menu na telefonie: kazdy numer w osobnym wierszu (dzial i osoba z lewej, numer z prawej),
+// tak samo dla dzialu z jednym i z dwoma numerami.
+const telefony = dzialy.flatMap((d) => d.telefony.map((t) => ({ ...t, dzial: d.nazwa })));
 ---
 <header class="naglowek" data-naglowek>
   <div class="naglowek__pas kontener">
@@ -32,23 +35,32 @@ const telGlowny = glowny.telefon!;
       {telKrotki(telGlowny)}
     </a>
 
-    <button class="naglowek__menu" type="button" aria-expanded="false" aria-controls="menu-mobilne" data-menu-przycisk>
-      <span data-menu-podpis>Menu</span>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="2" /></svg>
+    <button class="naglowek__menu" type="button" aria-label="Otwórz menu" aria-expanded="false" aria-controls="menu-mobilne" data-menu-przycisk>
+      <span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
     </button>
   </div>
 
   <div class="menu" id="menu-mobilne" hidden data-menu>
     <nav aria-label="Główna (telefon)">
       <ul role="list">
-        {linki.map((l) => <li><a href={l.href} data-menu-link>{l.tekst}</a></li>)}
+        {linki.map((l, i) => (
+          <li style={`--i:${i}`}>
+            <a href={l.href} data-menu-link>
+              <span>{l.tekst}</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" /></svg>
+            </a>
+          </li>
+        ))}
       </ul>
     </nav>
-    <ul class="menu__telefony" role="list">
-      {dzialy.map((d) => (
+    <ul class="menu__telefony" role="list" style={`--i:${linki.length}`}>
+      {telefony.map((t) => (
         <li>
-          <span>{d.nazwa}</span>
-          {d.telefony.map((t) => <a class="numer" href={telHref(t.numer)}>{telKrotki(t.numer)}</a>)}
+          <span class="menu__dzial">
+            {t.dzial}
+            {t.osoba && <small data-osoba-imie={t.osobaId}>{t.osoba}</small>}
+          </span>
+          <a class="numer" href={telHref(t.numer)}>{telKrotki(t.numer)}</a>
         </li>
       ))}
     </ul>
@@ -56,15 +68,39 @@ const telGlowny = glowny.telefon!;
 </header>
 
 <script>
+  // Menu na telefonie wylania sie z hamburgera (kolo odslaniane od przycisku), potem kolejno
+  // wjezdzaja pozycje. Zamkniecie odwraca odslanianie, a dopiero po nim menu dostaje hidden.
   const przycisk = document.querySelector<HTMLButtonElement>('[data-menu-przycisk]');
   const menu = document.querySelector<HTMLElement>('[data-menu]');
-  const podpis = document.querySelector<HTMLElement>('[data-menu-podpis]');
+  const spokoj = matchMedia('(prefers-reduced-motion: reduce)');
+  const CZAS_ZAMKNIECIA = 420;
+  let zamykanie = 0;
+
   const ustaw = (otwarte: boolean) => {
-    if (!przycisk || !menu || !podpis) return;
+    if (!przycisk || !menu) return;
+    if ((przycisk.getAttribute('aria-expanded') === 'true') === otwarte) return;
     przycisk.setAttribute('aria-expanded', String(otwarte));
-    menu.hidden = !otwarte;
-    podpis.textContent = otwarte ? 'Zamknij' : 'Menu';
+    przycisk.setAttribute('aria-label', otwarte ? 'Zamknij menu' : 'Otwórz menu');
     document.documentElement.classList.toggle('menu-otwarte', otwarte);
+    clearTimeout(zamykanie);
+    if (otwarte) {
+      menu.hidden = false;
+      // Srodek kola w srodku hamburgera (nad gorna krawedzia menu), promien do najdalszego rogu.
+      const p = przycisk.getBoundingClientRect();
+      const m = menu.getBoundingClientRect();
+      const x = p.left + p.width / 2 - m.left;
+      const y = p.top + p.height / 2 - m.top;
+      menu.style.setProperty('--x', `${x}px`);
+      menu.style.setProperty('--y', `${y}px`);
+      menu.style.setProperty('--r', `${Math.ceil(Math.hypot(Math.max(x, m.width - x), m.height - y))}px`);
+      // Klasa po dwoch klatkach (stan poczatkowy musi sie narysowac), o ile menu nie zamknieto w miedzyczasie.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (przycisk.getAttribute('aria-expanded') === 'true') menu.classList.add('menu--otwarte');
+      }));
+    } else {
+      menu.classList.remove('menu--otwarte');
+      zamykanie = window.setTimeout(() => { menu.hidden = true; }, spokoj.matches ? 0 : CZAS_ZAMKNIECIA);
+    }
   };
   przycisk?.addEventListener('click', () => ustaw(przycisk.getAttribute('aria-expanded') !== 'true'));
   menu?.querySelectorAll('[data-menu-link]').forEach((a) => a.addEventListener('click', () => ustaw(false)));
@@ -116,39 +152,106 @@ const telGlowny = glowny.telefon!;
   .naglowek__tel:hover { background: var(--grafit); color: var(--zolty); }
   .naglowek__tel-podpis { font-family: var(--kroj-tekst); font-size: 0.72rem; font-weight: 650; letter-spacing: 0.01em; }
 
+  /* Hamburger -> X: kreski zjezdzaja do srodka, potem sie obracaja (przy zamykaniu odwrotnie). */
   .naglowek__menu {
     display: none;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 650;
-    padding: 0.6rem 0.2rem;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-right: -0.5rem;
   }
-  .naglowek__menu svg { width: 1.5rem; height: 1.5rem; }
+  .hamburger { position: relative; display: block; width: 1.6rem; height: 1.1rem; }
+  .hamburger span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+    transition: top 180ms ease 180ms, transform 220ms var(--ruch-wyjscie) 0ms, opacity 120ms ease 120ms;
+  }
+  .hamburger span:nth-child(1) { top: 0; }
+  .hamburger span:nth-child(2) { top: calc(50% - 1px); }
+  .hamburger span:nth-child(3) { top: calc(100% - 2px); }
+  [aria-expanded='true'] .hamburger span { transition: top 180ms ease 0ms, transform 260ms var(--ruch-wyjscie) 170ms, opacity 100ms ease 60ms; }
+  [aria-expanded='true'] .hamburger span:nth-child(1) { top: calc(50% - 1px); transform: rotate(45deg); }
+  [aria-expanded='true'] .hamburger span:nth-child(2) { opacity: 0; }
+  [aria-expanded='true'] .hamburger span:nth-child(3) { top: calc(50% - 1px); transform: rotate(-45deg); }
 
   .menu {
     position: fixed;
     inset: 4.75rem 0 0 0;
     background: var(--grafit);
     color: var(--papier);
-    padding: 2rem var(--margines) 6rem;
+    padding: 0.75rem var(--margines) 3rem;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    clip-path: circle(0px at var(--x, 100%) var(--y, 0px));
+    transition: clip-path 380ms cubic-bezier(0.6, 0, 0.8, 0.4);
   }
-  .menu ul { display: grid; gap: 0.25rem; }
+  .menu--otwarte {
+    clip-path: circle(var(--r, 150vmax) at var(--x, 100%) var(--y, 0px));
+    transition: clip-path 640ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Pozycje wjezdzaja od dolu jedna po drugiej, kiedy kolo juz odslania menu. */
+  .menu nav li, .menu__telefony {
+    opacity: 0;
+    transform: translateY(1.1rem);
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+  .menu--otwarte nav li, .menu--otwarte .menu__telefony {
+    opacity: 1;
+    transform: none;
+    transition: opacity 420ms ease-out, transform 560ms var(--ruch-wyjscie);
+    transition-delay: calc(150ms + var(--i) * 60ms);
+  }
   .menu nav a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.85rem 0.7rem;
+    border-bottom: 1px solid #ffffff1f;
     font-family: var(--kroj-naglowki);
     font-weight: 800;
-    font-size: clamp(2.6rem, 11vw, 4rem);
-    line-height: 1.05;
+    font-size: clamp(2.1rem, 9.5vw, 3.4rem);
+    line-height: 1;
+    text-transform: uppercase;
     text-decoration: none;
   }
-  .menu__telefony { margin-top: 2.5rem; border-top: 1px solid #ffffff33; padding-top: 1.5rem; gap: 1rem !important; }
-  .menu__telefony li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 1rem; }
-  .menu__telefony span { color: #ffffffb3; }
-  .menu__telefony a { font-size: 1.25rem; font-weight: 650; text-decoration: none; }
+  .menu nav svg { flex: none; width: 1.6rem; height: 1.6rem; color: #ffffff73; transition: color var(--ruch-szybki), transform var(--ruch-szybki) var(--ruch-wyjscie); }
+  .menu nav a:hover svg, .menu nav a:focus-visible svg { color: var(--zolty); transform: translateX(4px); }
+
+  .menu__telefony { margin-top: 1.75rem; }
+  .menu__telefony li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 0.6rem;
+    border-bottom: 1px solid #ffffff14;
+  }
+  .menu__dzial { color: #ffffffb3; font-size: 0.95rem; line-height: 1.25; }
+  .menu__dzial small { display: block; color: #ffffff80; font-size: 0.82rem; }
+  .menu__telefony a {
+    font-family: var(--kroj-naglowki);
+    font-weight: 800;
+    font-size: 1.6rem;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .menu__telefony a:hover { color: var(--zolty); }
 
   @media (max-width: 63.99rem) {
     .naglowek__nav, .naglowek__tel { display: none; }
-    .naglowek__menu { display: inline-flex; }
+    .naglowek__menu { display: grid; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .menu, .menu--otwarte, .menu nav li, .menu__telefony, .hamburger span { transition: none !important; }
+    .menu { clip-path: none; }
+    .menu nav li, .menu__telefony { opacity: 1; transform: none; }
   }
   :global(html.menu-otwarte) { overflow: hidden; }
 </style>
