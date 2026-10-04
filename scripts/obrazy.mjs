@@ -17,11 +17,13 @@ const MANIFEST = path.join(KORZEN, 'src', 'data', 'obrazy.json');
 const hex = ({ r, g, b }) => '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('');
 
 async function przetworz(pozycja) {
-  const { zrodlo, cel, szerokosci = [640, 1024, 1600], jakosc = 76, kadr, tlo, przytnij = false } = pozycja;
+  const { zrodlo, cel, szerokosci = [640, 1024, 1600], jakosc = 76, kadr, tlo, przytnij = false, rozmycie } = pozycja;
   const plik = path.join(ZRODLA, zrodlo);
   let baza = sharp(plik, { failOn: 'none' }).rotate();
   if (kadr) baza = baza.extract(kadr);
   if (tlo) baza = baza.flatten({ background: tlo });
+  // Rozmycie (sigma w pikselach zrodla) wbudowane w plik, zeby przegladarka nie liczyla go co klatke.
+  if (rozmycie) baza = baza.blur(rozmycie);
   let bufor = await baza.toBuffer();
   // Wycinki maszyn maja rozne marginesy; po przycieciu maszyna wypelnia kadr tak samo w calym katalogu.
   if (przytnij) bufor = await sharp(bufor).trim({ threshold: 4 }).toBuffer();

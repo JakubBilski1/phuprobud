@@ -62,8 +62,8 @@ const obraz = wpis.warianty.at(-1)!;
     height: auto;
     transform: translate3d(-50%, var(--y, 0px), 0);
     will-change: transform;
-    /* Lekkie rozmycie jak glebia ostrosci: kamienie kruszywa nie walcza z drobnym tekstem. */
-    filter: saturate(0.85) blur(1.5px);
+    /* Rozmycie jest w pliku (scripts/obrazy.lista.mjs); tu tylko nizszy kontrast i nasycenie. */
+    filter: saturate(0.85) contrast(0.78);
   }
   /* Welon (czytelnosc tekstu) i drobne ziarno, ktore kryje miekkosc powiekszonej sceny. */
   .tlo-strony::after {
