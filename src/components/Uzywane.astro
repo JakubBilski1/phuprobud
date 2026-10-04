@@ -8,10 +8,10 @@ import { slot } from '../data/zdjecia-strony';
 const duze = slot('uzywane-duze');
 const male = slot('uzywane-male');
 
-const specjalnosci = (['1', '2', '3'] as const).map((n) => ({
-  typ: `uzywane.typ${n}` as const,
-  marki: `uzywane.marki${n}` as const,
-}));
+// Specjalnosc 1 (ladowarki teleskopowe Merlo Roto) stoi miedzy akapitami, reszta pod nimi.
+const specjalnosc = (n: '1' | '2' | '3') => ({ typ: `uzywane.typ${n}` as const, marki: `uzywane.marki${n}` as const });
+const glowna = specjalnosc('1');
+const pozostale = [specjalnosc('2'), specjalnosc('3')];
 ---
 <section class="uzywane sekcja" id="uzywane" aria-labelledby="uzywane-tytul">
   <div class="kontener uzywane__siatka">
@@ -23,10 +23,16 @@ const specjalnosci = (['1', '2', '3'] as const).map((n) => ({
     <div class="uzywane__tekst">
       <h2 id="uzywane-tytul" data-tresc="uzywane.tytul">{tresc('uzywane.tytul')}</h2>
       <p class="lead" data-tresc="uzywane.lead">{sierotki(tresc('uzywane.lead'))}</p>
+      <dl class="uzywane__lista uzywane__lista--miedzy">
+        <div>
+          <dt data-tresc={glowna.typ}>{tresc(glowna.typ)}</dt>
+          <dd data-tresc={glowna.marki}>{tresc(glowna.marki)}</dd>
+        </div>
+      </dl>
       <p data-tresc="uzywane.tekst">{sierotki(tresc('uzywane.tekst'))}</p>
 
       <dl class="uzywane__lista">
-        {specjalnosci.map((s) => (
+        {pozostale.map((s) => (
           <div>
             <dt data-tresc={s.typ}>{tresc(s.typ)}</dt>
             <dd data-tresc={s.marki}>{tresc(s.marki)}</dd>
@@ -80,6 +86,7 @@ const specjalnosci = (['1', '2', '3'] as const).map((n) => ({
   }
   .uzywane__lista dt { font-weight: 700; }
   .uzywane__lista dd { margin: 0; }
+  .uzywane__lista--miedzy { margin-block: 1.25rem 1.1rem; }
 
   .uzywane__akcje { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
   .uzywane__uwaga { margin-top: 1rem; font-size: var(--t-maly); }
