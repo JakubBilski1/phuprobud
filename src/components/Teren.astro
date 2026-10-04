@@ -104,4 +104,9 @@ const PODPISANE = ['Poznań', 'Bydgoszcz', 'Toruń', 'Kalisz'];
     .teren__siatka { grid-template-columns: 1fr; }
     .teren__legenda div { grid-template-columns: 1fr; gap: 0.1rem; }
   }
+  /* Najmniejsze telefony (kadr ok. 290 px): mniejsze etykiety, zeby piec miejsc zmiescilo sie obok siebie. */
+  @media (max-width: 23rem) {
+    .teren__etykiety :global(span) { padding: 0.1rem 0.35rem; font-size: 0.72rem; }
+    .teren__etykiety :global(span.siedziba) { font-size: 0.8rem; }
+  }
 </style>
