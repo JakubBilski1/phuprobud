@@ -20,7 +20,7 @@ await sharp(ciemne, raw).webp({ lossless: true }).toFile(cel('marka/probud-logo-
 await sharp(data, raw).webp({ lossless: true }).toFile(cel('marka/probud-logo-jasne.webp'));
 
 // Logotypy partnerow: przyciecie bialego marginesu, wysokosc 120 px.
-for (const [plik, wyj] of [['bomag.jpg', 'bomag'], ['schaeff.jpg', 'schaeff'], ['gehl.webp', 'gehl'], ['bpce.jpg', 'bpce']]) {
+for (const [plik, wyj] of [['bomag.jpg', 'bomag'], ['bpce.jpg', 'bpce']]) {
   const m = await sharp(zr(plik)).flatten({ background: '#ffffff' }).trim({ background: '#ffffff', threshold: 20 })
     .resize({ height: 120, withoutEnlargement: true }).webp({ quality: 90 }).toFile(cel(`marki/${wyj}.webp`));
   console.log(wyj, m.width, m.height);

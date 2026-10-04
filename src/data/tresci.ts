@@ -19,7 +19,7 @@ const pola = {
   'hero.tytul2': { grupa: 'Początek strony', etykieta: 'Tytuł, drugi wiersz', wartosc: 'budowlane', max: 14, gdzie: '/' },
   'hero.lead': {
     grupa: 'Początek strony', etykieta: 'Tekst pod tytułem', dlugi: true, gdzie: '/',
-    wartosc: `${firma.adres.miasto} pod Poznaniem, od ${firma.od} roku. Sprzedajemy nowe maszyny BOMAG, Schaeff i Gehl, sprowadzamy używane z całej Europy i skupujemy maszyny budowlane.`,
+    wartosc: `${firma.adres.miasto} pod Poznaniem, od ${firma.od} roku. Sprzedajemy nowe maszyny BOMAG, sprowadzamy używane z całej Europy i skupujemy maszyny budowlane.`,
   },
   'hero.przycisk1': { grupa: 'Początek strony', etykieta: 'Przycisk do katalogu', wartosc: 'Zobacz maszyny nowe', max: 40, gdzie: '/' },
   'hero.przycisk2': { grupa: 'Początek strony', etykieta: 'Przycisk do otomoto', wartosc: 'Używane na otomoto', max: 40, gdzie: '/' },
@@ -27,7 +27,7 @@ const pola = {
   'oferta.tytul': { grupa: 'Maszyny nowe', etykieta: 'Nagłówek sekcji', wartosc: 'Maszyny nowe', max: 40, gdzie: '/#oferta' },
   'oferta.lead': {
     grupa: 'Maszyny nowe', etykieta: 'Tekst sekcji', dlugi: true, gdzie: '/#oferta',
-    wartosc: 'Stopy wibracyjne, zagęszczarki i walce BOMAG, minikoparki, ładowarki i koparki Schaeff oraz ładowarki gąsienicowe Gehl.',
+    wartosc: 'Stopy wibracyjne, zagęszczarki i walce BOMAG.',
   },
   'katalog.lead': {
     grupa: 'Maszyny nowe', etykieta: 'Katalog: tekst pod liczbą modeli', dlugi: true, gdzie: '/oferta/',

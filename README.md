@@ -8,11 +8,11 @@ Założenia projektu, paleta, typografia i decyzje: [docs/PROJEKT.md](docs/PROJE
 
 ## Co jest na stronie
 
-- **Strona główna**: hero, maszyny nowe (indeks ośmiu grup), teren dealera BOMAG (scena 3D),
+- **Strona główna**: hero, maszyny nowe (indeks sześciu grup), teren dealera BOMAG (scena 3D),
   maszyny używane (odsyłacz do otomoto), ludzie bez zdjęć (tylko osoby z numerem: rola,
   imię i telefon), finansowanie BPCE,
   realizacje (19 zdjęć w jednym kadrze, cała galeria mieści się na ekranie), kontakt: działy, formularz, mapa dojazdu.
-- **`/oferta/`**: katalog 41 modeli BOMAG, Schaeff i Gehl.
+- **`/oferta/`**: katalog 31 modeli BOMAG.
 - **`/oferta/<grupa>/`**: grupa z tabelą porównania modeli.
 - **`/oferta/<grupa>/<model>/`**: karta modelu z parametrami i kartą katalogową producenta.
 - **`/admin/`**: panel strony (demo), patrz niżej.
@@ -73,8 +73,8 @@ nie przelicza.
   (PDF-y hostowane przez Probud, karty producentów). **Nie edytować ręcznie.** Nazwy grup,
   opisy i kolejność są w `src/data/katalog.ts`.
 - Zdjęcia: od Probudu (realizacje i maszyny używane, październik 2026), stara strona
-  phuprobud.pl (7 realizacji), zdjęcia producentów (BOMAG, Schaeff/Yanmar,
-  Gehl/Manitou). Zdjęć osób na stronie nie ma.
+  phuprobud.pl (7 realizacji), zdjęcia producenta (BOMAG).
+  Zdjęć osób na stronie nie ma.
 - Piktogramy maszyn: wygenerowane (Codex, `image_gen`), `public/piktogramy/`.
 - Mapa: dane OpenStreetMap z kafli OpenFreeMap (bez klucza API). Granice województw: Natural
   Earth (domena publiczna).
@@ -100,12 +100,7 @@ pokazujemy.
 - **Formularz** w demo składa gotową wiadomość w programie pocztowym (`mailto:` na adres
   wybranego działu). Wysyłka z serwera: ustawić `PUBLIC_FORMULARZ_URL` na endpoint, który
   przyjmuje JSON `{ dzial, do, temat, tresc }`.
-- **Gehl i Schaeff**: na starej stronie ich podstrony nie były podlinkowane z menu (sieroty w mapie
-  strony). Schaeff ma na `/v2/` zdanie „Firma PROBUD jest autoryzowanym dealerem Schaeff”, Gehl
-  tylko listę modeli z martwymi linkami. Do potwierdzenia, czy to aktualna oferta.
-- **Schaeff SV15, SV17, SV22**: brak potwierdzonych parametrów, zdjęcia 300 px. **Gehl RT185,
-  RT215**: brak masy roboczej w dostępnej karcie, małe zdjęcia. BW 65 D pokazuje zdjęcie BW 65
-  z podpisem.
+- BW 65 D pokazuje zdjęcie BW 65 z podpisem.
 - Zdjąć `noindex` (layout i `nginx/naglowki.conf`) i ustawić domenę docelową w `astro.config.mjs`.
 
 ## Wdrożenie

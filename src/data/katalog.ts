@@ -23,14 +23,12 @@ export type IdKategorii =
   | 'zageszczarki-rewersyjne'
   | 'walce-prowadzone'
   | 'walce-tandemowe'
-  | 'walce-do-gruntu'
-  | 'schaeff'
-  | 'gehl';
+  | 'walce-do-gruntu';
 
 type DefinicjaKategorii = {
   id: IdKategorii;
   nazwa: string;
-  marka: 'BOMAG' | 'Schaeff' | 'Gehl';
+  marka: 'BOMAG';
   piktogram: string;
   zrodla: string[];
   opis: string;
@@ -75,18 +73,6 @@ const DEFINICJE: DefinicjaKategorii[] = [
     opis: 'BMP 8500 do wykopów i kanałów, sterowany pilotem, oraz BW 124 DH-5 do zagęszczania gruntu na placu budowy.',
     zdjecieWPracy: 'kategorie/walce-do-robot-ziemnych-01',
   },
-  {
-    id: 'schaeff', nazwa: 'Maszyny Schaeff', marka: 'Schaeff', piktogram: '08-minikoparka',
-    zrodla: ['minikoparki', 'ladowarki-kolowe', 'koparki-kolowe'], karta: ['masa_robocza_kg', 'moc_kw', 'glebokosc_kopania_mm'],
-    opis: 'Minikoparki SV15, SV17 i SV22, ładowarka kołowa TL80 i koparka kołowa TW75. Schaeff to marka należąca do Yanmar.',
-    zdjecieWPracy: 'kategorie/ladowarki-kolowe-01',
-  },
-  {
-    id: 'gehl', nazwa: 'Ładowarki gąsienicowe Gehl', marka: 'Gehl', piktogram: '09-ladowarka-gasienicowa',
-    zrodla: ['ladowarki-gasienicowe'], karta: ['udzwig_nominalny_roc_35_kg', 'moc_brutto_kw', 'masa_robocza_kg'],
-    opis: 'Pięć modeli, od RT105 do RT215. Wszystkie z silnikami Yanmar.',
-    zdjecieWPracy: 'kategorie/ladowarki-gasienicowe-01',
-  },
 ];
 
 // Krotkie opisy: tylko to, co odroznia model. Zrodlo: opisy starej strony i karty producenta.
@@ -122,16 +108,6 @@ const OPISY: Record<string, string> = {
   'bw-135-ad-5': 'Dwa bębny 1300 mm, do ścieżek, remontów i modernizacji nawierzchni.',
   'bw-138-ad-5': 'Najcięższy walec tandemowy w ofercie, bębny 1380 mm.',
   'bw-138-ac-5': 'Walec kombinowany 1380 mm, silnik spełnia normę Stage V.',
-  sv15: 'Minikoparka Schaeff. Dane techniczne poda handlowiec.',
-  sv17: 'Minikoparka Schaeff. Dane techniczne poda handlowiec.',
-  sv22: 'Minikoparka Schaeff. Dane techniczne poda handlowiec.',
-  tl80: 'Ładowarka kołowa z silnikiem Yanmar.',
-  tw75: 'Koparka kołowa, głębokość kopania 3500 mm.',
-  rt105: 'Najmniejszy model Gehl w ofercie, udźwig roboczy 476 kg.',
-  rt135: 'Ładowarka gąsienicowa Gehl z silnikiem Yanmar 4TNV88.',
-  rt165: 'Ładowarka gąsienicowa Gehl z silnikiem Yanmar 4TNV98C.',
-  rt185: 'Ładowarka gąsienicowa Gehl, udźwig roboczy 839 kg.',
-  rt215: 'Największy model Gehl w ofercie, udźwig roboczy 975 kg.',
 };
 
 // Zdjecie zastepcze z jawnym podpisem, gdy wlasne zdjecie modelu sie nie nadaje.
@@ -146,19 +122,14 @@ const ETYKIETY: Record<string, Etykieta> = {
   sila_odsrodkowa_kn: { nazwa: 'Siła odśrodkowa', jednostka: 'kN' },
   czestotliwosc_hz: { nazwa: 'Częstotliwość drgań', jednostka: 'Hz' },
   moc_kw: { nazwa: 'Moc silnika', jednostka: 'kW' },
-  moc_brutto_kw: { nazwa: 'Moc silnika (brutto)', jednostka: 'kW' },
   naped: { nazwa: 'Napęd' },
   silnik: { nazwa: 'Silnik' },
   predkosc_m_min: { nazwa: 'Prędkość robocza', jednostka: 'm/min', zakres: true },
   predkosc_km_h: { nazwa: 'Prędkość jazdy', jednostka: 'km/h', zakres: true },
   predkosc_wstecz_km_h: { nazwa: 'Prędkość do tyłu', jednostka: 'km/h', zakres: true },
   predkosc_drugi_bieg_km_h: { nazwa: 'Prędkość na drugim biegu', jednostka: 'km/h', zakres: true },
-  predkosc_opcjonalna_km_h: { nazwa: 'Prędkość jazdy (opcja)', jednostka: 'km/h' },
-  glebokosc_kopania_mm: { nazwa: 'Głębokość kopania', jednostka: 'mm' },
-  udzwig_nominalny_roc_35_kg: { nazwa: 'Udźwig roboczy (ROC 35%)', jednostka: 'kg' },
-  udzwig_nominalny_roc_50_kg: { nazwa: 'Udźwig roboczy (ROC 50%)', jednostka: 'kg' },
 };
-// Kolejnosc w tabeli parametrow. moc_kw pomijamy, gdy jest moc brutto (Gehl podaje obie niespojnie).
+// Kolejnosc w tabeli parametrow.
 const KOLEJNOSC = Object.keys(ETYKIETY);
 const NAPEDY: Record<string, string> = { benzyna: 'Benzyna', diesel: 'Diesel', akumulator: 'Akumulator' };
 
@@ -208,8 +179,7 @@ const surowe = (zrodlo as unknown as { modele: ModelZrodlowy[] }).modele;
 
 function zbudujModel(m: ModelZrodlowy, def: DefinicjaKategorii): Model {
   const p = m.parametry;
-  const jestBrutto = p.moc_brutto_kw !== null && p.moc_brutto_kw !== undefined;
-  const parametry: Parametr[] = KOLEJNOSC.filter((k) => !(k === 'moc_kw' && jestBrutto))
+  const parametry: Parametr[] = KOLEJNOSC
     .map((k) => ({ k, f: formatuj(k, p[k] ?? null) }))
     .filter((x): x is { k: string; f: { tekst: string; dwie: boolean } } => x.f !== null)
     .map(({ k, f }) => ({
@@ -220,11 +190,11 @@ function zbudujModel(m: ModelZrodlowy, def: DefinicjaKategorii): Model {
     }));
   const masa = typeof p.masa_robocza_kg === 'number' ? p.masa_robocza_kg : Array.isArray(p.masa_robocza_kg) ? p.masa_robocza_kg[0] : null;
   const zastepcze = ZDJECIA_ZASTEPCZE[m.id];
-  const kartaPdf = m.pdf.find((u) => u.includes('bomag.com') || u.includes('manitou') || u.includes('schaeff')) ?? null;
+  const kartaPdf = m.pdf.find((u) => u.includes('bomag.com')) ?? null;
   return {
     id: m.id,
     nazwa: m.nazwa,
-    kod: m.nazwa.replace(/^(BOMAG|Schaeff|GEHL)\s+/i, ''),
+    kod: m.nazwa.replace(/^BOMAG\s+/i, ''),
     marka: def.marka,
     kategoria: def.id,
     opis: OPISY[m.id] ?? '',

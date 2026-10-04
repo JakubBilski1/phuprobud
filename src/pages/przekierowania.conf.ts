@@ -2,12 +2,11 @@
 // Generowane z danych katalogu przy kazdym buildzie, wiec nie rozjada sie z oferta.
 // Dockerfile przenosi plik do konfiguracji nginx (nie jest podawany jako strona).
 import type { APIRoute } from 'astro';
-import { kategorie, modele } from '../data/katalog';
+import { modele } from '../data/katalog';
 
 // Strony kategorii i inne adresy starej strony (w tym te, ktore juz wtedy dawaly 404).
 const RECZNE: Record<string, string> = {
   '/bomag/': '/oferta/',
-  '/v2/': '/oferta/schaeff/',
   '/zageszczarki/': '/oferta/',
   '/bomag-stopy-wibracyjne/': '/oferta/stopy-wibracyjne/',
   '/stopa-wibracyjna-bt60-bt65/': '/oferta/stopy-wibracyjne/',
@@ -19,8 +18,8 @@ const RECZNE: Record<string, string> = {
   '/phuprobud/bomag-walce-drogowe/': '/oferta/',
   '/bomag-walce-drogowe-2/': '/oferta/walce-tandemowe/',
   '/walce-do-5-ton/': '/oferta/walce-tandemowe/',
+  // Pod tym adresem stara strona pokazywala walce prowadzone BOMAG, nie maszyny Schaeff.
   '/schaeff-minikoparki/': '/oferta/walce-prowadzone/',
-  '/gehl-ladowarki-gasienicowe/': '/oferta/gehl/',
   '/kategoria-produktu/ladowarki-przegubowe-teleskopowe/': '/oferta/',
   '/bomag-bw-90-ad/': '/oferta/walce-tandemowe/bw-90-ad-5/',
 };
@@ -34,10 +33,6 @@ export const GET: APIRoute = () => {
       const sciezka = new URL(url).pathname;
       if (!kategorieStare.has(sciezka) && !mapa.has(sciezka)) mapa.set(sciezka, m.href);
     }
-  }
-  // Martwe linki Gehl ze starej strony (np. /gehl-rt105/) dostaja prawdziwe karty.
-  for (const m of kategorie.find((k) => k.id === 'gehl')?.modele ?? []) {
-    mapa.set(`/gehl-${m.id}/`, m.href);
   }
   const linie = [...mapa.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
