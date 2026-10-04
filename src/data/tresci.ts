@@ -58,7 +58,7 @@ const pola = {
   'uzywane.typ2': { grupa: 'Maszyny używane', etykieta: 'Specjalność 2: typ maszyn', wartosc: 'Koparki kołowe', max: 60, gdzie: '/#uzywane' },
   'uzywane.marki2': { grupa: 'Maszyny używane', etykieta: 'Specjalność 2: marki', wartosc: 'Case, Atlas, Yanmar', max: 80, gdzie: '/#uzywane' },
   'uzywane.typ3': { grupa: 'Maszyny używane', etykieta: 'Specjalność 3: typ maszyn', wartosc: 'Koparko-ładowarki', max: 60, gdzie: '/#uzywane' },
-  'uzywane.marki3': { grupa: 'Maszyny używane', etykieta: 'Specjalność 3: marki', wartosc: 'Case, New Holland', max: 80, gdzie: '/#uzywane' },
+  'uzywane.marki3': { grupa: 'Maszyny używane', etykieta: 'Specjalność 3: marki', wartosc: 'Case, New Holland, JCB, CAT', max: 80, gdzie: '/#uzywane' },
   'uzywane.uwaga': {
     grupa: 'Maszyny używane', etykieta: 'Dopisek o skupie', dlugi: true, gdzie: '/#uzywane',
     wartosc: 'Skupujemy też maszyny budowlane. Opisz swoją maszynę w formularzu albo zadzwoń do handlowca.',
