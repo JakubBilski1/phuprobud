@@ -3,6 +3,10 @@ import Foto from './Foto.astro';
 import { firma } from '../data/firma';
 import { sierotki } from '../lib/tekst';
 import { tresc } from '../data/tresci';
+import { slot } from '../data/zdjecia-strony';
+
+const duze = slot('uzywane-duze');
+const male = slot('uzywane-male');
 
 const specjalnosci = (['1', '2', '3'] as const).map((n) => ({
   typ: `uzywane.typ${n}` as const,
@@ -12,8 +16,8 @@ const specjalnosci = (['1', '2', '3'] as const).map((n) => ({
 <section class="uzywane sekcja" id="uzywane" aria-labelledby="uzywane-tytul">
   <div class="kontener uzywane__siatka">
     <div class="uzywane__zdjecia">
-      <Foto nazwa="realizacje/merlo-roto-widly" alt="Zielona ładowarka teleskopowa obrotowa Merlo z wysuniętym wysięgnikiem i widłami na placu" class="uzywane__duze kadr" sizes="(min-width: 64rem) 52vw, 100vw" />
-      <Foto nazwa="realizacje/atlas-150w" alt="Koparka kołowa Atlas 150W" class="uzywane__male kadr--prawy" sizes="(min-width: 64rem) 24vw, 55vw" />
+      <Foto nazwa={duze.plik} alt={duze.alt} class="uzywane__duze kadr" sizes="(min-width: 64rem) 52vw, 100vw" data-zdjecie-slot={duze.id} />
+      <Foto nazwa={male.plik} alt={male.alt} class="uzywane__male kadr--prawy" sizes="(min-width: 64rem) 32vw, 66vw" data-zdjecie-slot={male.id} />
     </div>
 
     <div class="uzywane__tekst">
@@ -55,8 +59,9 @@ const specjalnosci = (['1', '2', '3'] as const).map((n) => ({
     position: absolute;
     right: clamp(-1rem, -2vw, -2rem);
     bottom: 0;
-    width: 46%;
-    aspect-ratio: 4 / 3;
+    /* Panoramiczne zdjecie (Merlo z koszem): ramka w jego proporcjach, zeby kosz nie byl uciety. */
+    width: 60%;
+    aspect-ratio: 11 / 5;
     object-fit: cover;
     border: clamp(6px, 0.8vw, 10px) solid var(--papier);
     box-sizing: content-box;
@@ -81,7 +86,7 @@ const specjalnosci = (['1', '2', '3'] as const).map((n) => ({
 
   @media (max-width: 63.99rem) {
     .uzywane__zdjecia, .uzywane__tekst { grid-column: 1 / -1; }
-    .uzywane__male { right: 0; width: 52%; }
+    .uzywane__male { right: 0; width: 66%; }
   }
   @media (max-width: 30rem) {
     .uzywane__lista div { grid-template-columns: 1fr; }
