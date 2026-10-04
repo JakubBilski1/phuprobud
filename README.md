@@ -9,8 +9,8 @@ Założenia projektu, paleta, typografia i decyzje: [docs/PROJEKT.md](docs/PROJE
 ## Co jest na stronie
 
 - **Strona główna**: hero, maszyny nowe (indeks ośmiu grup), teren dealera BOMAG (scena 3D),
-  maszyny używane (odsyłacz do otomoto), ludzie bez zdjęć (CEO w centralnym bloku, pod nim
-  rola i numer każdej osoby), finansowanie BPCE,
+  maszyny używane (odsyłacz do otomoto), ludzie bez zdjęć (tylko osoby z numerem: rola,
+  imię i telefon), finansowanie BPCE,
   realizacje (19 zdjęć w jednym kadrze, cała galeria mieści się na ekranie), kontakt: działy, formularz, mapa dojazdu.
 - **`/oferta/`**: katalog 41 modeli BOMAG, Schaeff i Gehl.
 - **`/oferta/<grupa>/`**: grupa z tabelą porównania modeli.
@@ -89,9 +89,8 @@ nie przelicza.
 | 662 997 955 | dział serwisu (EWPA), bez osoby | phuprobud.pl; brak imiennego przypisania w sieci |
 | 722 223 755 | administracja, bez osoby | phuprobud.pl; katalogi firm podają go jako numer firmy |
 
-Szymon Atraszkiewicz jest pokazany jako CEO, bez numeru: prowadzi PHU Probud (polityka
-prywatności), numeru osobistego nie ma w publicznych źródłach. Na stronie głównej ma centralny
-blok, pod nim pozostałe osoby z rolą i numerem. Zdjęć osób nie pokazujemy.
+Na stronie głównej są tylko osoby z własnym numerem, każda z rolą i telefonem. Zdjęć osób nie
+pokazujemy.
 
 ## Przed przejściem z demo na produkcję
 

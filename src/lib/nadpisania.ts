@@ -170,7 +170,7 @@ export function zastosuj(pola: Record<string, Zmiana>) {
         ustawTekst(atr('data-osoba-imie', id), tekst, false);
         ustawTekst(atr('data-osoba-imie-krotkie', id), tekst.split(/\s+/)[0], false);
       }
-      if (pole === 'rola' || pole === 'tytul') ustawTekst(atr(`data-osoba-${pole}`, id), tekst, false);
+      if (pole === 'rola') ustawTekst(atr('data-osoba-rola', id), tekst, false);
       if (pole === 'telefon') zmienTelefon(oryginal, tekst);
     }
 

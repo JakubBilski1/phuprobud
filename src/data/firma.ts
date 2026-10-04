@@ -30,8 +30,6 @@ export type Osoba = {
   nazwisko: string;
   /** dzial albo funkcja, pod nazwiskiem */
   rola: string;
-  /** zamiast numeru: duzy napis (np. CEO), gdy osoba nie ma przypisanego telefonu */
-  tytul?: string;
   opis?: string;
   telefon?: string;
   /** skad wiemy, ze numer i funkcja naleza do tej osoby */
@@ -40,15 +38,10 @@ export type Osoba = {
 
 // Numery przypisane imiennie na podstawie https://ewpa.pl/kontakt/ (siostrzana firma pod tym samym
 // adresem; te same numery sa na phuprobud.pl w dzialach sprzedazy i czesci). Stan: 30.09.2026.
-// Szymon Atraszkiewicz prowadzi PHU Probud (polityka prywatnosci) - bez przypisanego numeru.
 // 662 997 955 (serwis) i 722 223 755 (administracja) to numery dzialow, bez osoby.
 const krzysztof: Osoba = {
   id: 'krzysztof-bilski', imie: 'Krzysztof', nazwisko: 'Bilski', rola: 'Sprzedaż maszyn',
   telefon: '+48 601 896 689', zrodlo: 'https://ewpa.pl/kontakt/',
-};
-const szymon: Osoba = {
-  id: 'szymon-atraszkiewicz', imie: 'Szymon', nazwisko: 'Atraszkiewicz', rola: 'Prowadzi PHU Probud',
-  tytul: 'CEO', zrodlo: '/dokumenty/polityka-prywatnosci-phu-probud.pdf',
 };
 const marcin: Osoba = {
   id: 'marcin-maj', imie: 'Marcin', nazwisko: 'Maj', rola: 'Sprzedaż maszyn',
@@ -59,9 +52,7 @@ const tomasz: Osoba = {
   telefon: '+48 693 221 733', zrodlo: 'https://ewpa.pl/kontakt/',
 };
 
-/** Centralny blok na stronie glownej. */
-export const szef: Osoba = szymon;
-/** Pod nim: rola i numer kazdej osoby. */
+/** Sekcja „Z kim rozmawiasz”: tylko osoby z wlasnym numerem, z rola i telefonem. */
 export const zespol: Osoba[] = [krzysztof, marcin, tomasz];
 /** Handlowcy z numerami: pasek telefonu, blok „Zapytaj” w katalogu, naglowek. */
 export const handlowcy: Osoba[] = [krzysztof, marcin];

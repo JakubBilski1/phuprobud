@@ -10,12 +10,12 @@ import Pole from '../../components/panel/Pole.astro';
 import Przelacznik from '../../components/panel/Przelacznik.astro';
 import { kategorie, modele } from '../../data/katalog';
 import { tresci, grupyTresci, type KluczTresci } from '../../data/tresci';
-import { szef, zespol, dzialy, finansowanie } from '../../data/firma';
+import { zespol, dzialy, finansowanie } from '../../data/firma';
 import { odmiana } from '../../lib/tekst';
 
 const polaTresci = Object.entries(tresci) as [KluczTresci, (typeof tresci)[KluczTresci]][];
 const MODEL: [string, string, string] = ['model', 'modele', 'modeli'];
-const osoby = [szef, ...zespol];
+const osoby = zespol;
 const imie = (o: { imie: string; nazwisko: string }) => `${o.imie} ${o.nazwisko}`;
 const szukaj = (s: string) => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
 
@@ -231,11 +231,10 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
 
           <div class="osoby-panelu">
             {osoby.map((o) => (
-              <section class:list={['karta-panelu', { 'karta-panelu--szef': o === szef }]}>
-                <h2>{o === szef ? 'Blok główny' : o.rola}</h2>
+              <section class="karta-panelu">
+                <h2>{o.rola}</h2>
                 <Pole klucz={`osoba:${o.id}:imie`} etykieta="Imię i nazwisko" sciezka={`${imie(o)} · imię i nazwisko`} wartosc={imie(o)} wymagane max={60} />
                 <Pole klucz={`osoba:${o.id}:rola`} etykieta="Rola" sciezka={`${imie(o)} · rola`} wartosc={o.rola} wymagane max={40} />
-                {o.tytul && <Pole klucz={`osoba:${o.id}:tytul`} etykieta="Tytuł" sciezka={`${imie(o)} · tytuł`} wartosc={o.tytul} wymagane max={20} />}
                 {o.telefon && <Pole klucz={`osoba:${o.id}:telefon`} etykieta="Telefon" sciezka={`${imie(o)} · telefon`} wartosc={o.telefon} typ="telefon" wymagane max={20} />}
               </section>
             ))}
@@ -391,7 +390,6 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
   .karta-panelu { display: grid; gap: 1rem; padding: clamp(1rem, 2.5vw, 1.5rem); min-width: 0; background: var(--papier); border: 1px solid var(--linia); border-radius: 0 0 0 var(--rog-maly); }
   .karta-panelu__glowa { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
   .karta-panelu h2 { font-size: clamp(1.6rem, 2.4vw, 2rem); }
-  .karta-panelu--szef { border-top: 6px solid var(--zolty); }
   .siatka-pol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 1rem 1.25rem; }
   .siatka-pol .pole--dlugie { grid-column: 1 / -1; }
   .pusto { color: var(--stal); }

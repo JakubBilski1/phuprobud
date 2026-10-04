@@ -1,7 +1,7 @@
 ---
-// Ludzie, bez zdjec: centralny blok CEO, pod nim rola i numer kazdej osoby.
+// Ludzie, bez zdjec: tylko osoby, do ktorych sie dzwoni, z rola i numerem.
 // Przypisania numerow do osob: src/data/firma.ts (zrodlo: ewpa.pl/kontakt).
-import { szef, zespol, dzialy } from '../data/firma';
+import { zespol, dzialy } from '../data/firma';
 import { sierotki, telHref, telKrotki } from '../lib/tekst';
 import { tresc } from '../data/tresci';
 
@@ -14,12 +14,6 @@ const ikonaTelefonu = 'M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25
       <h2 id="handlowcy-tytul" data-tresc="handlowcy.tytul">{tresc('handlowcy.tytul')}</h2>
       <p class="lead" data-tresc="handlowcy.lead">{sierotki(tresc('handlowcy.lead'))}</p>
     </div>
-
-    <article class="szef">
-      {szef.tytul && <p class="szef__tytul" data-osoba-tytul={szef.id}>{szef.tytul}</p>}
-      <h3 class="szef__imie" data-osoba-imie={szef.id}>{szef.imie} {szef.nazwisko}</h3>
-      <p class="szef__rola" data-osoba-rola={szef.id}>{szef.rola}</p>
-    </article>
 
     <ul class="zespol" role="list">
       {zespol.map((o) => (
@@ -50,31 +44,11 @@ const ikonaTelefonu = 'M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25
   }
   .handlowcy__glowa .lead { max-width: 46ch; }
 
-  /* Centralny blok: sam tekst na zoltym, wysrodkowany. */
-  .szef {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: clamp(2.5rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem);
-    background: var(--zolty);
-    border-radius: 0 0 0 var(--rog);
-  }
-  .szef__tytul {
-    font-family: var(--kroj-naglowki);
-    font-weight: 800;
-    font-size: var(--t-numer);
-    line-height: 1;
-  }
-  .szef__imie { margin-top: 0.75rem; font-size: clamp(2.8rem, 6.4vw, 6rem); line-height: 0.9; }
-  .szef__rola { margin-top: 1rem; font-weight: 600; font-size: var(--t-lead); }
-
-  /* Pod spodem: rola, osoba i numer, rowne kolumny na szerokosc bloku. */
+  /* Rola, osoba i numer, rowne kolumny na szerokosc sekcji. */
   .zespol {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
     gap: clamp(0.75rem, 1.5vw, 1.25rem);
-    margin-top: clamp(0.75rem, 1.5vw, 1.25rem);
   }
   .osoba {
     display: flex;
