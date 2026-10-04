@@ -79,4 +79,15 @@ const obraz = wpis.warianty.at(-1)!;
   body:has([data-tlo-strony]) { background: transparent; }
   body:has([data-tlo-strony]) .hero { background: transparent; }
   body:has([data-tlo-strony]) .sekcja--beton { background: rgb(236 236 232 / 0.7); }
+  /*
+    Bloki tekstu, ktore leza wprost na scenie, dostaja jasna plytke (jeden zaokraglony rog jak
+    kadry zdjec). Bez backdrop-filter: przy przesuwanej scenie liczylby sie co klatke.
+  */
+  body:has([data-tlo-strony]) :is(.oferta__glowa, .oferta__lista, .uzywane__tekst, .handlowcy__glowa, .finansowanie__tekst, .kontakt__glowa) {
+    padding: clamp(1.1rem, 2.4vw, 2rem);
+    background: rgb(255 255 255 / 0.84);
+    border-radius: 0 0 0 var(--rog-maly);
+  }
+  /* Karta finansowania ma wlasna ramke i odstepy, dostaje tylko tlo. */
+  body:has([data-tlo-strony]) .finansowanie__karta { background: rgb(255 255 255 / 0.84); }
 </style>
