@@ -1226,5 +1226,17 @@
     "src": "/img/kategorie/zageszczarki-rewersyjne-01-1800.webp"
    }
   ]
+ },
+ "tlo/krajobraz": {
+  "w": 1024,
+  "h": 1536,
+  "kolor": "#e8e8e8",
+  "alfa": false,
+  "warianty": [
+   {
+    "w": 1024,
+    "src": "/img/tlo/krajobraz-1024.webp"
+   }
+  ]
  }
 }

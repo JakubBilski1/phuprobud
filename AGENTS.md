@@ -17,7 +17,8 @@ co dotyczy tej strony.
 - **Zdjęcia**: tylko przez `scripts/obrazy.lista.mjs` + `npm run obrazy`. Komponent `Foto`
   rzuca błąd, gdy zdjęcia nie ma w manifeście.
 - **Grafika generowana** (Codex `image_gen`) tylko do rzeczy, które nie udają faktów
-  (piktogramy). Maszyn i ludzi nie generujemy.
+  (piktogramy, ikona telefonu, scena tła strony głównej). Maszyn i ludzi nie generujemy.
+  Tło: `zrodla/oryginaly/tlo/` → `npm run obrazy`, komponent `TloStrony.astro`.
 - **Build ma zostać lekki**: bez przetwarzania obrazów w `npm run build`. Serwer Coolify dzieli
   pamięć z kilkudziesięcioma aplikacjami; jeden push naraz.
 - **Przed pushem**: `npm run check` i `npm run build`, rozdzielone `&&`.

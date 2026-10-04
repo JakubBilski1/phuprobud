@@ -75,7 +75,10 @@ nie przelicza.
 - Zdjęcia: od Probudu (realizacje i maszyny używane, październik 2026), stara strona
   phuprobud.pl (7 realizacji), zdjęcia producenta (BOMAG).
   Zdjęć osób na stronie nie ma.
-- Piktogramy maszyn: wygenerowane (Codex, `image_gen`), `public/piktogramy/`.
+- Piktogramy maszyn i ikona telefonu: wygenerowane (Codex, `image_gen`), `public/piktogramy/`,
+  `public/ikony/`.
+- Tło strony głównej: scena budowy drogi o świcie, wygenerowana (Codex, `image_gen`, bez maszyn
+  i ludzi), przypięta za treścią i przesuwana przy przewijaniu (`TloStrony.astro`).
 - Mapa: dane OpenStreetMap z kafli OpenFreeMap (bez klucza API). Granice województw: Natural
   Earth (domena publiczna).
 

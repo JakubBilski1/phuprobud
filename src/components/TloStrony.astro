@@ -1,0 +1,81 @@
+---
+// Tlo strony glownej: jedna scena (wygenerowana przez Codex, bez maszyn i ludzi) przypieta za
+// trescia. Przy przewijaniu kamera zjezdza po niej z gory na dol: niebo za tytulem, budowana
+// droga w srodku strony, grunt przy stopce. Scena jedzie wolniej niz tresc, wiec wyglada jak
+// glebia. Jasne sekcje sa na niej przezroczyste albo polprzezroczyste, ciemne zostaja pelne.
+import manifest from '../data/obrazy.json';
+
+type Wpis = { w: number; h: number; warianty: { w: number; src: string }[] };
+const wpis = (manifest as Record<string, Wpis>)['tlo/krajobraz'];
+if (!wpis) throw new Error('Brak tla „tlo/krajobraz” w src/data/obrazy.json - dopisz je do scripts/obrazy.lista.mjs');
+const obraz = wpis.warianty.at(-1)!;
+---
+<div class="tlo-strony" aria-hidden="true" data-tlo-strony>
+  <img src={obraz.src} alt="" width={wpis.w} height={wpis.h} decoding="async" fetchpriority="low" data-tlo-obraz />
+</div>
+
+<script>
+  const tlo = document.querySelector<HTMLElement>('[data-tlo-strony]');
+  const obraz = tlo?.querySelector<HTMLImageElement>('[data-tlo-obraz]');
+  if (tlo && obraz) {
+    const proporcja = obraz.height / obraz.width;
+    const spokoj = matchMedia('(prefers-reduced-motion: reduce)');
+    let zakres = 0;
+    let klatka = 0;
+
+    const przesun = () => {
+      klatka = 0;
+      const max = document.documentElement.scrollHeight - innerHeight;
+      // Bez ruchu (prefers-reduced-motion) scena stoi na kadrze z niebem i horyzontem.
+      const postep = spokoj.matches ? 0.3 : max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+      tlo.style.setProperty('--y', `${(-zakres * postep).toFixed(1)}px`);
+    };
+    // Scena wypelnia szerokosc okna i jest co najmniej 1,6 raza wyzsza od niego, zeby bylo po
+    // czym jechac; na telefonie oznacza to powiekszenie i uciete boki (srodek kadru zostaje).
+    const dopasuj = () => {
+      const szer = Math.max(innerWidth, (innerHeight * 1.6) / proporcja);
+      zakres = szer * proporcja - innerHeight;
+      tlo.style.setProperty('--szer', `${Math.ceil(szer)}px`);
+      przesun();
+    };
+    addEventListener('scroll', () => { if (!klatka) klatka = requestAnimationFrame(przesun); }, { passive: true });
+    addEventListener('resize', dopasuj);
+    dopasuj();
+  }
+</script>
+
+<style is:global>
+  .tlo-strony {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--beton);
+  }
+  .tlo-strony img {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--szer, 100vw);
+    max-width: none;
+    height: auto;
+    transform: translate3d(-50%, var(--y, 0px), 0);
+    will-change: transform;
+    filter: saturate(0.78);
+  }
+  /* Welon (czytelnosc tekstu) i drobne ziarno, ktore kryje miekkosc powiekszonej sceny. */
+  .tlo-strony::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='z'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23z)'/%3E%3C/svg%3E"),
+      rgb(255 255 255 / 0.42);
+  }
+
+  /* Strona ze scena: jasne tla sekcji ustepuja scenie. */
+  body:has([data-tlo-strony]) { background: transparent; }
+  body:has([data-tlo-strony]) .hero { background: transparent; }
+  body:has([data-tlo-strony]) .sekcja--beton { background: rgb(236 236 232 / 0.55); }
+</style>
