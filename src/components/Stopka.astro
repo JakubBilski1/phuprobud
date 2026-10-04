@@ -8,6 +8,7 @@ const rok = new Date().getFullYear();
     <div class="stopka__gora">
       <div class="stopka__firma">
         <img class="stopka__logo" src="/marka/probud-logo-jasne.webp" alt="PHU Probud" width="489" height="98" loading="lazy" />
+        <p class="stopka__nazwa">{firma.nazwa} {firma.wlasciciel}</p>
         <address>
           {firma.adres.ulica}<br />
           {firma.adres.kod} {firma.adres.miasto}
@@ -72,7 +73,8 @@ const rok = new Date().getFullYear();
     grid-template-columns: minmax(16rem, 1.4fr) repeat(3, minmax(10rem, 1fr));
     gap: 2.5rem clamp(1.5rem, 4vw, 4rem);
   }
-  .stopka__logo { height: 36px; width: auto; margin-bottom: 1.5rem; }
+  .stopka__logo { height: 36px; width: auto; margin-bottom: 0.75rem; }
+  .stopka__nazwa { margin-bottom: 1.25rem; font-weight: 700; color: var(--papier); }
   .stopka address { font-style: normal; }
   .stopka__dane { margin-top: 1rem; color: #ffffffa6; }
   .stopka__konta { margin-top: 1rem; display: grid; gap: 0.4rem; }

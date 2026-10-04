@@ -3,6 +3,7 @@
 
 export const firma = {
   nazwa: 'PHU Probud',
+  wlasciciel: 'Szymon Atraszkiewicz',
   nazwaPrawna: 'Szymon Atraszkiewicz PHU Probud',
   od: 1994,
   adres: { ulica: 'ul. Poznańska 152', kod: '62-052', miasto: 'Komorniki' },
