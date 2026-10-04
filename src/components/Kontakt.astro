@@ -8,7 +8,7 @@ import { telHref, telKrotki } from '../lib/tekst';
   <div class="kontener sekcja kontakt__centrala">
     <div class="kontakt__glowa">
       <h2 id="kontakt-tytul">Kontakt</h2>
-      <p class="lead">{firma.nazwa}, {firma.adres.ulica}, {firma.adres.kod} {firma.adres.miasto}</p>
+      <p class="lead">{firma.nazwa}, {firma.adres.ulica}, <span class="kontakt__miasto">{firma.adres.kod} {firma.adres.miasto}</span></p>
     </div>
     <ul class="dzialy" role="list">
       {dzialy.map((d) => (
@@ -33,6 +33,8 @@ import { telHref, telKrotki } from '../lib/tekst';
 
 <style>
   .kontakt__centrala { padding-bottom: clamp(3rem, 6vw, 5rem); }
+  /* Kod pocztowy z miejscowoscia w jednym wierszu (bez „62-” na koncu linii i „052” w nastepnej). */
+  .kontakt__miasto { white-space: nowrap; }
   .kontakt__glowa { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 1rem 3rem; margin-bottom: clamp(2rem, 4vw, 3rem); }
   .dzialy {
     display: grid;
