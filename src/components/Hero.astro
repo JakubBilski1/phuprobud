@@ -144,11 +144,28 @@ const masa = walec.parametry.find((p) => p.klucz === 'masa_robocza_kg')?.wartosc
     @keyframes pojaw { from { opacity: 0; } }
   }
 
+  /*
+    Telefon i tablet: tytul na cala szerokosc, walec mniejszy, po prawej i - jak na komputerze -
+    miedzy wierszami: rama wchodzi w wolne miejsce obok „MASZYNY”, „BUDOWLANE” przecina go z przodu.
+    Szerokosc walca liczona od wielkosci tytulu, wiec tekst i przyciski mieszcza sie na pierwszym ekranie.
+  */
   @media (max-width: 63.99rem) {
-    .hero { --rozmiar: clamp(4rem, 18.5vw, 9rem); }
+    .hero { --rozmiar: clamp(4rem, 20.5vw, 9rem); }
     .hero__wiersz--dol { padding-left: 0; }
-    .hero__maszyna { position: relative; right: auto; bottom: auto; width: 100%; max-width: none; margin-top: -0.12em; }
+    .hero__maszyna {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      width: min(100%, calc(var(--rozmiar) * 3.4));
+      max-width: none;
+      margin-left: auto;
+      margin-top: calc(var(--rozmiar) * -1.7);
+    }
+    .hero__dol { padding-top: 1.25rem; }
     .hero__dol-siatka { grid-template-columns: 1fr; }
+    .hero__lead { font-size: 1.08rem; }
+    .hero__akcje { width: 100%; }
+    .hero__akcje > * { flex: 1 1 14rem; justify-content: center; }
     .hero__podpis { justify-self: start; }
   }
 </style>
