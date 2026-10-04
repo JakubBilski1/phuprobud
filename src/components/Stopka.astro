@@ -52,7 +52,6 @@ const rok = new Date().getFullYear();
     <div class="stopka__dol">
       <p>© {rok} {firma.nazwaPrawna}</p>
       <a class="stopka__pbdevs" href={pbdevs.url} rel="noopener" target="_blank">
-        <span>Wersja demonstracyjna nowej strony. Projekt i wykonanie:</span>
         <img src="/logo/pbdevs.svg" alt="PB Devs" width="871" height="118" loading="lazy" />
       </a>
     </div>
@@ -99,17 +98,14 @@ const rok = new Date().getFullYear();
     color: #ffffff99;
     font-size: 0.88rem;
   }
-  /* Kredyt PB Devs: przygaszony do polowy, zeby nie konkurowal z marka klienta. */
+  /* Samo logo PB Devs w prawym rogu, przygaszone, zeby nie konkurowalo z marka klienta. */
   .stopka__pbdevs {
     display: inline-flex;
-    align-items: center;
-    gap: 0.9rem;
-    text-decoration: none;
+    margin-left: auto;
     opacity: 0.55;
     transition: opacity var(--ruch-szybki);
   }
   .stopka__pbdevs:hover, .stopka__pbdevs:focus-visible { opacity: 1; }
-  .stopka__pbdevs span { color: var(--papier); }
   .stopka__pbdevs img { height: 18px; width: auto; }
 
   @media (max-width: 63.99rem) {
