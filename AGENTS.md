@@ -15,7 +15,8 @@ co dotyczy tej strony.
   stronie dostaje `data-tresc="klucz"`. Nowy tekst na stronie, który ma być edytowalny, idzie przez
   ten plik. Zdjęcia: galeria (pole `galeria:uklad`) i miejsca ze zdjęciem z `src/data/zdjecia-strony.ts`
   (element dostaje `data-zdjecie-slot`); pliki wgrane w panelu leżą w IndexedDB przeglądarki.
-  Zdjęć osób na stronie nie pokazujemy.
+  Logowanie i zmiana hasła: `src/lib/konto-demo.ts` (kod startowy tylko jako skrót, samego kodu
+  nie zapisujemy w repozytorium). Zdjęć osób na stronie nie pokazujemy.
 - **Zdjęcia**: tylko przez `scripts/obrazy.lista.mjs` + `npm run obrazy`. Komponent `Foto`
   rzuca błąd, gdy zdjęcia nie ma w manifeście.
 - **Grafika generowana** (Codex `image_gen`) tylko do rzeczy, które nie udają faktów

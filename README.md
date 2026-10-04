@@ -21,7 +21,13 @@ Założenia projektu, paleta, typografia i decyzje: [docs/PROJEKT.md](docs/PROJE
 
 ## Panel `/admin/` (demo)
 
-Logowanie z wpisanymi danymi (`admin` / `probud2026`, bez serwera). W panelu:
+Pierwsze logowanie danymi startowymi (`admin` / `probud2026`, wpisane w formularzu, bez serwera).
+W zakładce **Konto i hasło** właściciel ustawia własne hasło; pierwsza zmiana wymaga 6-cyfrowego
+kodu startowego, kolejne obecnego hasła. Kodu nie ma w repozytorium (w kodzie jest tylko skrót
+PBKDF2 w `src/lib/konto-demo.ts`), przekazujemy go właścicielowi osobno. Po pierwszej zmianie dane
+startowe przestają działać, a formularz logowania nie podpowiada już loginu ani hasła. Hasło
+zapisuje się w tej przeglądarce jako skrót z losową solą; wyczyszczenie danych strony w przeglądarce
+wraca do danych startowych (i do kodu przy pierwszej zmianie). W panelu:
 
 - **Oferta i maszyny**: widoczność każdego z 31 modeli i każdej z 6 grup, nazwa i opis grupy,
   opis modelu, etykieta (np. „Nowość”) i cena na karcie i podstronie modelu. Ukrycie przelicza
@@ -104,8 +110,8 @@ pokazujemy.
 
 ## Przed przejściem z demo na produkcję
 
-- **Panel `/admin/`** zapisuje zmiany w przeglądarce, a logowanie nic nie chroni (dane są jawne
-  w kodzie strony). Na produkcję: zapis na serwerze (baza `probud`), logowanie z hasłem po stronie
+- **Panel `/admin/`** zapisuje zmiany w przeglądarce, a logowanie nic nie chroni: hasło i kod
+  startowy są sprawdzane w przeglądarce, a dane startowe są jawne w kodzie strony. Na produkcję: zapis na serwerze (baza `probud`), logowanie z hasłem po stronie
   serwera i strona budowana albo renderowana z danych z bazy.
 - **Formularz** w demo składa gotową wiadomość w programie pocztowym (`mailto:` na adres
   wybranego działu). Wysyłka z serwera: ustawić `PUBLIC_FORMULARZ_URL` na endpoint, który

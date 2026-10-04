@@ -5,10 +5,11 @@ import { wczytaj, zapisz, wyczysc, type Wartosc, type Zmiana } from '../lib/nadp
 import { odmiana } from '../lib/tekst';
 import { odnosnikiIdb, posprzataj } from '../lib/zdjecia-demo';
 import { opisWartosciZdjec } from './panel-zdjecia';
+import { przygotujLogowanie } from './panel-konto';
+import { sprawdzLogowanie } from '../lib/konto-demo';
 
-// To nie jest zabezpieczenie: dane logowania sa jawne w kodzie strony, a zmiany i tak zostaja
-// w przegladarce osoby, ktora je wpisala. Logowanie jest po to, zeby demo wygladalo jak panel.
-const DEMO = { login: 'admin', haslo: 'probud2026' };
+// Logowanie bez serwera (src/lib/konto-demo.ts): dane startowe albo haslo ustawione w zakladce
+// „Konto i haslo”. Zmiany i tak zostaja w przegladarce osoby, ktora je wpisala.
 const SESJA = 'probud-panel-sesja';
 
 type Pole = HTMLInputElement | HTMLTextAreaElement;
@@ -60,31 +61,33 @@ export function uruchomPanel() {
     panel.hidden = false;
     zHasha();
   };
-  formLogowania.addEventListener('submit', (e) => {
+  formLogowania.addEventListener('submit', async (e) => {
     e.preventDefault();
     const dane = new FormData(formLogowania);
-    const ok = String(dane.get('login') ?? '').trim() === DEMO.login && dane.get('haslo') === DEMO.haslo;
     bladLogowania.hidden = true;
     przyciskLogowania.disabled = true;
     przyciskLogowania.textContent = 'Logowanie…';
     // Krotka pauza jak przy prawdziwym logowaniu, zeby przejscie nie bylo skokiem.
-    setTimeout(() => {
-      przyciskLogowania.disabled = false;
-      przyciskLogowania.textContent = 'Zaloguj się';
-      if (!ok) {
-        bladLogowania.textContent = 'Nieprawidłowy login lub hasło.';
-        bladLogowania.hidden = false;
-        return;
-      }
-      sesja(true);
-      pokazPanel();
-    }, 450);
+    const [ok] = await Promise.all([
+      sprawdzLogowanie(String(dane.get('login') ?? '').trim(), String(dane.get('haslo') ?? '')),
+      new Promise((r) => setTimeout(r, 450)),
+    ]);
+    przyciskLogowania.disabled = false;
+    przyciskLogowania.textContent = 'Zaloguj się';
+    if (!ok) {
+      bladLogowania.textContent = 'Nieprawidłowy login lub hasło.';
+      bladLogowania.hidden = false;
+      return;
+    }
+    sesja(true);
+    pokazPanel();
   });
   $('[data-wyloguj]')!.addEventListener('click', () => {
     odrzuc();
     sesja(false);
     panel.hidden = true;
     logowanie.hidden = false;
+    przygotujLogowanie();
     history.replaceState(null, '', location.pathname);
   });
 
