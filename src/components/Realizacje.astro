@@ -28,7 +28,7 @@ const razem = zdjecia.length;
     <div class="galeria" id="realizacje" data-galeria tabindex="-1">
       <h2 class="galeria__tytul" id="realizacje-tytul">Realizacje</h2>
       <p class="galeria__licznik numer" aria-live="polite">
-        <span class="sr-only">Zdjęcie </span><span data-galeria-nr>1</span><span aria-hidden="true"> / </span><span class="sr-only"> z </span>{razem}
+        <span class="sr-only">Zdjęcie </span><span data-galeria-nr>1</span><span aria-hidden="true"> / </span><span class="sr-only"> z </span><span data-galeria-razem>{razem}</span>
       </p>
 
       <div class="galeria__kadr">
@@ -36,6 +36,7 @@ const razem = zdjecia.length;
           {zdjecia.map((z, i) => (
             <img
               data-galeria-zdjecie={i}
+            data-plik={z.plik}
               data-srcset={z.srcset}
               data-src={z.src}
               src={i === 0 ? z.src : undefined}
@@ -66,7 +67,7 @@ const razem = zdjecia.length;
 
       <ul class="galeria__miniatury" role="list" data-galeria-miniatury>
         {zdjecia.map((z, i) => (
-          <li>
+          <li data-plik={z.plik}>
             <button type="button" data-galeria-idz={i} aria-label={`Zdjęcie ${z.nr} z ${razem}: ${z.podpis}`} aria-current={i === 0 ? 'true' : undefined}>
               <img src={z.miniatura} alt="" width="120" height="80" loading="lazy" decoding="async" style={`background-color:${z.kolor}`} />
             </button>

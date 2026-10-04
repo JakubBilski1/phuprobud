@@ -13,7 +13,9 @@ co dotyczy tej strony.
   jeśli model nie ma grupy albo opisu.
 - **Panel `/admin/`** (demo, localStorage): teksty do edycji są w `src/data/tresci.ts`, element na
   stronie dostaje `data-tresc="klucz"`. Nowy tekst na stronie, który ma być edytowalny, idzie przez
-  ten plik. Zdjęć osób na stronie nie pokazujemy.
+  ten plik. Zdjęcia: galeria (pole `galeria:uklad`) i miejsca ze zdjęciem z `src/data/zdjecia-strony.ts`
+  (element dostaje `data-zdjecie-slot`); pliki wgrane w panelu leżą w IndexedDB przeglądarki.
+  Zdjęć osób na stronie nie pokazujemy.
 - **Zdjęcia**: tylko przez `scripts/obrazy.lista.mjs` + `npm run obrazy`. Komponent `Foto`
   rzuca błąd, gdy zdjęcia nie ma w manifeście.
 - **Grafika generowana** (Codex `image_gen`) tylko do rzeczy, które nie udają faktów

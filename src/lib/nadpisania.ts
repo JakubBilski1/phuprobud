@@ -3,9 +3,11 @@
 //
 // Format: { wersja, zapisano, pola: { klucz: { w: nowa wartosc, o: oryginal } } }.
 // Klucze: tekst:<klucz>, model:<id>:<pole>, kategoria:<id>:<pole>, osoba:<id>:<pole>,
-// dzial:<id>:<pole>, finansowanie:<pole>, ogloszenie:<pole>. Oryginal jest potrzebny przy
+// dzial:<id>:<pole>, finansowanie:<pole>, ogloszenie:<pole>, galeria:uklad (JSON z kolejnoscia
+// i podpisami), zdjecie:<slot> („plik:<klucz>” albo „idb:<id>”). Oryginal jest potrzebny przy
 // telefonach i e-mailach: te podmieniamy wszedzie, gdzie stary numer albo adres wystepuje.
 import { odmiana, sierotki, telHref, telKrotki, liczba } from './tekst';
+import { adresZdjecia, PREFIKS_IDB, PREFIKS_PLIKU, type PozycjaGalerii } from './zdjecia-demo';
 
 export const KLUCZ_MAGAZYNU = 'probud-demo-tresci';
 
@@ -94,6 +96,93 @@ function uwaga(el: Element, tekst: string) {
   p.className = 'demo-uwaga';
   p.textContent = tekst;
   el.prepend(p);
+}
+
+/** Zdjecie w miejscu na stronie (data-zdjecie-slot): z galerii („plik:”) albo wgrane w panelu („idb:”). */
+function zastosujZdjecie(slot: string, wartosc: string) {
+  wszystkie<HTMLImageElement>(atr('data-zdjecie-slot', slot)).forEach((img) => {
+    if (wartosc.startsWith(PREFIKS_PLIKU)) {
+      // Zdjecia galerii sa w HTML strony glownej razem z adresami wszystkich rozmiarow.
+      const zrodlo = document.querySelector<HTMLImageElement>(`[data-galeria-zdjecie]${atr('data-plik', wartosc.slice(PREFIKS_PLIKU.length))}`);
+      if (!zrodlo) return;
+      img.srcset = zrodlo.dataset.srcset || zrodlo.srcset;
+      img.src = zrodlo.dataset.src || zrodlo.src;
+      img.alt = zrodlo.alt;
+    } else if (wartosc.startsWith(PREFIKS_IDB)) {
+      img.removeAttribute('srcset');
+      img.alt = 'Zdjęcie maszyny';
+      void adresZdjecia(wartosc).then((adres) => { if (adres) img.src = adres; });
+    }
+    img.style.backgroundColor = '';
+  });
+}
+
+/** Galeria „Realizacje” w kolejnosci z panelu: podpisy, usuniete zdjecia, nowe zdjecia z dysku. */
+function zastosujGalerie(json: string) {
+  let uklad: PozycjaGalerii[];
+  try { uklad = JSON.parse(json); } catch { return; }
+  const korzen = document.querySelector<HTMLElement>('[data-galeria]');
+  const scena = korzen?.querySelector<HTMLElement>('[data-galeria-scena]');
+  const lista = korzen?.querySelector<HTMLElement>('[data-galeria-miniatury]');
+  if (!korzen || !scena || !lista || !Array.isArray(uklad) || !uklad.length) return;
+
+  const zdjecia = new Map(wszystkie<HTMLImageElement>('[data-galeria-zdjecie]').map((img) => [img.dataset.plik!, img]));
+  const miniatury = new Map([...lista.querySelectorAll<HTMLLIElement>('li[data-plik]')].map((li) => [li.dataset.plik!, li]));
+  const wzorZdjecia = [...zdjecia.values()][0];
+  const wzorMiniatury = [...miniatury.values()][0];
+  if (!wzorZdjecia || !wzorMiniatury) return;
+
+  const nowe: { img: HTMLImageElement; li: HTMLLIElement; podpis: string }[] = [];
+  for (const { z, p } of uklad) {
+    const podpis = p.trim() || 'Zdjęcie realizacji';
+    let img = zdjecia.get(z);
+    let li = miniatury.get(z);
+    if (img && li) {
+      zdjecia.delete(z);
+      miniatury.delete(z);
+    } else if (z.startsWith(PREFIKS_IDB)) {
+      img = wzorZdjecia.cloneNode() as HTMLImageElement;
+      ['src', 'srcset', 'data-src', 'data-srcset', 'loading', 'style', 'class'].forEach((a) => img!.removeAttribute(a));
+      li = wzorMiniatury.cloneNode(true) as HTMLLIElement;
+      const mini = li.querySelector('img')!;
+      mini.removeAttribute('src');
+      mini.style.backgroundColor = '';
+      img.dataset.plik = li.dataset.plik = z;
+      const duze = img;
+      void adresZdjecia(z).then((adres) => { if (adres) { duze.src = adres; mini.src = adres; } });
+    } else {
+      continue;
+    }
+    img.alt = podpis;
+    nowe.push({ img, li, podpis });
+  }
+  if (!nowe.length) return;
+
+  // Zdjecia usuniete w panelu znikaja razem z miniaturami.
+  zdjecia.forEach((img) => img.remove());
+  miniatury.forEach((li) => li.remove());
+  const przyciskPelny = scena.querySelector('[data-galeria-pelny]');
+  nowe.forEach(({ img, li, podpis }, i) => {
+    scena.insertBefore(img, przyciskPelny);
+    lista.append(li);
+    img.dataset.galeriaZdjecie = String(i);
+    img.classList.toggle('aktywne', i === 0);
+    const b = li.querySelector('button')!;
+    b.dataset.galeriaIdz = String(i);
+    b.setAttribute('aria-label', `Zdjęcie ${i + 1} z ${nowe.length}: ${podpis}`);
+    if (i === 0) b.setAttribute('aria-current', 'true');
+    else b.removeAttribute('aria-current');
+  });
+  // Pierwsze zdjecie musi byc wczytane od razu; reszte galeria dociaga w trakcie przegladania.
+  const pierwsze = nowe[0].img;
+  if (!pierwsze.getAttribute('src') && pierwsze.dataset.src) {
+    pierwsze.srcset = pierwsze.dataset.srcset ?? '';
+    pierwsze.src = pierwsze.dataset.src;
+  }
+  const razem = korzen.querySelector('[data-galeria-razem]');
+  if (razem) razem.textContent = String(nowe.length);
+  const podpis = korzen.querySelector('[data-galeria-podpis]');
+  if (podpis) podpis.textContent = nowe[0].podpis;
 }
 
 type ModelKatalogu = [id: string, kategoria: string, masa: number | null];
@@ -203,4 +292,12 @@ export function zastosuj(pola: Record<string, Zmiana>) {
   });
 
   if (ukryteModele.size || ukryteKategorie.size) przeliczKatalog(ukryteModele, ukryteKategorie);
+
+  // Zdjecia: najpierw miejsca na stronie (moga brac zdjecie z galerii), potem sama galeria.
+  for (const [klucz, { w }] of Object.entries(pola)) {
+    const [typ, id] = klucz.split(':');
+    if (typ === 'zdjecie' && typeof w === 'string' && w) zastosujZdjecie(id, w);
+  }
+  const galeria = pola['galeria:uklad']?.w;
+  if (typeof galeria === 'string') zastosujGalerie(galeria);
 }

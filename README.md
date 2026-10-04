@@ -23,10 +23,14 @@ Założenia projektu, paleta, typografia i decyzje: [docs/PROJEKT.md](docs/PROJE
 
 Logowanie z wpisanymi danymi (`admin` / `probud2026`, bez serwera). W panelu:
 
-- **Oferta i maszyny**: widoczność każdego z 41 modeli i każdej z 8 grup, nazwa i opis grupy,
+- **Oferta i maszyny**: widoczność każdego z 31 modeli i każdej z 6 grup, nazwa i opis grupy,
   opis modelu, etykieta (np. „Nowość”) i cena na karcie i podstronie modelu. Ukrycie przelicza
   liczby modeli i zakresy masy w ofercie i katalogu.
 - **Teksty strony**: nagłówki, opisy sekcji i przyciski (`src/data/tresci.ts`).
+- **Galeria realizacji**: kolejność (strzałki albo przeciąganie), podpisy, podmiana zdjęcia,
+  usuwanie i przywracanie, nowe zdjęcia z dysku.
+- **Zdjęcia na stronie**: zdjęcia w sekcji „Maszyny używane” (`src/data/zdjecia-strony.ts`),
+  wybrane z galerii albo wgrane z dysku.
 - **Ludzie i kontakt**: imię i nazwisko, rola, telefon osób, telefony i e-maile działów,
   finansowanie. Nowy numer albo adres zastępuje stary w każdym miejscu strony, także w formularzu.
 - **Ogłoszenie**: pasek z komunikatem nad nagłówkiem każdej strony.
@@ -34,8 +38,10 @@ Logowanie z wpisanymi danymi (`admin` / `probud2026`, bez serwera). W panelu:
 
 Zmiany zapisują się w `localStorage` tej przeglądarki (`src/lib/nadpisania.ts`): panel zapisuje
 tylko różnicę względem oryginału, a skrypt w layoucie (`src/components/DemoTresci.astro`) nanosi
-ją na elementy oznaczone atrybutami `data-tresc`, `data-model`, `data-kategoria`, `data-osoba-*`.
-Inni odwiedzający widzą oryginał. Nowy tekst do edycji: wpis w `src/data/tresci.ts` i
+ją na elementy oznaczone atrybutami `data-tresc`, `data-model`, `data-kategoria`, `data-osoba-*`,
+`data-zdjecie-slot` i na galerię. Zdjęcia wgrane z dysku są za duże na `localStorage`: panel
+zmniejsza je do 2000 px i trzyma w IndexedDB (`src/lib/zdjecia-demo.ts`), a w zapisie zostaje
+odnośnik. Inni odwiedzający widzą oryginał. Nowy tekst do edycji: wpis w `src/data/tresci.ts` i
 `data-tresc="klucz"` na elemencie w komponencie.
 
 ## Uruchomienie

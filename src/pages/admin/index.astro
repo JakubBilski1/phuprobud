@@ -11,6 +11,9 @@ import Przelacznik from '../../components/panel/Przelacznik.astro';
 import { kategorie, modele } from '../../data/katalog';
 import { tresci, grupyTresci, type KluczTresci } from '../../data/tresci';
 import { zespol, dzialy, finansowanie } from '../../data/firma';
+import { realizacje } from '../../data/realizacje';
+import { slotyZdjec } from '../../data/zdjecia-strony';
+import manifest from '../../data/obrazy.json';
 import { odmiana } from '../../lib/tekst';
 
 const polaTresci = Object.entries(tresci) as [KluczTresci, (typeof tresci)[KluczTresci]][];
@@ -19,10 +22,24 @@ const osoby = zespol;
 const imie = (o: { imie: string; nazwisko: string }) => `${o.imie} ${o.nazwisko}`;
 const szukaj = (s: string) => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '');
 
+// Zdjecia strony dla zakladek „Galeria realizacji” i „Zdjecia na stronie”: oryginalny uklad galerii
+// (wartosc domyslna pola) i miniatury do podgladu w edytorze (src/scripts/panel-zdjecia.ts).
+type WpisObrazu = { warianty: { w: number; src: string }[] };
+const obraz = (k: string) => (manifest as Record<string, WpisObrazu>)[k].warianty;
+const zdjeciaStrony = Object.fromEntries(realizacje.map((r) => [r.plik, {
+  podpis: r.podpis,
+  mini: obraz(r.plik)[0].src,
+  sredni: (obraz(r.plik).find((v) => v.w >= 700) ?? obraz(r.plik).at(-1)!).src,
+}]));
+const galeriaOryginal = JSON.stringify(realizacje.map((r) => ({ z: r.plik, p: r.podpis })));
+const ZDJEC: [string, string, string] = ['zdjęcie', 'zdjęcia', 'zdjęć'];
+
 const sekcje = [
   { id: 'pulpit', nazwa: 'Pulpit' },
   { id: 'oferta', nazwa: 'Oferta i maszyny' },
   { id: 'teksty', nazwa: 'Teksty strony' },
+  { id: 'galeria', nazwa: 'Galeria realizacji' },
+  { id: 'zdjecia', nazwa: 'Zdjęcia na stronie' },
   { id: 'kontakt', nazwa: 'Ludzie i kontakt' },
   { id: 'ogloszenie', nazwa: 'Ogłoszenie' },
 ];
@@ -122,6 +139,8 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
           <div class="skroty">
             <a class="skrot" href="#oferta"><strong>Oferta i maszyny</strong><span>Widoczność {odmiana(modele.length, MODEL)} i {kategorie.length} grup, opisy, etykiety i ceny.</span></a>
             <a class="skrot" href="#teksty"><strong>Teksty strony</strong><span>{polaTresci.length} tekstów: nagłówki, opisy sekcji, przyciski.</span></a>
+            <a class="skrot" href="#galeria"><strong>Galeria realizacji</strong><span>{odmiana(realizacje.length, ZDJEC)}: kolejność, podpisy, podmiana i nowe zdjęcia.</span></a>
+            <a class="skrot" href="#zdjecia"><strong>Zdjęcia na stronie</strong><span>Zdjęcia w sekcji „Maszyny używane”: z galerii albo z dysku.</span></a>
             <a class="skrot" href="#kontakt"><strong>Ludzie i kontakt</strong><span>Osoby, role, numery telefonów i adresy e-mail działów.</span></a>
             <a class="skrot" href="#ogloszenie"><strong>Ogłoszenie</strong><span>Pasek z komunikatem na górze każdej strony.</span></a>
           </div>
@@ -222,6 +241,89 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
           })}
         </section>
 
+        <!-- Galeria realizacji -->
+        <section class="sekcja-panelu" data-sekcja="galeria" aria-labelledby="s-galeria" hidden>
+          <div class="sekcja-panelu__glowa">
+            <h1 id="s-galeria">Galeria realizacji</h1>
+            <p>Zdjęcia w galerii „Realizacje” na stronie głównej, w tej kolejności. Pierwsze na liście pokazuje się jako pierwsze. Kolejność zmienisz strzałkami albo przeciągając wiersz za uchwyt.</p>
+          </div>
+          <div class="karta-panelu" data-pole-ramka>
+            <input type="text" hidden tabindex="-1" aria-hidden="true" data-pole="galeria:uklad" data-etykieta="Galeria realizacji" data-typ="galeria" value={galeriaOryginal} />
+            <div class="karta-panelu__glowa">
+              <h2><span data-galeria-licznik>{odmiana(realizacje.length, ZDJEC)}</span> w galerii</h2>
+              <div class="karta-panelu__akcje">
+                <button type="button" class="pole__przywroc" data-przywroc="galeria:uklad" hidden>Przywróć oryginał</button>
+                <label class="przycisk-maly przycisk-plik">Dodaj zdjęcia z dysku<input type="file" accept="image/*" multiple class="sr-only" data-galeria-dodaj /></label>
+              </div>
+            </div>
+            <p class="pole__blad" data-galeria-blad role="alert" hidden></p>
+            <ol class="galeria-panelu" role="list" data-galeria-lista></ol>
+            <div class="galeria-panelu__usuniete" data-galeria-usuniete-ramka hidden>
+              <h3>Usunięte z galerii</h3>
+              <ul class="galeria-panelu" role="list" data-galeria-usuniete></ul>
+            </div>
+            <p class="pole__podpowiedz">Nowe zdjęcia panel zmniejsza do 2000 px na dłuższym boku. W wersji demonstracyjnej zostają w tej przeglądarce.</p>
+          </div>
+          <template data-szablon-galerii>
+            <li class="poz-galerii">
+              <span class="poz-galerii__uchwyt" aria-hidden="true" title="Przeciągnij, żeby zmienić kolejność" data-uchwyt></span>
+              <span class="poz-galerii__nr" data-nr></span>
+              <img class="poz-galerii__foto" alt="" width="120" height="80" data-foto />
+              <div class="pole poz-galerii__podpis">
+                <label data-etykieta-podpisu>Podpis <span class="poz-galerii__nowe" data-znacznik-nowe hidden>z dysku</span></label>
+                <input type="text" maxlength="80" placeholder="np. Koparka kołowa Atlas" data-podpis />
+              </div>
+              <div class="poz-galerii__akcje">
+                <button type="button" class="przycisk-maly" data-w-gore aria-label="Przesuń wyżej">↑</button>
+                <button type="button" class="przycisk-maly" data-w-dol aria-label="Przesuń niżej">↓</button>
+                <label class="przycisk-maly przycisk-plik">Podmień<input type="file" accept="image/*" class="sr-only" data-podmien /></label>
+                <button type="button" class="przycisk-maly przycisk-maly--ostrzezenie" data-usun>Usuń</button>
+              </div>
+            </li>
+          </template>
+          <template data-szablon-usunietego>
+            <li class="poz-galerii poz-galerii--usunieta">
+              <img class="poz-galerii__foto" alt="" width="120" height="80" data-foto />
+              <p class="poz-galerii__nazwa" data-nazwa></p>
+              <button type="button" class="przycisk-maly" data-przywroc-zdjecie>Przywróć do galerii</button>
+            </li>
+          </template>
+        </section>
+
+        <!-- Zdjecia na stronie -->
+        <section class="sekcja-panelu" data-sekcja="zdjecia" aria-labelledby="s-zdjecia" hidden>
+          <div class="sekcja-panelu__glowa">
+            <h1 id="s-zdjecia">Zdjęcia na stronie</h1>
+            <p>Zdjęcia, które pokazują się przed galerią. Możesz wybrać jedno ze zdjęć galerii albo wgrać nowe z dysku.</p>
+          </div>
+          {slotyZdjec.map((s) => (
+            <section class="karta-panelu slot-zdjecia" data-pole-ramka data-slot={s.id} data-oryginal={s.plik} aria-labelledby={`slot-${s.id}`}>
+              <input type="text" hidden tabindex="-1" aria-hidden="true" data-pole={`zdjecie:${s.id}`} data-etykieta={s.nazwa} data-typ="zdjecie" value="" />
+              <div class="karta-panelu__glowa">
+                <h2 id={`slot-${s.id}`}>{s.nazwa}</h2>
+                <button type="button" class="pole__przywroc" data-przywroc={`zdjecie:${s.id}`} hidden>Przywróć oryginał</button>
+              </div>
+              <div class="slot-zdjecia__uklad">
+                <img class="slot-zdjecia__podglad" alt="" style={`aspect-ratio:${s.proporcje}`} data-slot-podglad />
+                <div class="slot-zdjecia__akcje">
+                  <p class="slot-zdjecia__stan" data-slot-opis></p>
+                  <div class="pole">
+                    <label for={`slot-wybor-${s.id}`}>Wybierz z galerii</label>
+                    <select id={`slot-wybor-${s.id}`} data-slot-wybor>
+                      <option value="">Oryginał: {zdjeciaStrony[s.plik]?.podpis}</option>
+                      <option value="dysk" hidden>Zdjęcie wgrane z dysku</option>
+                      {realizacje.map((r) => <option value={`plik:${r.plik}`}>{r.podpis}</option>)}
+                    </select>
+                  </div>
+                  <label class="przycisk-maly przycisk-plik">Wgraj z dysku<input type="file" accept="image/*" class="sr-only" data-slot-plik /></label>
+                  <p class="pole__blad" data-slot-blad role="alert" hidden></p>
+                  <p class="pole__podpowiedz">Ramka na stronie ma proporcje {s.proporcje.replace(' / ', ':')}: zdjęcie zostanie w nią wpasowane i przycięte.</p>
+                </div>
+              </div>
+            </section>
+          ))}
+        </section>
+
         <!-- Ludzie i kontakt -->
         <section class="sekcja-panelu" data-sekcja="kontakt" aria-labelledby="s-kontakt" hidden>
           <div class="sekcja-panelu__glowa">
@@ -293,8 +395,12 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
       <div class="komunikat" data-komunikat role="status" aria-live="polite" hidden></div>
     </div>
 
+    <script type="application/json" data-zdjecia-strony set:html={JSON.stringify(zdjeciaStrony)} />
     <script>
       import { uruchomPanel } from '../../scripts/panel';
+      import { uruchomZdjeciaPanelu } from '../../scripts/panel-zdjecia';
+      // Najpierw edytory zdjec: panel przy starcie ustawia zapisane wartosci i powiadamia o tym pola.
+      uruchomZdjeciaPanelu();
       uruchomPanel();
     </script>
   </body>
@@ -446,6 +552,44 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
   .model-panelu.ukryty .model-panelu__nazwa h3 { text-decoration: line-through; }
   .model-panelu.zmieniony { box-shadow: inset 4px 0 0 var(--zolty-ciemny); }
 
+  /* Przycisk wyboru pliku: etykieta wyglada jak przycisk, pole pliku jest schowane (sr-only). */
+  .przycisk-plik { cursor: pointer; }
+  .przycisk-plik:focus-within { outline: 3px solid var(--zolty); outline-offset: 2px; }
+  .karta-panelu__akcje { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; }
+  .karta-panelu.zmienione { box-shadow: inset 4px 0 0 var(--zolty-ciemny); }
+
+  /* Galeria realizacji */
+  .galeria-panelu { display: grid; }
+  .poz-galerii {
+    display: grid;
+    grid-template-columns: 1.25rem 2rem 7.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    padding: 0.6rem 0;
+    border-top: 1px solid var(--linia);
+    background: var(--papier);
+  }
+  .poz-galerii.przeciagany { opacity: 0.4; }
+  .poz-galerii.cel-upuszczenia { box-shadow: inset 0 3px 0 var(--zolty-ciemny); }
+  .poz-galerii__uchwyt { align-self: stretch; min-height: 3rem; cursor: grab; background: radial-gradient(circle, var(--stal) 1.5px, transparent 2px) 0 0 / 8px 8px; opacity: 0.6; }
+  .poz-galerii__nr { font-family: var(--kroj-naglowki); font-weight: 800; font-size: 1.5rem; text-align: right; font-variant-numeric: tabular-nums; }
+  .poz-galerii__foto { width: 7.5rem; height: 5rem; object-fit: cover; background: var(--beton); }
+  .poz-galerii__podpis label { font-size: 0.8rem; color: var(--stal); }
+  .poz-galerii__podpis input { padding: 0.45rem 0.6rem; font-size: 0.95rem; }
+  .poz-galerii__nowe { margin-left: 0.4rem; padding: 0 0.35rem; background: var(--zolty); color: var(--grafit); font-weight: 700; }
+  .poz-galerii__akcje { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .poz-galerii--usunieta { grid-template-columns: 7.5rem minmax(0, 1fr) auto; opacity: 0.85; }
+  .poz-galerii__nazwa { font-weight: 650; }
+  .galeria-panelu__usuniete { display: grid; gap: 0.5rem; padding-top: 0.5rem; }
+  .galeria-panelu__usuniete h3 { font-size: 1.3rem; }
+
+  /* Zdjecia na stronie */
+  .slot-zdjecia__uklad { display: grid; grid-template-columns: minmax(0, 22rem) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+  .slot-zdjecia__podglad { width: 100%; height: auto; object-fit: cover; background: var(--beton); border-radius: 0 0 0 var(--rog-maly); }
+  .slot-zdjecia__akcje { display: grid; gap: 0.9rem; justify-items: start; }
+  .slot-zdjecia__akcje .pole { width: 100%; max-width: 28rem; }
+  .slot-zdjecia__stan { font-weight: 700; }
+
   /* Ogloszenie */
   .podglad-ogloszenia { display: grid; gap: 0.35rem; }
   .podglad-ogloszenia__pasek { padding: 0.7rem 1rem; background: var(--probud); color: var(--papier); font-weight: 600; text-align: center; }
@@ -481,6 +625,12 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
     .model-panelu__nazwa, .model-panelu__akcje, .model-panelu__opis, .model-panelu .pole { grid-column: 2 / -1; }
     .model-panelu > .przelacznik { grid-column: 2 / -1; }
     .zmiana { flex-direction: column; align-items: flex-start; }
+    .poz-galerii { grid-template-columns: 1.25rem 1.6rem 5.5rem minmax(0, 1fr); }
+    .poz-galerii__foto { width: 5.5rem; height: 3.7rem; }
+    .poz-galerii__akcje { grid-column: 3 / -1; }
+    .poz-galerii--usunieta { grid-template-columns: 5.5rem minmax(0, 1fr); }
+    .poz-galerii--usunieta .przycisk-maly { grid-column: 1 / -1; justify-self: start; }
+    .slot-zdjecia__uklad { grid-template-columns: 1fr; }
     .zapis { flex-direction: column; align-items: stretch; gap: 0.5rem; }
   }
 </style>

@@ -3,6 +3,8 @@
 // wiec panel nie potrzebuje osobnej kopii danych strony.
 import { wczytaj, zapisz, wyczysc, type Wartosc, type Zmiana } from '../lib/nadpisania';
 import { odmiana } from '../lib/tekst';
+import { odnosnikiIdb, posprzataj } from '../lib/zdjecia-demo';
+import { opisWartosciZdjec } from './panel-zdjecia';
 
 // To nie jest zabezpieczenie: dane logowania sa jawne w kodzie strony, a zmiany i tak zostaja
 // w przegladarce osoby, ktora je wpisala. Logowanie jest po to, zeby demo wygladalo jak panel.
@@ -20,7 +22,11 @@ const wartosc = (p: Pole): Wartosc => (czyPrzelacznik(p) ? p.checked : p.value.t
 const ustaw = (p: Pole, w: Wartosc) => {
   if (czyPrzelacznik(p)) p.checked = w === true;
   else p.value = String(w);
+  // Edytory zdjec (pola z atrybutem hidden) przerysowuja sie, gdy panel zmieni wartosc z zewnatrz.
+  p.dispatchEvent(new CustomEvent('panel:ustawiono'));
 };
+// Wgrane zdjecia, do ktorych nie prowadzi juz zaden zapis, znikaja z IndexedDB.
+const sprzatnijZdjecia = (pola: Record<string, Zmiana>) => void posprzataj(odnosnikiIdb(Object.values(pola).map((z) => z.w)));
 const klucz = (p: Pole) => p.dataset.pole!;
 
 function sesja(wlacz?: boolean): boolean {
@@ -102,8 +108,10 @@ export function uruchomPanel() {
     pokazSekcje(sekcja);
     const schowany = p.closest<HTMLElement>('[hidden]');
     if (schowany) $<HTMLButtonElement>(`[aria-controls="${schowany.id}"]`)?.click();
-    p.scrollIntoView({ block: 'center' });
-    p.focus({ preventScroll: true });
+    // Ukryte pole (galeria, zdjecia) nie ma wlasnego miejsca na stronie: przewijamy do jego karty.
+    const cel = p.hidden ? p.closest<HTMLElement>('[data-pole-ramka]') ?? p : p;
+    cel.scrollIntoView({ block: p.hidden ? 'start' : 'center' });
+    if (!p.hidden) p.focus({ preventScroll: true });
   }
 
   // Rozwijane opisy grup i modeli
@@ -180,6 +188,7 @@ export function uruchomPanel() {
       return;
     }
     zapisane = nowe;
+    sprzatnijZdjecia(zapisane);
     odswiez();
     powiedz('Zapisano. Zmiany są już widoczne na stronie w tej przeglądarce.', { link: ['/', 'Otwórz stronę'] });
   }
@@ -230,6 +239,7 @@ export function uruchomPanel() {
     przyciskWszystko.textContent = 'Przywróć całą stronę do oryginału';
     wyczysc();
     zapisane = {};
+    sprzatnijZdjecia(zapisane);
     pola.forEach((p) => { ustaw(p, oryginal(p)); pokazBlad(p, ''); });
     odswiez();
     powiedz('Przywrócono oryginalną treść strony.');
@@ -243,6 +253,8 @@ export function uruchomPanel() {
 
   function opisWartosci(p: Pole, w: Wartosc): string {
     if (typeof w === 'boolean') return (w ? p.dataset.tak : p.dataset.nie) ?? (w ? 'tak' : 'nie');
+    const zdjecia = opisWartosciZdjec(p.dataset.typ, w, String(oryginal(p)));
+    if (zdjecia !== null) return zdjecia;
     if (!w) return '(puste)';
     return w.length > 90 ? `${w.slice(0, 88)}…` : w;
   }
@@ -262,7 +274,10 @@ export function uruchomPanel() {
         ustaw(p, oryginal(p));
         const reszta = { ...zapisane };
         delete reszta[k];
-        if (zapisz(reszta)) zapisane = reszta;
+        if (zapisz(reszta)) {
+          zapisane = reszta;
+          sprzatnijZdjecia(zapisane);
+        }
         odswiez();
         powiedz('Cofnięto zmianę.');
       });
