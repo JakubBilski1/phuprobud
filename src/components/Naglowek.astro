@@ -30,9 +30,12 @@ const telefony = dzialy.flatMap((d) => d.telefony.map((t) => ({ ...t, dzial: d.n
       </ul>
     </nav>
 
-    <a class="naglowek__tel numer" href={telHref(telGlowny)}>
-      <span class="naglowek__tel-podpis">Sprzedaż</span>
-      {telKrotki(telGlowny)}
+    <a class="naglowek__tel" href={telHref(telGlowny)}>
+      <span class="naglowek__tel-ikona" aria-hidden="true"></span>
+      <span class="naglowek__tel-tekst">
+        <span class="naglowek__tel-podpis">Sprzedaż maszyn</span>
+        <span class="naglowek__tel-numer numer">{telKrotki(telGlowny)}</span>
+      </span>
     </a>
 
     <button class="naglowek__menu" type="button" aria-label="Otwórz menu" aria-expanded="false" aria-controls="menu-mobilne" data-menu-przycisk>
@@ -139,18 +142,70 @@ const telefony = dzialy.flatMap((d) => d.telefony.map((t) => ({ ...t, dzial: d.n
   }
   .naglowek__nav a:hover, .naglowek__nav a[aria-current='page'] { background-size: 100% 2px; }
 
+  /*
+    Telefon do sprzedazy: zolta plakietka z jednym zaokraglonym rogiem (jak kadry zdjec),
+    grafitowe kolko ze sluchawka (piktogram z Codeksa) i fala co kilka sekund. Po najechaniu
+    kolory sie odwracaja, a sluchawka drga jak przy dzwonieniu.
+  */
   .naglowek__tel {
-    display: grid;
-    font-family: var(--kroj-naglowki);
-    font-weight: 800;
-    font-size: 1.55rem;
-    line-height: 1;
-    text-decoration: none;
-    padding: 0.45rem 0.8rem 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.4rem 1.05rem 0.4rem 0.45rem;
     background: var(--zolty);
+    border-radius: 0 0 0 var(--rog-maly);
+    text-decoration: none;
+    transition: background var(--ruch-szybki), color var(--ruch-szybki);
   }
-  .naglowek__tel:hover { background: var(--grafit); color: var(--zolty); }
-  .naglowek__tel-podpis { font-family: var(--kroj-tekst); font-size: 0.72rem; font-weight: 650; letter-spacing: 0.01em; }
+  .naglowek__tel-ikona {
+    position: relative;
+    flex: none;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: var(--grafit);
+    transition: background var(--ruch-szybki);
+  }
+  .naglowek__tel-ikona::before {
+    content: '';
+    position: absolute;
+    inset: 0.6rem;
+    background: var(--zolty);
+    -webkit-mask: url(/ikony/telefon.png) center / contain no-repeat;
+    mask: url(/ikony/telefon.png) center / contain no-repeat;
+    transition: background var(--ruch-szybki);
+  }
+  .naglowek__tel-ikona::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 2px solid var(--grafit);
+    border-radius: 50%;
+    opacity: 0;
+  }
+  .naglowek__tel-tekst { display: grid; gap: 0.2rem; line-height: 1; }
+  .naglowek__tel-podpis { font-size: 0.72rem; font-weight: 650; letter-spacing: 0.01em; }
+  .naglowek__tel-numer { font-family: var(--kroj-naglowki); font-weight: 800; font-size: 1.5rem; }
+  .naglowek__tel:hover, .naglowek__tel:focus-visible { background: var(--grafit); color: var(--zolty); }
+  .naglowek__tel:hover .naglowek__tel-ikona, .naglowek__tel:focus-visible .naglowek__tel-ikona { background: var(--zolty); }
+  .naglowek__tel:hover .naglowek__tel-ikona::before, .naglowek__tel:focus-visible .naglowek__tel-ikona::before { background: var(--grafit); }
+  .naglowek__tel:hover .naglowek__tel-ikona::after { border-color: var(--zolty); }
+  @media (prefers-reduced-motion: no-preference) {
+    .naglowek__tel-ikona::after { animation: fala-telefonu 3.6s ease-out 1.2s infinite; }
+    .naglowek__tel:hover .naglowek__tel-ikona::before { animation: dzwonek 0.7s ease-in-out; }
+    @keyframes fala-telefonu {
+      0% { transform: scale(0.95); opacity: 0.6; }
+      40%, 100% { transform: scale(1.5); opacity: 0; }
+    }
+    @keyframes dzwonek {
+      0%, 100% { rotate: 0deg; }
+      15% { rotate: -16deg; }
+      30% { rotate: 14deg; }
+      45% { rotate: -10deg; }
+      60% { rotate: 7deg; }
+      75% { rotate: -3deg; }
+    }
+  }
 
   /* Hamburger -> X: kreski zjezdzaja do srodka, potem sie obracaja (przy zamykaniu odwrotnie). */
   .naglowek__menu {
