@@ -3,10 +3,11 @@ import Strona from '../../layouts/Strona.astro';
 import KartaModelu from '../../components/KartaModelu.astro';
 import ZapytajHandlowca from '../../components/ZapytajHandlowca.astro';
 import Okruszki from '../../components/Okruszki.astro';
-import KatalogDemo from '../../components/KatalogDemo.astro';
 import { tresc } from '../../data/tresci';
 import { kategorie, modele } from '../../data/katalog';
 import { odmiana, sierotki } from '../../lib/tekst';
+
+export const prerender = false;
 ---
 <Strona
   tytul="Maszyny nowe"
@@ -47,7 +48,6 @@ import { odmiana, sierotki } from '../../lib/tekst';
   ))}
 
   <ZapytajHandlowca temat="maszynę" />
-  <KatalogDemo />
 </Strona>
 
 <style>

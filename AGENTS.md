@@ -11,17 +11,20 @@ co dotyczy tej strony.
 - **Katalog**: `src/data/zrodla/katalog-astra.json` to dane ze źródłami, nie edytuj ich ręcznie.
   Redakcja (grupy, opisy, kolejność, etykiety) jest w `src/data/katalog.ts`. Build padnie,
   jeśli model nie ma grupy albo opisu.
-- **Panel `/admin/`** (demo, localStorage): teksty do edycji są w `src/data/tresci.ts`, element na
-  stronie dostaje `data-tresc="klucz"`. Nowy tekst na stronie, który ma być edytowalny, idzie przez
-  ten plik. Zdjęcia: galeria (pole `galeria:uklad`) i miejsca ze zdjęciem z `src/data/zdjecia-strony.ts`
-  (element dostaje `data-zdjecie-slot`); pliki wgrane w panelu leżą w IndexedDB przeglądarki.
-  Logowanie i zmiana hasła: `src/lib/konto-demo.ts` (kod startowy tylko jako skrót, samego kodu
-  nie zapisujemy w repozytorium). Zdjęć osób na stronie nie pokazujemy.
+- **Panel `/admin/`** (produkcyjny, zapis w Postgresie): strona jest renderowana na serwerze ze zmianami
+  z panelu. Zmiany siedzą w pamięci serwera (`src/data/stan.ts`), a moduły danych (`firma.ts`,
+  `katalog.ts`, `tresci.ts`, `realizacje.ts`) przeliczają z nich swoje eksporty. Teksty do edycji są
+  w `src/data/tresci.ts`; nowy tekst na stronie, który ma być edytowalny, idzie przez ten plik i `tresc()`.
+  Każdy nowy klucz zapisu trzeba dopisać do `src/server/walidacja.ts`, inaczej serwer go odrzuci.
+  Sama strona panelu buduje się statycznie z treści z repozytorium (wartości w polach to oryginały).
+  Logowanie, sesje i hasło: `src/server/konto.ts`; hasła ani sekretów nie zapisujemy w repozytorium.
+  Zdjęcia wgrane w panelu leżą w bazie i są pod `/media/`. Zdjęć osób na stronie nie pokazujemy.
 - **Zdjęcia**: tylko przez `scripts/obrazy.lista.mjs` + `npm run obrazy`. Komponent `Foto`
   rzuca błąd, gdy zdjęcia nie ma w manifeście.
 - **Grafika generowana** (Codex `image_gen`) tylko do rzeczy, które nie udają faktów
   (piktogramy, ikona telefonu, scena tła strony głównej). Maszyn i ludzi nie generujemy.
   Tło: `zrodla/oryginaly/tlo/` → `npm run obrazy`, komponent `TloStrony.astro`.
-- **Build ma zostać lekki**: bez przetwarzania obrazów w `npm run build`. Serwer Coolify dzieli
+- **Build ma zostać lekki**: bez przetwarzania obrazów w `npm run build`. Kontener to nginx (pliki
+  statyczne, przekierowania, nagłówki) i serwer Node za nim (`start.sh`). Serwer Coolify dzieli
   pamięć z kilkudziesięcioma aplikacjami; jeden push naraz.
 - **Przed pushem**: `npm run check` i `npm run build`, rozdzielone `&&`.

@@ -1,6 +1,7 @@
-// Teksty strony, ktore mozna zmienic w panelu /admin/. Komponenty biora stad wartosc domyslna
-// i oznaczaja element atrybutem data-tresc="klucz"; panel pokazuje te same pola z etykietami.
+// Teksty strony, ktore mozna zmienic w panelu /admin/. Komponenty biora tekst przez tresc():
+// wersje z panelu, a gdy jej nie ma, wartosc domyslna stad. Panel pokazuje te same pola z etykietami.
 import { firma } from './firma';
+import { tekstNadpisany } from './stan';
 
 export type PoleTresci = {
   grupa: string;
@@ -80,8 +81,8 @@ const pola = {
 export type KluczTresci = keyof typeof pola;
 export const tresci: Record<KluczTresci, PoleTresci> = pola;
 
-/** Wartosc domyslna tekstu; element na stronie dostaje data-tresc={klucz}. */
-export const tresc = (klucz: KluczTresci): string => tresci[klucz].wartosc;
+/** Tekst na strone: z panelu albo domyslny. Element na stronie dostaje data-tresc={klucz}. */
+export const tresc = (klucz: KluczTresci): string => tekstNadpisany(`tekst:${klucz}`) ?? tresci[klucz].wartosc;
 
 /** Kolejnosc grup w panelu = kolejnosc sekcji na stronie. */
 export const grupyTresci = [...new Set(Object.values(tresci).map((p) => p.grupa))];

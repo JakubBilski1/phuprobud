@@ -1,16 +1,12 @@
-// Panel demonstracyjny /admin/: logowanie bez serwera, edycja pol i zapis roznicy wzgledem
-// oryginalu w localStorage. Oryginal to wartosc z HTML (defaultValue / defaultChecked),
-// wiec panel nie potrzebuje osobnej kopii danych strony.
-import { wczytaj, zapisz, wyczysc, type Wartosc, type Zmiana } from '../lib/nadpisania';
+// Panel /admin/: logowanie na serwerze, edycja pol i zapis roznicy wzgledem oryginalu w bazie
+// (src/pages/api/panel/). Oryginal to wartosc z HTML (defaultValue / defaultChecked): strona
+// panelu jest budowana z tresci z repozytorium, wiec panel nie potrzebuje osobnej kopii danych.
+// Zapisane zmiany sa od razu na stronie, dla wszystkich odwiedzajacych.
+import type { Pola, Wartosc } from '../lib/nadpisania';
 import { odmiana } from '../lib/tekst';
-import { odnosnikiIdb, posprzataj } from '../lib/zdjecia-demo';
 import { opisWartosciZdjec } from './panel-zdjecia';
-import { przygotujLogowanie } from './panel-konto';
-import { sprawdzLogowanie } from '../lib/konto-demo';
-
-// Logowanie bez serwera (src/lib/konto-demo.ts): dane startowe albo haslo ustawione w zakladce
-// „Konto i haslo”. Zmiany i tak zostaja w przegladarce osoby, ktora je wpisala.
-const SESJA = 'probud-panel-sesja';
+import { pokazKonto, uruchomKontoPanelu } from './panel-konto';
+import { BladPanelu, pobierzStan, wyloguj, zaloguj, zapiszStan, type StanPanelu } from './panel-api';
 
 type Pole = HTMLInputElement | HTMLTextAreaElement;
 
@@ -26,21 +22,9 @@ const ustaw = (p: Pole, w: Wartosc) => {
   // Edytory zdjec (pola z atrybutem hidden) przerysowuja sie, gdy panel zmieni wartosc z zewnatrz.
   p.dispatchEvent(new CustomEvent('panel:ustawiono'));
 };
-// Wgrane zdjecia, do ktorych nie prowadzi juz zaden zapis, znikaja z IndexedDB.
-const sprzatnijZdjecia = (pola: Record<string, Zmiana>) => void posprzataj(odnosnikiIdb(Object.values(pola).map((z) => z.w)));
 const klucz = (p: Pole) => p.dataset.pole!;
 
-function sesja(wlacz?: boolean): boolean {
-  try {
-    if (wlacz === true) sessionStorage.setItem(SESJA, '1');
-    if (wlacz === false) sessionStorage.removeItem(SESJA);
-    return sessionStorage.getItem(SESJA) === '1';
-  } catch {
-    return false;
-  }
-}
-
-export function uruchomPanel() {
+export async function uruchomPanel() {
   const logowanie = $('[data-logowanie]')!;
   const panel = $('[data-panel]')!;
   const pola = $$<Pole>('[data-pole]');
@@ -48,7 +32,8 @@ export function uruchomPanel() {
   const przywracanie = new Map($$<HTMLButtonElement>('[data-przywroc]').map((b) => [b.dataset.przywroc!, b]));
   const sekcje = $$('[data-sekcja]');
 
-  let zapisane: Record<string, Zmiana> = {};
+  let zapisane: Pola = {};
+  let ostatniZapis: string | null = null;
   const stanZapisany = (p: Pole): Wartosc => (klucz(p) in zapisane ? zapisane[klucz(p)].w : oryginal(p));
 
   // ---------- Logowanie ----------
@@ -61,33 +46,53 @@ export function uruchomPanel() {
     panel.hidden = false;
     zHasha();
   };
+  const pokazLogowanie = (komunikat = '') => {
+    panel.hidden = true;
+    logowanie.hidden = false;
+    bladLogowania.textContent = komunikat;
+    bladLogowania.hidden = !komunikat;
+    formLogowania.reset();
+    $<HTMLInputElement>('#l-login')?.focus();
+  };
+  /** Wczytuje do pol zmiany zapisane na serwerze i otwiera panel. */
+  const otworz = (stan: Extract<StanPanelu, { zalogowany: true }>) => {
+    zapisane = Object.fromEntries(Object.entries(stan.pola).filter(([k]) => poKluczu.has(k)));
+    ostatniZapis = stan.zapisano;
+    pola.forEach((p) => { ustaw(p, stanZapisany(p)); pokazBlad(p, ''); });
+    pokazKonto(stan);
+    odswiez();
+    pokazPanel();
+  };
+  /** Serwer odrzucil zadanie: przy wygaslej sesji wracamy do logowania, inaczej pokazujemy powod. */
+  const obsluzBlad = (b: unknown, domyslny: string) => {
+    if (b instanceof BladPanelu && b.status === 401) return pokazLogowanie('Sesja wygasła. Zaloguj się ponownie; niezapisane zmiany trzeba wpisać jeszcze raz.');
+    powiedz(b instanceof Error && b.message ? b.message : domyslny, { rodzaj: 'blad' });
+  };
+
   formLogowania.addEventListener('submit', async (e) => {
     e.preventDefault();
     const dane = new FormData(formLogowania);
     bladLogowania.hidden = true;
     przyciskLogowania.disabled = true;
     przyciskLogowania.textContent = 'Logowanie…';
-    // Krotka pauza jak przy prawdziwym logowaniu, zeby przejscie nie bylo skokiem.
-    const [ok] = await Promise.all([
-      sprawdzLogowanie(String(dane.get('login') ?? '').trim(), String(dane.get('haslo') ?? '')),
-      new Promise((r) => setTimeout(r, 450)),
-    ]);
-    przyciskLogowania.disabled = false;
-    przyciskLogowania.textContent = 'Zaloguj się';
-    if (!ok) {
-      bladLogowania.textContent = 'Nieprawidłowy login lub hasło.';
+    try {
+      await zaloguj(String(dane.get('login') ?? '').trim(), String(dane.get('haslo') ?? ''));
+      const stan = await pobierzStan();
+      if (!stan.zalogowany) throw new BladPanelu(0, 'Przeglądarka nie zapisała sesji. Sprawdź, czy nie blokuje ciasteczek tej strony.');
+      formLogowania.reset();
+      otworz(stan);
+    } catch (b) {
+      bladLogowania.textContent = b instanceof Error ? b.message : 'Nie udało się zalogować.';
       bladLogowania.hidden = false;
-      return;
+    } finally {
+      przyciskLogowania.disabled = false;
+      przyciskLogowania.textContent = 'Zaloguj się';
     }
-    sesja(true);
-    pokazPanel();
   });
-  $('[data-wyloguj]')!.addEventListener('click', () => {
+  $('[data-wyloguj]')!.addEventListener('click', async () => {
     odrzuc();
-    sesja(false);
-    panel.hidden = true;
-    logowanie.hidden = false;
-    przygotujLogowanie();
+    await wyloguj().catch(() => { /* bez polaczenia sesja i tak wygasnie sama */ });
+    pokazLogowanie();
     history.replaceState(null, '', location.pathname);
   });
 
@@ -168,7 +173,24 @@ export function uruchomPanel() {
   }
 
   // ---------- Zapis ----------
-  function zapiszZmiany() {
+  const przyciskZapisu = $<HTMLButtonElement>('[data-zapisz]')!;
+  /** Wysyla komplet zmian na serwer; false, gdy sie nie udalo (komunikat juz pokazany). */
+  async function wyslij(nowe: Pola): Promise<boolean> {
+    przyciskZapisu.disabled = true;
+    try {
+      ostatniZapis = (await zapiszStan(nowe)).zapisano;
+      zapisane = nowe;
+      return true;
+    } catch (b) {
+      obsluzBlad(b, 'Nie udało się zapisać zmian.');
+      return false;
+    } finally {
+      przyciskZapisu.disabled = false;
+    }
+  }
+
+  async function zapiszZmiany() {
+    if (przyciskZapisu.disabled) return;
     const bledne = pola.filter((p) => {
       const b = blad(p);
       pokazBlad(p, b);
@@ -179,21 +201,16 @@ export function uruchomPanel() {
       idzDoPola(bledne[0]);
       return;
     }
-    const nowe: Record<string, Zmiana> = {};
+    const nowe: Pola = {};
     for (const p of pola) {
       if (!czyPrzelacznik(p)) p.value = p.value.trim();
       const w = wartosc(p);
       const o = oryginal(p);
       if (w !== o) nowe[klucz(p)] = { w, o };
     }
-    if (!zapisz(nowe)) {
-      powiedz('Nie udało się zapisać: przeglądarka blokuje zapis danych strony (np. tryb prywatny).', { rodzaj: 'blad' });
-      return;
-    }
-    zapisane = nowe;
-    sprzatnijZdjecia(zapisane);
+    if (!(await wyslij(nowe))) return;
     odswiez();
-    powiedz('Zapisano. Zmiany są już widoczne na stronie w tej przeglądarce.', { link: ['/', 'Otwórz stronę'] });
+    powiedz('Zapisano. Zmiany są już widoczne na stronie.', { link: ['/', 'Otwórz stronę'] });
   }
 
   function odrzuc() {
@@ -204,7 +221,7 @@ export function uruchomPanel() {
     odswiez();
   }
 
-  $('[data-zapisz]')!.addEventListener('click', zapiszZmiany);
+  przyciskZapisu.addEventListener('click', () => void zapiszZmiany());
   $('[data-odrzuc]')!.addEventListener('click', () => {
     odrzuc();
     powiedz('Odrzucono niezapisane zmiany.');
@@ -212,7 +229,7 @@ export function uruchomPanel() {
   addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && !panel.hidden) {
       e.preventDefault();
-      zapiszZmiany();
+      void zapiszZmiany();
     }
   });
   addEventListener('beforeunload', (e) => {
@@ -232,7 +249,7 @@ export function uruchomPanel() {
     odswiez();
   }));
   const przyciskWszystko = $<HTMLButtonElement>('[data-przywroc-wszystko]')!;
-  przyciskWszystko.addEventListener('click', () => {
+  przyciskWszystko.addEventListener('click', async () => {
     if (!przyciskWszystko.dataset.potwierdz) {
       przyciskWszystko.dataset.potwierdz = '1';
       przyciskWszystko.textContent = 'Na pewno? Kliknij jeszcze raz';
@@ -240,9 +257,7 @@ export function uruchomPanel() {
     }
     delete przyciskWszystko.dataset.potwierdz;
     przyciskWszystko.textContent = 'Przywróć całą stronę do oryginału';
-    wyczysc();
-    zapisane = {};
-    sprzatnijZdjecia(zapisane);
+    if (!(await wyslij({}))) return;
     pola.forEach((p) => { ustaw(p, oryginal(p)); pokazBlad(p, ''); });
     odswiez();
     powiedz('Przywrócono oryginalną treść strony.');
@@ -273,25 +288,21 @@ export function uruchomPanel() {
       $('[data-bylo]', el)!.textContent = opisWartosci(p, z.o);
       $('[data-jest]', el)!.textContent = opisWartosci(p, z.w);
       $('[data-edytuj]', el)!.addEventListener('click', () => idzDoPola(p));
-      $('[data-cofnij]', el)!.addEventListener('click', () => {
-        ustaw(p, oryginal(p));
+      $('[data-cofnij]', el)!.addEventListener('click', async () => {
         const reszta = { ...zapisane };
         delete reszta[k];
-        if (zapisz(reszta)) {
-          zapisane = reszta;
-          sprzatnijZdjecia(zapisane);
-        }
+        if (!(await wyslij(reszta))) return;
+        ustaw(p, oryginal(p));
         odswiez();
-        powiedz('Cofnięto zmianę.');
+        powiedz('Cofnięto zmianę. Na stronie jest znowu oryginał tego pola.');
       });
       return el;
     }));
     $('[data-brak-zmian]')!.hidden = wpisy.length > 0;
     przyciskWszystko.hidden = wpisy.length === 0;
 
-    const zapis = wczytaj();
-    $('[data-ostatni-zapis]')!.textContent = zapis
-      ? `Ostatni zapis: ${new Date(zapis.zapisano).toLocaleString('pl-PL', { dateStyle: 'long', timeStyle: 'short' })}.`
+    $('[data-ostatni-zapis]')!.textContent = ostatniZapis
+      ? `Ostatni zapis: ${new Date(ostatniZapis).toLocaleString('pl-PL', { dateStyle: 'long', timeStyle: 'short' })}.`
       : '';
   }
 
@@ -396,9 +407,20 @@ export function uruchomPanel() {
   filtr.addEventListener('change', filtruj);
 
   // ---------- Start ----------
-  zapisane = Object.fromEntries(Object.entries(wczytaj()?.pola ?? {}).filter(([k]) => poKluczu.has(k)));
-  for (const [k, z] of Object.entries(zapisane)) ustaw(poKluczu.get(k)!, z.w);
+  uruchomKontoPanelu(() => pokazLogowanie('Sesja wygasła. Zaloguj się ponownie.'));
   odswiez();
-  if (sesja()) pokazPanel();
-  else przyciskLogowania.focus();
+  try {
+    const stan = await pobierzStan();
+    if (stan.zalogowany) return otworz(stan);
+    if (!stan.skonfigurowany) {
+      pokazLogowanie('Panel nie jest jeszcze podłączony do bazy danych. Skontaktuj się z opiekunem strony.');
+      przyciskLogowania.disabled = true;
+      return;
+    }
+  } catch (b) {
+    bladLogowania.textContent = b instanceof Error ? b.message : 'Serwer nie odpowiada.';
+    bladLogowania.hidden = false;
+  }
+  logowanie.hidden = false;
+  $<HTMLInputElement>('#l-login')?.focus();
 }

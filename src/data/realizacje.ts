@@ -1,8 +1,14 @@
 // Galeria „Realizacje”: najpierw zdjecia od Probudu (pazdziernik 2026), potem siedem
 // zachowanych ze starej strony. Podpis z marka i modelem tylko tam, gdzie widac je na maszynie.
+import manifest from './obrazy.json';
+import { idMedia, type PozycjaGalerii } from '../lib/nadpisania';
+import { infoMedia, nadpisane, poZmianie } from './stan';
+
+/** plik = klucz zdjecia w manifescie albo „media:<id>” (zdjecie wgrane w panelu). */
 export type Realizacja = { plik: string; podpis: string };
 
-export const realizacje: Realizacja[] = [
+/** Galeria z repozytorium: oryginal w panelu i zrodlo zdjec do wyboru w „Zdjeciach na stronie”. */
+export const REALIZACJE: Realizacja[] = [
   { plik: 'realizacje/merlo-roto-widly', podpis: 'Ładowarka teleskopowa obrotowa Merlo' },
   { plik: 'realizacje/case-koparko-ladowarka-1', podpis: 'Koparko-ładowarka Case' },
   { plik: 'realizacje/jcb-8025-zts', podpis: 'Minikoparka JCB 8025 ZTS' },
@@ -23,3 +29,22 @@ export const realizacje: Realizacja[] = [
   { plik: 'realizacje/16', podpis: 'Minikoparka' },
   { plik: 'realizacje/17', podpis: 'Koparka kołowa Atlas' },
 ];
+
+const znane = (plik: string) => plik in manifest || Boolean(infoMedia(idMedia(plik) ?? ''));
+
+/** Galeria na strone: kolejnosc, podpisy i zdjecia z panelu; bez zapisu w panelu oryginal. */
+export let realizacje: Realizacja[] = REALIZACJE;
+
+poZmianie(() => {
+  realizacje = REALIZACJE;
+  const zapis = nadpisane('galeria:uklad');
+  if (typeof zapis !== 'string') return;
+  try {
+    const uklad = (JSON.parse(zapis) as PozycjaGalerii[])
+      .filter((p) => znane(p.z))
+      .map((p) => ({ plik: p.z, podpis: p.p.trim() || 'Zdjęcie realizacji' }));
+    if (uklad.length) realizacje = uklad;
+  } catch {
+    // uszkodzony zapis: zostaje oryginal
+  }
+});

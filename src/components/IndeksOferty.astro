@@ -1,6 +1,5 @@
 ---
 import Foto from './Foto.astro';
-import KatalogDemo from './KatalogDemo.astro';
 import { tresc } from '../data/tresci';
 import { kategorie, modele } from '../data/katalog';
 import { odmiana, sierotki } from '../lib/tekst';
@@ -56,7 +55,6 @@ const REPREZENTANT: Record<string, string> = {
     </div>
 
     <a class="przycisk oferta__wszystko" href="/oferta/">Cały katalog: <span data-licznik-modeli>{odmiana(modele.length, ['model', 'modele', 'modeli'])}</span></a>
-    <KatalogDemo />
   </div>
 </section>
 

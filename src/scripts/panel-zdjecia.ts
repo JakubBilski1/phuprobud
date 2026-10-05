@@ -3,7 +3,8 @@
 // w ukrytym polu tekstowym panelu (data-pole, input type=text z atrybutem hidden: w type=hidden
 // ustawienie value zmienia tez wartosc domyslna, czyli oryginal), wiec zapis, odrzucanie, licznik niezapisanych zmian i lista
 // zmian na pulpicie dzialaja tak samo jak dla tekstow (src/scripts/panel.ts).
-import { adresZdjecia, przygotujZdjecie, zapiszZdjecie, PREFIKS_IDB, PREFIKS_PLIKU, type PozycjaGalerii } from '../lib/zdjecia-demo';
+import { adresMedia, idMedia, PREFIKS_MEDIA, PREFIKS_PLIKU, type PozycjaGalerii } from '../lib/nadpisania';
+import { BladPanelu, wgrajZdjecie } from './panel-api';
 import { odmiana } from '../lib/tekst';
 
 type Info = { podpis: string; mini: string; sredni: string };
@@ -13,15 +14,10 @@ let katalog: Record<string, Info> = {};
 const $ = <T extends Element = HTMLElement>(s: string, rodzic: ParentNode = document) => rodzic.querySelector<T>(s);
 const $$ = <T extends Element = HTMLElement>(s: string, rodzic: ParentNode = document) => [...rodzic.querySelectorAll<T>(s)];
 
-/** Obrazek w edytorze: zdjecie strony (miniatura z manifestu) albo wgrane (blob z IndexedDB). */
+/** Obrazek w edytorze: zdjecie strony (miniatura z manifestu) albo wgrane (miniatura z serwera). */
 function pokazZdjecie(img: HTMLImageElement, z: string, rozmiar: 'mini' | 'sredni') {
-  img.dataset.z = z;
-  if (z.startsWith(PREFIKS_IDB)) {
-    img.removeAttribute('src');
-    void adresZdjecia(z).then((adres) => { if (adres && img.dataset.z === z) img.src = adres; });
-  } else {
-    img.src = katalog[z]?.[rozmiar] ?? '';
-  }
+  const media = idMedia(z);
+  img.src = media ? adresMedia(media, 'mini') : katalog[z]?.[rozmiar] ?? '';
 }
 
 function zglos(el: HTMLElement | null, tekst: string) {
@@ -30,12 +26,16 @@ function zglos(el: HTMLElement | null, tekst: string) {
   el.hidden = !tekst;
 }
 
-/** Zmniejsza plik z dysku i zapisuje go w IndexedDB; zwraca odnosnik „idb:<id>”. */
+/** Zmniejsza plik z dysku i wysyla go na serwer; zwraca odnosnik „media:<id>”. */
 async function wgraj(plik: File): Promise<string> {
   if (!plik.type.startsWith('image/')) throw new Error(`„${plik.name}” nie jest zdjęciem.`);
-  return zapiszZdjecie(await przygotujZdjecie(plik));
+  return wgrajZdjecie(plik);
 }
-const powodBledu = (e: unknown) => (e instanceof Error && e.message.startsWith('„') ? e.message : 'Nie udało się zapisać zdjęcia w przeglądarce (np. tryb prywatny albo brak miejsca).');
+const powodBledu = (e: unknown) => {
+  if (e instanceof BladPanelu && e.status === 401) return 'Sesja wygasła. Odśwież stronę i zaloguj się ponownie.';
+  if (e instanceof BladPanelu || (e instanceof Error && e.message.startsWith('„'))) return e.message;
+  return 'Nie udało się przygotować zdjęcia. Spróbuj z plikiem JPG albo PNG.';
+};
 
 /** Zmienia wartosc ukrytego pola i powiadamia panel (licznik zmian, pasek zapisu). */
 function ustawPole(pole: HTMLInputElement, wartosc: string) {
@@ -79,7 +79,7 @@ function edytorGalerii() {
     const el = szablon.content.firstElementChild!.cloneNode(true) as HTMLElement;
     $('[data-nr]', el)!.textContent = String(i + 1);
     pokazZdjecie($<HTMLImageElement>('[data-foto]', el)!, poz.z, 'mini');
-    $('[data-znacznik-nowe]', el)!.hidden = !poz.z.startsWith(PREFIKS_IDB);
+    $('[data-znacznik-nowe]', el)!.hidden = !poz.z.startsWith(PREFIKS_MEDIA);
 
     const podpis = $<HTMLInputElement>('[data-podpis]', el)!;
     podpis.id = `galeria-podpis-${i}`;
@@ -191,8 +191,8 @@ function edytoryMiejsc() {
       const w = pole.value;
       const z = w.startsWith(PREFIKS_PLIKU) ? w.slice(PREFIKS_PLIKU.length) : w || oryginal;
       pokazZdjecie(podglad, z, 'sredni');
-      wybor.value = w.startsWith(PREFIKS_IDB) ? 'dysk' : w;
-      opis.textContent = !w ? 'Na stronie: oryginał' : w.startsWith(PREFIKS_IDB) ? 'Na stronie: zdjęcie wgrane z dysku' : `Na stronie: ${katalog[z]?.podpis ?? z} (z galerii)`;
+      wybor.value = w.startsWith(PREFIKS_MEDIA) ? 'dysk' : w;
+      opis.textContent = !w ? 'Na stronie: oryginał' : w.startsWith(PREFIKS_MEDIA) ? 'Na stronie: zdjęcie wgrane z dysku' : `Na stronie: ${katalog[z]?.podpis ?? z} (z galerii)`;
     };
     const ustaw = (w: string) => {
       ustawPole(pole, w);
@@ -221,7 +221,7 @@ export function opisWartosciZdjec(typ: string | undefined, w: string, o: string)
     try {
       const teraz = JSON.parse(w) as PozycjaGalerii[];
       const bylo = JSON.parse(o) as PozycjaGalerii[];
-      const zDysku = teraz.filter((p) => p.z.startsWith(PREFIKS_IDB)).length;
+      const zDysku = teraz.filter((p) => p.z.startsWith(PREFIKS_MEDIA)).length;
       const czesci = [odmiana(teraz.length, ZDJEC)];
       if (zDysku) czesci.push(`w tym z dysku: ${zDysku}`);
       if (w !== o && teraz.length === bylo.length && !zDysku) czesci.push('zmieniona kolejność lub podpisy');
@@ -232,7 +232,7 @@ export function opisWartosciZdjec(typ: string | undefined, w: string, o: string)
   }
   if (typ === 'zdjecie') {
     if (!w) return 'oryginał';
-    if (w.startsWith(PREFIKS_IDB)) return 'zdjęcie z dysku';
+    if (w.startsWith(PREFIKS_MEDIA)) return 'zdjęcie z dysku';
     return `z galerii: ${katalog[w.slice(PREFIKS_PLIKU.length)]?.podpis ?? w}`;
   }
   return null;

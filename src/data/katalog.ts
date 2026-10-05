@@ -4,6 +4,7 @@
 // 2. ponizej - redakcja: kategorie po polsku, krotkie opisy z faktami, kolejnosc, etykiety.
 import zrodlo from './zrodla/katalog-astra.json';
 import { liczba } from '../lib/tekst';
+import { nadpisane, poZmianie, tekstNadpisany } from './stan';
 
 type Wartosc = number | number[] | string | null;
 type ModelZrodlowy = {
@@ -158,6 +159,9 @@ export type Model = {
   marka: string;
   kategoria: IdKategorii;
   opis: string;
+  /** etykieta i cena tylko z panelu /admin/ */
+  etykieta?: string;
+  cena?: string;
   zdjecie: string;
   podpisZdjecia?: string;
   masa: number | null;
@@ -210,22 +214,55 @@ function zbudujModel(m: ModelZrodlowy, def: DefinicjaKategorii): Model {
   };
 }
 
-export const kategorie: Kategoria[] = DEFINICJE.map((def) => {
+function zakresMasy(modele: Model[]): string | null {
+  const masy = modele.map((m) => m.masa).filter((x): x is number => x !== null);
+  if (!masy.length) return null;
+  return Math.min(...masy) === Math.max(...masy) ? `${liczba(masy[0])} kg` : `${liczba(Math.min(...masy))}-${liczba(Math.max(...masy))} kg`;
+}
+
+/** Caly katalog z repozytorium, bez zmian z panelu: oryginaly w panelu i przekierowania starych adresow. */
+export const WSZYSTKIE_KATEGORIE: Kategoria[] = DEFINICJE.map((def) => {
   const modele = surowe
     .filter((m) => def.zrodla.includes(m.kategoria))
     .map((m) => zbudujModel(m, def))
     .sort((a, b) => (a.masa ?? Infinity) - (b.masa ?? Infinity) || a.kod.localeCompare(b.kod, 'pl'));
-  const masy = modele.map((m) => m.masa).filter((x): x is number => x !== null);
-  const zakresMasy = masy.length ? (Math.min(...masy) === Math.max(...masy) ? `${liczba(masy[0])} kg` : `${liczba(Math.min(...masy))}-${liczba(Math.max(...masy))} kg`) : null;
   const { zrodla: _z, karta: _k, ...reszta } = def;
-  return { ...reszta, modele, href: `/oferta/${def.id}/`, zakresMasy };
+  return { ...reszta, modele, href: `/oferta/${def.id}/`, zakresMasy: zakresMasy(modele) };
 });
+export const WSZYSTKIE_MODELE: Model[] = WSZYSTKIE_KATEGORIE.flatMap((k) => k.modele);
 
-export const modele: Model[] = kategorie.flatMap((k) => k.modele);
-
-const brakujace = surowe.filter((m) => !modele.some((x) => x.id === m.id));
+const brakujace = surowe.filter((m) => !WSZYSTKIE_MODELE.some((x) => x.id === m.id));
 if (brakujace.length) throw new Error(`Modele bez kategorii: ${brakujace.map((m) => m.id).join(', ')}`);
-const bezOpisu = modele.filter((m) => !m.opis);
+const bezOpisu = WSZYSTKIE_MODELE.filter((m) => !m.opis);
 if (bezOpisu.length) throw new Error(`Modele bez opisu: ${bezOpisu.map((m) => m.id).join(', ')}`);
+
+/** Katalog na strone: bez modeli i grup ukrytych w panelu, z opisami, etykietami i cenami z panelu. */
+export let kategorie: Kategoria[] = [];
+export let modele: Model[] = [];
+
+poZmianie(() => {
+  kategorie = WSZYSTKIE_KATEGORIE
+    .filter((k) => nadpisane(`kategoria:${k.id}:widoczna`) !== false)
+    .map((k) => {
+      const widoczne = k.modele
+        .filter((m) => nadpisane(`model:${m.id}:widoczny`) !== false)
+        .map((m) => ({
+          ...m,
+          opis: tekstNadpisany(`model:${m.id}:opis`) ?? m.opis,
+          etykieta: tekstNadpisany(`model:${m.id}:etykieta`),
+          cena: tekstNadpisany(`model:${m.id}:cena`),
+        }));
+      return {
+        ...k,
+        nazwa: tekstNadpisany(`kategoria:${k.id}:nazwa`) ?? k.nazwa,
+        opis: tekstNadpisany(`kategoria:${k.id}:opis`) ?? k.opis,
+        modele: widoczne,
+        zakresMasy: zakresMasy(widoczne),
+      };
+    })
+    // Grupa, w ktorej ukryto wszystkie modele, znika razem z nimi.
+    .filter((k) => k.modele.length > 0);
+  modele = kategorie.flatMap((k) => k.modele);
+});
 
 export const kategoria = (id: string) => kategorie.find((k) => k.id === id);

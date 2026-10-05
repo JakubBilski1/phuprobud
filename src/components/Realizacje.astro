@@ -6,10 +6,16 @@
 // Pelne zdjecia dostaja srcset dopiero, gdy sa biezace albo sasiednie (skrypt nizej).
 import manifest from '../data/obrazy.json';
 import { realizacje } from '../data/realizacje';
+import { adresMedia, idMedia } from '../lib/nadpisania';
 
 type Wpis = { w: number; h: number; kolor: string; warianty: { w: number; src: string }[] };
 const m = manifest as Record<string, Wpis>;
 const zdjecia = realizacje.map((r, i) => {
+  // Zdjecie wgrane w panelu ma tylko miniature i pelny rozmiar.
+  const media = idMedia(r.plik);
+  if (media) {
+    return { ...r, nr: i + 1, kolor: '#2a2a2a', srcset: '', src: adresMedia(media), miniatura: adresMedia(media, 'mini') };
+  }
   const wpis = m[r.plik];
   if (!wpis) throw new Error(`Brak ${r.plik} w manifescie zdjec`);
   return {
@@ -37,10 +43,10 @@ const razem = zdjecia.length;
             <img
               data-galeria-zdjecie={i}
             data-plik={z.plik}
-              data-srcset={z.srcset}
+              data-srcset={z.srcset || undefined}
               data-src={z.src}
               src={i === 0 ? z.src : undefined}
-              srcset={i === 0 ? z.srcset : undefined}
+              srcset={i === 0 && z.srcset ? z.srcset : undefined}
               sizes="(min-width: 90rem) 960px, (min-width: 60rem) and (orientation: landscape) 68vw, 92vw"
               alt={z.podpis}
               class={i === 0 ? 'aktywne' : undefined}

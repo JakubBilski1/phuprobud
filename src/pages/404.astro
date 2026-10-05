@@ -3,6 +3,8 @@ import Strona from '../layouts/Strona.astro';
 import { kategorie } from '../data/katalog';
 import { handlowcy } from '../data/firma';
 import { telHref, telKrotki } from '../lib/tekst';
+
+export const prerender = true;
 ---
 <Strona tytul="Nie ma takiej strony" opis="Strona, której szukasz, nie istnieje albo zmieniła adres." bezIndeksu>
   <section class="kontener brak">

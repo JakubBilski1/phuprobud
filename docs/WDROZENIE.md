@@ -12,7 +12,7 @@ Zasób `phuprobud` w projekcie `apps`, środowisko `production`
 | --- | --- |
 | Źródło | GitHub App `bilski-github-apps`, repo `JakubBilski1/phuprobud`, gałąź `main` |
 | Build pack | Dockerfile (`/Dockerfile`, katalog `/`) |
-| Port | `80` (nginx w obrazie) |
+| Port | `80` (nginx w obrazie, za nim serwer Node na `127.0.0.1:4321`) |
 | Domena | `https://phuprobud.pbdevs.com`, indeksowanie: NoIndex |
 
 Push do `main` wdraża automatycznie (GitHub App). Build jest lekki: `npm ci` + `astro build`,
@@ -44,8 +44,32 @@ bazy, nie nazwa `pbdevs-postgres` (ta nie rozwiązuje się w sieci `coolify`, pa
 
 Zmienna w aplikacji (zakładka Environment Variables): `DATABASE_URL` = adres wyżej.
 
-Strona jest dziś statyczna (nginx) i z bazy nie korzysta. Zmienna jest przygotowana pod
-backend formularza (zapis zapytań), zgodnie z konwencją pozostałych aplikacji.
+## Panel `/admin/`
+
+Panel zapisuje zmiany w bazie `probud`. Tabele (`panel_stan`, `panel_historia`, `panel_konto`,
+`panel_sesje`, `panel_zdjecia`) serwer zakłada sam przy pierwszym połączeniu.
+
+Zmienne w aplikacji (zakładka Environment Variables), obie tylko w czasie działania, nie przy buildzie:
+
+| Zmienna | Wartość |
+| --- | --- |
+| `DATABASE_URL` | adres bazy z sekcji wyżej |
+| `PANEL_HASLO_STARTOWE` | hasło do pierwszego logowania (login `admin`), generowane poza repozytorium |
+| `PANEL_LOGIN` | opcjonalnie inny login niż `admin` |
+
+Konto zakłada się przy pierwszym wejściu na `/admin/`, z hasłem z `PANEL_HASLO_STARTOWE`. Panel
+prosi o zmianę hasła; po zmianie zmienna nie ma znaczenia i można ją usunąć. Bez `DATABASE_URL`
+strona działa na treści z repozytorium, a panel pokazuje, że nie jest podłączony do bazy.
+
+Stan panelu bez logowania: `curl -s https://<domena>/api/panel/stan/`. Odpowiedź
+`"skonfigurowany":false` oznacza brak bazy albo brak hasła startowego.
+
+Zapomniane hasło: w terminalu bazy `delete from panel_konto; delete from panel_sesje;`, ustaw nowe
+`PANEL_HASLO_STARTOWE` i uruchom aplikację ponownie.
+
+Cofnięcie pomyłki w treści: tabela `panel_historia` trzyma 50 ostatnich zapisów. Przywrócenie
+wybranego: `update panel_stan set pola = (select pola from panel_historia where id = <ID>);`
+i restart aplikacji (serwer czyta zmiany przy starcie i po każdym zapisie z panelu).
 
 ## Przepięcie domeny phuprobud.pl (SEO)
 

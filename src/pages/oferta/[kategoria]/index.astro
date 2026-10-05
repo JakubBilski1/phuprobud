@@ -4,14 +4,13 @@ import KartaModelu from '../../../components/KartaModelu.astro';
 import ZapytajHandlowca from '../../../components/ZapytajHandlowca.astro';
 import Okruszki from '../../../components/Okruszki.astro';
 import Foto from '../../../components/Foto.astro';
-import KatalogDemo from '../../../components/KatalogDemo.astro';
-import { kategorie, type Kategoria } from '../../../data/katalog';
+import { kategorie } from '../../../data/katalog';
 import { odmiana, sierotki } from '../../../lib/tekst';
 
-export function getStaticPaths() {
-  return kategorie.map((k) => ({ params: { kategoria: k.id }, props: { k } }));
-}
-const { k } = Astro.props as { k: Kategoria };
+// Strona renderowana na serwerze: grupa ukryta w panelu nie istnieje (404).
+export const prerender = false;
+const k = kategorie.find((x) => x.id === Astro.params.kategoria);
+if (!k) return new Response(null, { status: 404 });
 
 // Tabela porownania: kolumny, ktore ma co najmniej polowa modeli w grupie (bez silnika i predkosci).
 const POMIJANE = ['silnik', 'predkosc_m_min', 'predkosc_km_h', 'predkosc_wstecz_km_h', 'predkosc_drugi_bieg_km_h', 'predkosc_opcjonalna_km_h'];
@@ -70,7 +69,6 @@ const dwieWartosci = k.modele.some((m) => m.parametry.some((p) => p.dwieWartosci
   )}
 
   <ZapytajHandlowca temat={k.nazwa.toLowerCase()} />
-  <KatalogDemo />
 </Strona>
 
 <style>

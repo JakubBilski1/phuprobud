@@ -29,9 +29,10 @@ export function uruchomGalerie(korzen: HTMLElement) {
 
   const zaladuj = (i: number) => {
     const img = zdjecia[(i + zdjecia.length) % zdjecia.length];
-    if (img.srcset || !img.dataset.srcset) return;
-    img.srcset = img.dataset.srcset;
-    img.src = img.dataset.src ?? '';
+    // Zdjecie wgrane w panelu ma sam adres, bez srcset.
+    if (img.getAttribute('src') || !img.dataset.src) return;
+    if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+    img.src = img.dataset.src;
   };
 
   const pokaz = (i: number, zPrzewinieciem = true) => {

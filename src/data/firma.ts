@@ -1,5 +1,10 @@
+// Dane firmy. Osoby, dzialy i finansowanie mozna zmienic w panelu /admin/ (src/data/stan.ts):
+// eksporty ponizej sa wtedy przeliczane, a oryginaly zostaja w stalych pisanych wielkimi literami.
+//
 // Dane firmy. Zrodlo: phuprobud.pl (zrzut z 30.09.2026) i regulamin sprzedazy (PDF, s. 1).
 // Wspolrzedne adresu: OpenStreetMap Nominatim dla „Poznanska 152, 62-052 Komorniki”.
+
+import { poZmianie, tekstNadpisany } from './stan';
 
 export const firma = {
   nazwa: 'PHU Probud',
@@ -53,14 +58,18 @@ const tomasz: Osoba = {
   telefon: '+48 693 221 733', zrodlo: 'https://ewpa.pl/kontakt/',
 };
 
+/** Osoby i dzialy w tresci z repozytorium: z nich panel bierze oryginaly, a serwer liste kluczy. */
+export const OSOBY: Osoba[] = [krzysztof, marcin, tomasz];
+export const ID_DZIALOW = ['sprzedaz', 'serwis', 'czesci', 'administracja'] as const;
+
 /** Sekcja „Z kim rozmawiasz”: tylko osoby z wlasnym numerem, z rola i telefonem. */
-export const zespol: Osoba[] = [krzysztof, marcin, tomasz];
+export let zespol: Osoba[] = [];
 /** Handlowcy z numerami: pasek telefonu, blok „Zapytaj” w katalogu, naglowek. */
-export const handlowcy: Osoba[] = [krzysztof, marcin];
+export let handlowcy: Osoba[] = [];
 
 export type Telefon = { numer: string; osoba?: string; osobaId?: string };
 export type Dzial = {
-  id: 'sprzedaz' | 'serwis' | 'czesci' | 'administracja';
+  id: (typeof ID_DZIALOW)[number];
   nazwa: string;
   telefony: Telefon[];
   email: string;
@@ -68,18 +77,50 @@ export type Dzial = {
 };
 
 const telefonOsoby = (o: Osoba): Telefon => ({ numer: o.telefon!, osoba: `${o.imie} ${o.nazwisko}`, osobaId: o.id });
-export const dzialy: Dzial[] = [
-  { id: 'sprzedaz', nazwa: 'Sprzedaż maszyn', telefony: [telefonOsoby(krzysztof), telefonOsoby(marcin)], email: 'sprzedaz@phuprobud.pl' },
+const zbudujDzialy = (k: Osoba, m: Osoba, t: Osoba): Dzial[] => [
+  { id: 'sprzedaz', nazwa: 'Sprzedaż maszyn', telefony: [telefonOsoby(k), telefonOsoby(m)], email: 'sprzedaz@phuprobud.pl' },
   { id: 'serwis', nazwa: 'Serwis', telefony: [{ numer: '+48 662 997 955' }], email: 'zlecenia@ewpa.pl', dopisek: 'Zlecenia serwisowe przyjmuje EWPA.' },
-  { id: 'czesci', nazwa: 'Części zamienne', telefony: [telefonOsoby(tomasz)], email: 'handel@phuprobud.pl' },
+  { id: 'czesci', nazwa: 'Części zamienne', telefony: [telefonOsoby(t)], email: 'handel@phuprobud.pl' },
   { id: 'administracja', nazwa: 'Administracja', telefony: [{ numer: '+48 722 223 755' }], email: 'info@phuprobud.pl' },
 ];
+export let dzialy: Dzial[] = [];
 
-export const finansowanie = {
+const FINANSOWANIE = {
   firma: 'BPCE Equipment Solutions Polska',
   osoba: 'Sebastian Bartczak',
   telefon: '+48 660 785 358',
   email: 'sebastian.bartczak@groupebpce.com',
 };
+export let finansowanie = FINANSOWANIE;
+
+// W panelu imie i nazwisko to jedno pole: pierwsze slowo jest imieniem (pasek telefonu pokazuje samo imie).
+function osobaZPanelu(o: Osoba): Osoba {
+  const [imie, ...reszta] = (tekstNadpisany(`osoba:${o.id}:imie`) ?? `${o.imie} ${o.nazwisko}`).trim().split(/\s+/);
+  return {
+    ...o,
+    imie,
+    nazwisko: reszta.join(' '),
+    rola: tekstNadpisany(`osoba:${o.id}:rola`) ?? o.rola,
+    telefon: tekstNadpisany(`osoba:${o.id}:telefon`) ?? o.telefon,
+  };
+}
+
+poZmianie(() => {
+  const [k, m, t] = OSOBY.map(osobaZPanelu);
+  zespol = [k, m, t];
+  handlowcy = [k, m];
+  dzialy = zbudujDzialy(k, m, t).map((d) => ({
+    ...d,
+    // Numer dzialu z panelu dotyczy tylko numerow bez osoby (serwis, administracja).
+    telefony: d.telefony.map((tel) => (tel.osobaId ? tel : { numer: tekstNadpisany(`dzial:${d.id}:telefon`) ?? tel.numer })),
+    email: tekstNadpisany(`dzial:${d.id}:email`) ?? d.email,
+  }));
+  finansowanie = {
+    ...FINANSOWANIE,
+    osoba: tekstNadpisany('finansowanie:osoba') ?? FINANSOWANIE.osoba,
+    telefon: tekstNadpisany('finansowanie:telefon') ?? FINANSOWANIE.telefon,
+    email: tekstNadpisany('finansowanie:email') ?? FINANSOWANIE.email,
+  };
+});
 
 export const pbdevs = { url: 'https://pbdevs.com', nazwa: 'PB Devs' };

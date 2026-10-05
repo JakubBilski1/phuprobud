@@ -1,21 +1,24 @@
 ---
-// Panel strony (demo). Logowanie bez serwera, z wpisanymi danymi; edycja oferty, tekstow,
-// ludzi i kontaktu. Zmiany trafiaja do localStorage i skrypt w layoucie nanosi je na strone
-// (src/lib/nadpisania.ts). Wersja produkcyjna zapisze to samo na serwerze.
+// Panel strony: edycja oferty, tekstow, zdjec, ludzi i kontaktu. Logowanie i zapis ida przez
+// API serwera (src/pages/api/panel/), zmiany leza w bazie i serwer renderuje z nimi strone.
+// Sama strona panelu jest budowana statycznie z tresci z repozytorium: wartosci w polach to
+// oryginaly, a zapisane zmiany skrypt dociaga z serwera po zalogowaniu.
 import '@fontsource-variable/big-shoulders/opsz.css';
 import '@fontsource-variable/sofia-sans/index.css';
 import '../../styles/global.css';
 import Foto from '../../components/Foto.astro';
 import Pole from '../../components/panel/Pole.astro';
 import Przelacznik from '../../components/panel/Przelacznik.astro';
-import { kategorie, modele } from '../../data/katalog';
+import { WSZYSTKIE_KATEGORIE as kategorie, WSZYSTKIE_MODELE as modele } from '../../data/katalog';
 import { tresci, grupyTresci, type KluczTresci } from '../../data/tresci';
 import { zespol, dzialy, finansowanie } from '../../data/firma';
-import { realizacje } from '../../data/realizacje';
+import { REALIZACJE as realizacje } from '../../data/realizacje';
 import { slotyZdjec } from '../../data/zdjecia-strony';
 import manifest from '../../data/obrazy.json';
 import { odmiana } from '../../lib/tekst';
-import { KLUCZ_KONTA, MIN_DLUGOSC_HASLA } from '../../lib/konto-demo';
+import { MIN_DLUGOSC_HASLA } from '../../lib/nadpisania';
+
+export const prerender = true;
 
 const polaTresci = Object.entries(tresci) as [KluczTresci, (typeof tresci)[KluczTresci]][];
 const MODEL: [string, string, string] = ['model', 'modele', 'modeli'];
@@ -57,14 +60,11 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
     <meta name="theme-color" content="#222222" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <!-- Po pierwszej zmianie hasla dopisek o danych startowych znika od razu, bez mrugniecia. -->
-    <script is:inline define:vars={{ klucz: KLUCZ_KONTA }}>
-      try { if (localStorage.getItem(klucz)) document.documentElement.classList.add('konto-wlasne'); } catch (e) { /* tryb startowy */ }
-    </script>
   </head>
   <body class="panel-strona">
     <!-- Logowanie -->
-    <div class="logowanie" data-logowanie>
+    <!-- Ukryte do czasu, az skrypt sprawdzi sesje: zalogowana osoba nie widzi mrugniecia formularza. -->
+    <div class="logowanie" data-logowanie hidden>
       <form class="logowanie__karta" data-form-logowania novalidate>
         <img class="logowanie__logo" src="/marka/probud-logo-ciemne.webp" alt="PHU Probud" width="489" height="98" />
         <h1>Panel strony</h1>
@@ -79,7 +79,6 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
         </div>
         <p class="logowanie__blad" data-blad-logowania role="alert" hidden></p>
         <button class="przycisk logowanie__przycisk" type="submit" data-przycisk-logowania>Zaloguj się</button>
-        <p class="logowanie__demo" data-tylko-start>Pierwsze logowanie: login i hasło startowe są już wpisane. Po zalogowaniu ustaw własne hasło w zakładce „Konto i hasło”.</p>
       </form>
       <a class="logowanie__powrot" href="/">Wróć na stronę</a>
     </div>
@@ -154,12 +153,12 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
           <div class="zacheta-hasla" data-tylko-start>
             <div>
               <strong>Ustaw własne hasło</strong>
-              <p>Panel działa jeszcze na loginie i haśle startowym, które każdy może przeczytać. Do pierwszej zmiany hasła potrzebny jest 6-cyfrowy kod startowy.</p>
+              <p>Panel działa jeszcze na haśle startowym, które zna też opiekun strony. Zmień je na własne.</p>
             </div>
             <a class="przycisk przycisk--jasny" href="#konto">Zmień hasło</a>
           </div>
 
-          <p class="uwaga-demo">Panel pokazuje, jak będzie wyglądała edycja strony. W wersji demonstracyjnej zmiany zapisują się w tej przeglądarce: widzisz je na stronie od razu po zapisaniu, inni odwiedzający widzą oryginał. W wersji produkcyjnej panel zapisze je na serwerze.</p>
+          <p class="uwaga-panelu">Zapisane zmiany są od razu widoczne na stronie dla wszystkich odwiedzających. Każdą zmianę można cofnąć na liście powyżej; „oryginał” to treść, z którą strona została uruchomiona.</p>
         </section>
 
         <!-- Oferta -->
@@ -276,7 +275,7 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
               <h3>Usunięte z galerii</h3>
               <ul class="galeria-panelu" role="list" data-galeria-usuniete></ul>
             </div>
-            <p class="pole__podpowiedz">Nowe zdjęcia panel zmniejsza do 2000 px na dłuższym boku. W wersji demonstracyjnej zostają w tej przeglądarce.</p>
+            <p class="pole__podpowiedz">Nowe zdjęcia panel zmniejsza do 2000 px na dłuższym boku. Na stronie pojawiają się po zapisaniu zmian.</p>
           </div>
           <template data-szablon-galerii>
             <li class="poz-galerii">
@@ -404,14 +403,9 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
             <p data-konto-stan></p>
           </div>
           <form class="karta-panelu konto-panelu" data-form-hasla novalidate>
-            <h2 data-tytul-hasla>Pierwsza zmiana hasła</h2>
-            <input type="text" name="login" value="admin" autocomplete="username" hidden tabindex="-1" aria-hidden="true" data-login-konta />
-            <div class="pole" data-tylko-pierwsza>
-              <label for="h-kod">Kod startowy</label>
-              <input id="h-kod" name="kod" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" aria-describedby="h-kod-opis" />
-              <p class="pole__podpowiedz" id="h-kod-opis">6 cyfr przekazanych razem z panelem. Potrzebny tylko przy pierwszej zmianie hasła.</p>
-            </div>
-            <div class="pole" data-tylko-kolejna hidden>
+            <h2>Zmiana hasła</h2>
+            <input type="text" name="login" value="" autocomplete="username" hidden tabindex="-1" aria-hidden="true" data-login-konta />
+            <div class="pole">
               <label for="h-obecne">Obecne hasło</label>
               <input id="h-obecne" name="obecne" type="password" autocomplete="current-password" />
             </div>
@@ -428,7 +422,7 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
             <p class="konto-panelu__ok" data-ok-hasla role="status" hidden></p>
             <button class="przycisk" type="submit" data-przycisk-hasla>Zmień hasło</button>
           </form>
-          <p class="uwaga-demo">Wersja demonstracyjna nie ma serwera: hasło zapisuje się w tej przeglądarce, jako skrót (PBKDF2), nie wprost. Na innym komputerze panel nadal startuje z danymi startowymi. W wersji produkcyjnej hasło będzie sprawdzane na serwerze.</p>
+          <p class="uwaga-panelu">Hasło sprawdza serwer; w bazie leży tylko jego skrót. Po zmianie hasła panel wylogowuje wszystkie inne urządzenia.</p>
         </section>
       </main>
 
@@ -446,11 +440,9 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
     <script>
       import { uruchomPanel } from '../../scripts/panel';
       import { uruchomZdjeciaPanelu } from '../../scripts/panel-zdjecia';
-      import { uruchomKontoPanelu } from '../../scripts/panel-konto';
       // Najpierw edytory zdjec: panel przy starcie ustawia zapisane wartosci i powiadamia o tym pola.
       uruchomZdjeciaPanelu();
-      uruchomKontoPanelu();
-      uruchomPanel();
+      void uruchomPanel();
     </script>
   </body>
 </html>
@@ -515,7 +507,6 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
   .logowanie__blad { padding: 0.6rem 0.8rem; background: #f7e3e1; color: var(--probud); font-weight: 650; }
   .logowanie__przycisk { justify-content: center; width: 100%; margin-top: 0.25rem; }
   .logowanie__przycisk[disabled] { opacity: 0.75; cursor: progress; }
-  .logowanie__demo { font-size: var(--t-maly); color: var(--stal); padding-top: 0.75rem; border-top: 1px solid var(--linia); }
   .logowanie__powrot { color: var(--papier); font-weight: 600; }
 
   /* Uklad panelu */
@@ -567,11 +558,12 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
   .skrot strong { font-family: var(--kroj-naglowki); font-size: 1.6rem; line-height: 1; color: var(--zolty); }
   .skrot span { font-size: 0.95rem; }
   .skrot:hover { background: var(--probud); }
-  .uwaga-demo { max-width: none; padding: 1rem 1.25rem; border-left: 6px solid var(--zolty); background: var(--papier); }
+  .uwaga-panelu { max-width: none; padding: 1rem 1.25rem; border-left: 6px solid var(--zolty); background: var(--papier); }
   .zacheta-hasla { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem 2rem; padding: 1.25rem 1.5rem; background: var(--grafit); color: var(--papier); border-radius: 0 0 0 var(--rog-maly); }
   .zacheta-hasla strong { font-family: var(--kroj-naglowki); font-size: 1.8rem; line-height: 1; color: var(--zolty); }
   .zacheta-hasla p { margin-top: 0.35rem; max-width: 60ch; }
-  .konto-wlasne [data-tylko-start] { display: none !important; }
+  /* Zacheta do zmiany hasla tylko wtedy, gdy panel dziala jeszcze na hasle startowym. */
+  html:not(.haslo-startowe) [data-tylko-start] { display: none !important; }
 
   /* Konto i haslo */
   .konto-panelu { max-width: 34rem; }

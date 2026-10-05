@@ -14,12 +14,12 @@ const kodTla = model.kod.replace(/\s+STONEGUARD$/i, '').replace(/\s+(AD|AC|DH|D|
   <a class="karta__link" href={model.href}>
     <div class="karta__scena kadr">
       <span class="karta__kod" aria-hidden="true">{kodTla}</span>
-      <span class="karta__etykieta" data-model-etykieta={model.id} hidden></span>
+      {model.etykieta && <span class="karta__etykieta">{model.etykieta}</span>}
       <Foto nazwa={model.zdjecie} alt="" class="karta__foto" sizes="(min-width: 64rem) 26vw, (min-width: 40rem) 45vw, 90vw" />
     </div>
     <Naglowek class="karta__nazwa">{model.nazwa}</Naglowek>
   </a>
-  <p class="karta__cena numer" data-model-cena={model.id} hidden></p>
+  {model.cena && <p class="karta__cena numer">{model.cena}</p>}
   {model.karta.length > 0 && (
     <dl class="karta__dane">
       {model.karta.map((p) => (

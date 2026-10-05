@@ -15,40 +15,29 @@ Założenia projektu, paleta, typografia i decyzje: [docs/PROJEKT.md](docs/PROJE
 - **`/oferta/`**: katalog 31 modeli BOMAG.
 - **`/oferta/<grupa>/`**: grupa z tabelą porównania modeli.
 - **`/oferta/<grupa>/<model>/`**: karta modelu z parametrami i kartą katalogową producenta.
-- **`/admin/`**: panel strony (demo), patrz niżej.
+- **`/admin/`**: panel strony, patrz niżej.
 - **Przekierowania 301** ze wszystkich adresów starej strony, generowane z danych katalogu
   (`src/pages/przekierowania.conf.ts` → konfiguracja nginx w obrazie).
 
-## Panel `/admin/` (demo)
+## Panel `/admin/`
 
-Pierwsze logowanie danymi startowymi (`admin` / `probud2026`, wpisane w formularzu, bez serwera).
-W zakładce **Konto i hasło** właściciel ustawia własne hasło; pierwsza zmiana wymaga 6-cyfrowego
-kodu startowego, kolejne obecnego hasła. Kodu nie ma w repozytorium (w kodzie jest tylko skrót
-PBKDF2 w `src/lib/konto-demo.ts`), przekazujemy go właścicielowi osobno. Po pierwszej zmianie dane
-startowe przestają działać, a formularz logowania nie podpowiada już loginu ani hasła. Hasło
-zapisuje się w tej przeglądarce jako skrót z losową solą; wyczyszczenie danych strony w przeglądarce
-wraca do danych startowych (i do kodu przy pierwszej zmianie). W panelu:
+Panel do edycji strony: widoczność modeli i grup, opisy, etykiety i ceny, teksty sekcji, galeria
+realizacji, zdjęcia w sekcji „Maszyny używane”, osoby, telefony, e-maile i pasek ogłoszenia.
 
-- **Oferta i maszyny**: widoczność każdego z 31 modeli i każdej z 6 grup, nazwa i opis grupy,
-  opis modelu, etykieta (np. „Nowość”) i cena na karcie i podstronie modelu. Ukrycie przelicza
-  liczby modeli i zakresy masy w ofercie i katalogu.
-- **Teksty strony**: nagłówki, opisy sekcji i przyciski (`src/data/tresci.ts`).
-- **Galeria realizacji**: kolejność (strzałki albo przeciąganie), podpisy, podmiana zdjęcia,
-  usuwanie i przywracanie, nowe zdjęcia z dysku.
-- **Zdjęcia na stronie**: zdjęcia w sekcji „Maszyny używane” (`src/data/zdjecia-strony.ts`),
-  wybrane z galerii albo wgrane z dysku.
-- **Ludzie i kontakt**: imię i nazwisko, rola, telefon osób, telefony i e-maile działów,
-  finansowanie. Nowy numer albo adres zastępuje stary w każdym miejscu strony, także w formularzu.
-- **Ogłoszenie**: pasek z komunikatem nad nagłówkiem każdej strony.
-- **Pulpit**: liczniki, lista zapisanych zmian z cofaniem pojedynczo albo wszystkich naraz.
+- **Zapis**: zmiany idą przez API (`src/pages/api/panel/`) do Postgresa jako różnica względem
+  treści z repozytorium. Serwer trzyma je w pamięci (`src/data/stan.ts`) i renderuje z nimi strony,
+  więc zapis jest od razu widoczny dla wszystkich odwiedzających i w kodzie HTML (ważne dla SEO).
+  Ukryty model albo grupa zwraca 404 i znika z mapy strony.
+- **Logowanie**: jedno konto, hasło jako skrót scrypt w bazie, sesja w ciasteczku `HttpOnly`,
+  limit nieudanych prób. Pierwsze hasło pochodzi ze zmiennej `PANEL_HASLO_STARTOWE`.
+- **Zdjęcia z dysku**: przeglądarka zmniejsza je do 2000 px i miniatury 640 px, serwer zapisuje
+  oba pliki w bazie i podaje spod `/media/`.
+- **Bezpieczeństwo zapisu**: serwer przyjmuje tylko znane klucze i sprawdza wartości
+  (`src/server/walidacja.ts`); 50 ostatnich zapisów zostaje w tabeli `panel_historia`.
 
-Zmiany zapisują się w `localStorage` tej przeglądarki (`src/lib/nadpisania.ts`): panel zapisuje
-tylko różnicę względem oryginału, a skrypt w layoucie (`src/components/DemoTresci.astro`) nanosi
-ją na elementy oznaczone atrybutami `data-tresc`, `data-model`, `data-kategoria`, `data-osoba-*`,
-`data-zdjecie-slot` i na galerię. Zdjęcia wgrane z dysku są za duże na `localStorage`: panel
-zmniejsza je do 2000 px i trzyma w IndexedDB (`src/lib/zdjecia-demo.ts`), a w zapisie zostaje
-odnośnik. Inni odwiedzający widzą oryginał. Nowy tekst do edycji: wpis w `src/data/tresci.ts` i
-`data-tresc="klucz"` na elemencie w komponencie.
+Lokalnie panel potrzebuje Postgresa: ustaw `DATABASE_URL` i `PANEL_HASLO_STARTOWE` przed
+`npm run dev`. Bez nich strona działa na treści z repozytorium, a panel informuje o braku bazy.
+Konfiguracja na serwerze: [docs/WDROZENIE.md](docs/WDROZENIE.md).
 
 ## Uruchomienie
 
@@ -110,14 +99,12 @@ pokazujemy.
 
 ## Przed przejściem z demo na produkcję
 
-- **Panel `/admin/`** zapisuje zmiany w przeglądarce, a logowanie nic nie chroni: hasło i kod
-  startowy są sprawdzane w przeglądarce, a dane startowe są jawne w kodzie strony. Na produkcję: zapis na serwerze (baza `probud`), logowanie z hasłem po stronie
-  serwera i strona budowana albo renderowana z danych z bazy.
 - **Formularz** w demo składa gotową wiadomość w programie pocztowym (`mailto:` na adres
   wybranego działu). Wysyłka z serwera: ustawić `PUBLIC_FORMULARZ_URL` na endpoint, który
   przyjmuje JSON `{ dzial, do, temat, tresc }`.
 - BW 65 D pokazuje zdjęcie BW 65 z podpisem.
-- Zdjąć `noindex` (layout i `nginx/naglowki.conf`) i ustawić domenę docelową w `astro.config.mjs`.
+- Ustawić domenę docelową w `astro.config.mjs` (`noindex` zależy od hosta i zdejmuje się sam, patrz
+  `docs/WDROZENIE.md`).
 
 ## Wdrożenie
 
@@ -125,5 +112,5 @@ Szczegóły: [docs/WDROZENIE.md](docs/WDROZENIE.md). W skrócie: Coolify, projek
 `production`, aplikacja `phuprobud` z GitHub App `bilski-github-apps`, build pack **Dockerfile**,
 port **80**, domena `https://phuprobud.pbdevs.com` (NoIndex). Push do `main` wdraża automatycznie.
 Build na serwerze trwa ok. 25 s (bez przetwarzania obrazów). Baza `probud` na `pbdevs-postgres`
-i zmienna `DATABASE_URL` jak w pozostałych aplikacjach; strona jest statyczna i z bazy jeszcze
-nie korzysta.
+i zmienna `DATABASE_URL` jak w pozostałych aplikacjach: w bazie leżą zmiany z panelu `/admin/`,
+konto panelu i wgrane zdjęcia.

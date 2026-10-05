@@ -1,6 +1,9 @@
-// Mapa strony dla wyszukiwarek: strona glowna i caly katalog. Panel /admin/ i 404 poza mapa.
+// Mapa strony dla wyszukiwarek: strona glowna i katalog bez pozycji ukrytych w panelu.
+// Panel /admin/ i 404 poza mapa.
 import type { APIRoute } from 'astro';
 import { kategorie, modele } from '../data/katalog';
+
+export const prerender = false;
 
 export const GET: APIRoute = ({ site }) => {
   const sciezki = ['/', '/oferta/', ...kategorie.map((k) => k.href), ...modele.map((m) => m.href)];

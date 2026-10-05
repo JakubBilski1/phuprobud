@@ -1,0 +1,19 @@
+---
+// Pasek ogloszenia nad naglowkiem, wlaczany i redagowany w panelu /admin/.
+import { nadpisane, tekstNadpisany } from '../data/stan';
+import { sierotki } from '../lib/tekst';
+
+const tekst = nadpisane('ogloszenie:wlaczone') === true ? tekstNadpisany('ogloszenie:tekst') : undefined;
+const link = tekstNadpisany('ogloszenie:link');
+---
+{tekst && (
+  <div class="ogloszenie">
+    <p class="kontener">{sierotki(tekst)}{link && <> <a href={link}>Szczegóły</a></>}</p>
+  </div>
+)}
+
+<style>
+  .ogloszenie { background: var(--probud); color: var(--papier); font-weight: 600; }
+  .ogloszenie p { max-width: none; padding-block: 0.7rem; text-align: center; }
+  .ogloszenie a { color: inherit; margin-left: 0.4rem; }
+</style>

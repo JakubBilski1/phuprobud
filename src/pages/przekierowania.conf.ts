@@ -2,7 +2,9 @@
 // Generowane z danych katalogu przy kazdym buildzie, wiec nie rozjada sie z oferta.
 // Dockerfile przenosi plik do konfiguracji nginx (nie jest podawany jako strona).
 import type { APIRoute } from 'astro';
-import { modele } from '../data/katalog';
+import { WSZYSTKIE_MODELE as modele } from '../data/katalog';
+
+export const prerender = true;
 
 // Strony kategorii i inne adresy starej strony (w tym te, ktore juz wtedy dawaly 404).
 const RECZNE: Record<string, string> = {

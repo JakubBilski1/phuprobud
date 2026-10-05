@@ -1,7 +1,10 @@
 ---
 // Zdjecie z manifestu scripts/obrazy.mjs: srcset, wymiary (bez przeskokow ukladu)
-// i kolor dominujacy jako tlo, zanim plik doplynie.
+// i kolor dominujacy jako tlo, zanim plik doplynie. Zdjecie wgrane w panelu („media:<id>”)
+// ma dwa rozmiary z bazy: miniature i pelne.
 import manifest from '../data/obrazy.json';
+import { adresMedia, idMedia, SZEROKOSC_MINI } from '../lib/nadpisania';
+import { infoMedia } from '../data/stan';
 
 type Wpis = { w: number; h: number; kolor: string; alfa: boolean; warianty: { w: number; src: string }[] };
 interface Props {
@@ -15,7 +18,21 @@ interface Props {
   [atrybut: `data-${string}`]: string | undefined;
 }
 const { nazwa, alt, sizes = '100vw', class: klasa, priorytet = false, pozycja, style: stylDodatkowy, ...reszta } = Astro.props;
-const wpis = (manifest as Record<string, Wpis>)[nazwa];
+const media = idMedia(nazwa);
+const wgrane = media ? infoMedia(media) : undefined;
+const wpis: Wpis | undefined = media && wgrane
+  ? {
+      w: wgrane.w,
+      h: wgrane.h,
+      kolor: '#d9d9d2',
+      alfa: false,
+      // Miniatura ma SZEROKOSC_MINI na dluzszym boku (panel zmniejsza tak samo).
+      warianty: [
+        { w: Math.round(wgrane.w * Math.min(1, SZEROKOSC_MINI / Math.max(wgrane.w, wgrane.h))), src: adresMedia(media, 'mini') },
+        { w: wgrane.w, src: adresMedia(media) },
+      ],
+    }
+  : (manifest as Record<string, Wpis>)[nazwa];
 if (!wpis) throw new Error(`Brak zdjecia „${nazwa}” w src/data/obrazy.json - dopisz je do scripts/obrazy.lista.mjs`);
 const srcset = wpis.warianty.map((v) => `${v.src} ${v.w}w`).join(', ');
 const domyslny = wpis.warianty.find((v) => v.w >= 1000) ?? wpis.warianty.at(-1)!;
