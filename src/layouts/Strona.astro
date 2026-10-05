@@ -9,15 +9,69 @@ import Naglowek from '../components/Naglowek.astro';
 import Stopka from '../components/Stopka.astro';
 import PasekTelefonu from '../components/PasekTelefonu.astro';
 import DemoTresci from '../components/DemoTresci.astro';
+import { firma, dzialy } from '../data/firma';
 
 interface Props {
   tytul: string;
   opis: string;
   obrazOg?: string;
+  /** strony, ktorych wyszukiwarka nie ma pokazywac (404) */
+  bezIndeksu?: boolean;
 }
-const { tytul, opis, obrazOg = '/og.jpg' } = Astro.props;
-const pelnyTytul = tytul === 'PHU Probud' ? 'PHU Probud: maszyny budowlane, Komorniki' : `${tytul} | PHU Probud`;
+const { tytul, opis, obrazOg = '/og.jpg', bezIndeksu = false } = Astro.props;
+const glowna = Astro.url.pathname === '/';
+const pelnyTytul = tytul === 'PHU Probud' ? 'PHU Probud: maszyny budowlane BOMAG, Komorniki k. Poznania' : `${tytul} | PHU Probud`;
 const adres = new URL(Astro.url.pathname, Astro.site);
+const obraz = new URL(obrazOg, Astro.site).href;
+
+// Dane strukturalne firmy: te same fakty, co w sekcji Kontakt i w wizytowce Google.
+// Godzin otwarcia nie podajemy, bo nie mamy ich ze zrodla.
+const bezSpacji = (numer: string) => numer.replace(/\s/g, '');
+const idFirmy = new URL('/#firma', Astro.site).href;
+const daneFirmy = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'LocalBusiness',
+      '@id': idFirmy,
+      name: firma.nazwa,
+      legalName: firma.nazwaPrawna,
+      url: new URL('/', Astro.site).href,
+      image: obraz,
+      logo: new URL('/marka/probud-logo-ciemne.webp', Astro.site).href,
+      description: opis,
+      foundingDate: String(firma.od),
+      taxID: firma.nip,
+      telephone: bezSpacji(dzialy[0].telefony[0].numer),
+      email: dzialy[0].email,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: firma.adres.ulica,
+        postalCode: firma.adres.kod,
+        addressLocality: firma.adres.miasto,
+        addressRegion: 'wielkopolskie',
+        addressCountry: 'PL',
+      },
+      geo: { '@type': 'GeoCoordinates', latitude: firma.wspolrzedne.lat, longitude: firma.wspolrzedne.lng },
+      contactPoint: dzialy.map((d) => ({
+        '@type': 'ContactPoint',
+        contactType: d.nazwa,
+        telephone: bezSpacji(d.telefony[0].numer),
+        email: d.email,
+        availableLanguage: 'pl',
+      })),
+      sameAs: [firma.facebook, firma.instagram, firma.otomoto],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': new URL('/#strona', Astro.site).href,
+      url: new URL('/', Astro.site).href,
+      name: firma.nazwa,
+      inLanguage: 'pl-PL',
+      publisher: { '@id': idFirmy },
+    },
+  ],
+};
 ---
 <!doctype html>
 <html lang="pl">
@@ -26,9 +80,11 @@ const adres = new URL(Astro.url.pathname, Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pelnyTytul}</title>
     <meta name="description" content={opis} />
-    <!-- Wersja demonstracyjna: poza wyszukiwarkami, zeby nie konkurowala z phuprobud.pl -->
-    <meta name="robots" content="noindex, nofollow" />
-    <link rel="canonical" href={adres.href} />
+    <!-- Adres demonstracyjny jest poza wyszukiwarkami przez naglowek X-Robots-Tag (nginx.conf),
+         wiec na domenie docelowej strona indeksuje sie bez zmian w szablonie. -->
+    {bezIndeksu
+      ? <meta name="robots" content="noindex" />
+      : <link rel="canonical" href={adres.href} />}
     <meta name="theme-color" content="#881810" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -40,8 +96,11 @@ const adres = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:locale" content="pl_PL" />
     <meta property="og:title" content={pelnyTytul} />
     <meta property="og:description" content={opis} />
-    <meta property="og:image" content={new URL(obrazOg, Astro.site).href} />
+    <meta property="og:image" content={obraz} />
     <meta property="og:url" content={adres.href} />
+    <meta property="og:site_name" content={firma.nazwa} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {glowna && <script type="application/ld+json" is:inline set:html={JSON.stringify(daneFirmy)} />}
     <slot name="glowa" />
   </head>
   <body>

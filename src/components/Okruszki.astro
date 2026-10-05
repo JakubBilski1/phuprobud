@@ -1,7 +1,19 @@
 ---
 interface Props { sciezka: { nazwa: string; href?: string }[] }
 const { sciezka } = Astro.props;
+// Ta sama sciezka dla wyszukiwarek: w wynikach zamiast adresu pokazuja sie nazwy poziomow.
+const dane = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: sciezka.map((e, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: e.nazwa,
+    item: new URL(e.href && i < sciezka.length - 1 ? e.href : Astro.url.pathname, Astro.site).href,
+  })),
+};
 ---
+<script type="application/ld+json" is:inline set:html={JSON.stringify(dane)} />
 <nav class="okruszki" aria-label="Jesteś tutaj">
   <ol role="list">
     {sciezka.map((e, i) => (

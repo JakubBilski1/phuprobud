@@ -22,6 +22,9 @@ const RECZNE: Record<string, string> = {
   '/schaeff-minikoparki/': '/oferta/walce-prowadzone/',
   '/kategoria-produktu/ladowarki-przegubowe-teleskopowe/': '/oferta/',
   '/bomag-bw-90-ad/': '/oferta/walce-tandemowe/bw-90-ad-5/',
+  // Strony z mapy starej witryny bez odpowiednika w katalogu (Gehl, robocza kopia strony glownej).
+  '/gehl-ladowarki-gasienicowe/': '/',
+  '/v2/': '/',
 };
 
 export const GET: APIRoute = () => {

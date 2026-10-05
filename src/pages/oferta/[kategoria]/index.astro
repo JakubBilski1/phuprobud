@@ -21,7 +21,7 @@ const kolumny = [...new Map(k.modele.flatMap((m) => m.parametry).map((p) => [p.k
   .slice(0, 6);
 const dwieWartosci = k.modele.some((m) => m.parametry.some((p) => p.dwieWartosci && kolumny.some(([kl]) => kl === p.klucz)));
 ---
-<Strona tytul={k.nazwa} opis={`${k.nazwa}: ${odmiana(k.modele.length, ['model', 'modele', 'modeli'])}. ${k.opis}`}>
+<Strona tytul={`${k.nazwa} ${k.marka}`} opis={`${k.nazwa}: ${odmiana(k.modele.length, ['model', 'modele', 'modeli'])}. ${k.opis}`}>
   <div class="kontener kat" data-strona-kategorii={k.id}>
     <Okruszki sciezka={[{ nazwa: 'Strona główna', href: '/' }, { nazwa: 'Maszyny nowe', href: '/oferta/' }, { nazwa: k.nazwa }]} />
     <div class="kat__glowa">
