@@ -46,26 +46,45 @@ Zmienna w aplikacji (zakładka Environment Variables): `DATABASE_URL` = adres wy
 
 ## Panel `/admin/`
 
-Panel zapisuje zmiany w bazie `probud`. Tabele (`panel_stan`, `panel_historia`, `panel_konto`,
-`panel_sesje`, `panel_zdjecia`) serwer zakłada sam przy pierwszym połączeniu.
+Panel zapisuje zmiany w bazie `probud`. Tabele (`panel_stan`, `panel_historia`,
+`panel_uzytkownicy`, `panel_sesje`, `panel_kody`, `panel_zdjecia`) serwer zakłada sam przy
+pierwszym połączeniu. Dawna tabela `panel_konto` (jedno konto `admin`) nie jest już używana.
 
-Zmienne w aplikacji (zakładka Environment Variables), obie tylko w czasie działania, nie przy buildzie:
+Logowanie: e-mail i hasło, potem obowiązkowy 6-cyfrowy kod wysłany na ten e-mail. Kod działa
+10 minut i przyjmuje 5 prób; nowy można poprosić po 30 s. Bez skonfigurowanej poczty panel nie
+wpuszcza nikogo, zamiast logować samym hasłem.
+
+Zmienne w aplikacji (zakładka Environment Variables), tylko w czasie działania, nie przy buildzie:
 
 | Zmienna | Wartość |
 | --- | --- |
 | `DATABASE_URL` | adres bazy z sekcji wyżej |
-| `PANEL_HASLO_STARTOWE` | hasło do pierwszego logowania (login `admin`), generowane poza repozytorium |
-| `PANEL_LOGIN` | opcjonalnie inny login niż `admin` |
+| `SMTP_HOST` | `cloudserver106176.home.pl` (serwer poczty Probudu w home.pl) |
+| `SMTP_PORT` | `465` (SSL); `587` też działa, ze STARTTLS |
+| `SMTP_UZYTKOWNIK` | skrzynka, z której idą kody, np. `info@phuprobud.pl` |
+| `SMTP_HASLO` | hasło tej skrzynki; wpisuje je Probud albo Jakub, nie trafia do repozytorium |
+| `SMTP_NADAWCA` | opcjonalnie, domyślnie `Panel phuprobud.pl <SMTP_UZYTKOWNIK>` |
 
-Konto zakłada się przy pierwszym wejściu na `/admin/`, z hasłem z `PANEL_HASLO_STARTOWE`. Panel
-prosi o zmianę hasła; po zmianie zmienna nie ma znaczenia i można ją usunąć. Bez `DATABASE_URL`
-strona działa na treści z repozytorium, a panel pokazuje, że nie jest podłączony do bazy.
+Po zmianie zmiennych: Restart aplikacji w Coolify (bez nowego builda).
+
+### Konta
+
+Konta dodaje się w bazie. Skrypt liczy skrót hasła lokalnie i wypisuje zapytanie SQL:
+
+```
+node scripts/panel-uzytkownik.mjs info@phuprobud.pl
+```
+
+Bez podanego hasła losuje hasło startowe i wypisuje je osobno. Zapytanie wklej w Coolify:
+zasób `pbdevs-postgres`, Terminal, `psql -U postgres -d probud`. Tabela musi już istnieć, więc
+najpierw wejdź na `/api/panel/stan/` po wdrożeniu (serwer zakłada tabele przy pierwszym
+zapytaniu). Panel prosi o zmianę hasła startowego po pierwszym logowaniu.
+
+Zapomniane hasło: to samo polecenie dla tego samego e-maila ustawia nowe hasło startowe
+i wylogowuje jego sesje. Usunięcie konta: `delete from panel_uzytkownicy where email = '...';`.
 
 Stan panelu bez logowania: `curl -s https://<domena>/api/panel/stan/`. Odpowiedź
-`"skonfigurowany":false` oznacza brak bazy albo brak hasła startowego.
-
-Zapomniane hasło: w terminalu bazy `delete from panel_konto; delete from panel_sesje;`, ustaw nowe
-`PANEL_HASLO_STARTOWE` i uruchom aplikację ponownie.
+`"skonfigurowany":false` oznacza brak bazy albo brak kont.
 
 Cofnięcie pomyłki w treści: tabela `panel_historia` trzyma 50 ostatnich zapisów. Przywrócenie
 wybranego: `update panel_stan set pola = (select pola from panel_historia where id = <ID>);`

@@ -1,6 +1,6 @@
 // Zmiana hasla panelu: wymaga sesji i obecnego hasla. Po zmianie pozostale sesje sa zamykane.
 import type { APIRoute } from 'astro';
-import { adresKlienta, blokada, zmienHaslo } from '../../../server/konto';
+import { adresKlienta, blokada, odnotujNieudana, uzytkownikSesji, zmienHaslo } from '../../../server/konto';
 import { blad, json, trescJson, wymagajSesji } from '../../../server/odpowiedzi';
 import { MIN_DLUGOSC_HASLA } from '../../../lib/nadpisania';
 
@@ -17,6 +17,11 @@ export const POST: APIRoute = async (kontekst) => {
   if (nowe.length < MIN_DLUGOSC_HASLA) return blad(400, `Nowe hasło musi mieć co najmniej ${MIN_DLUGOSC_HASLA} znaków.`);
   if (nowe.length > 200) return blad(400, 'Nowe hasło jest za długie.');
   if (nowe === obecne) return blad(400, 'Nowe hasło jest takie samo jak obecne.');
-  if ((await zmienHaslo(obecne, nowe, kontekst.cookies)) !== 'ok') return blad(400, 'Obecne hasło jest nieprawidłowe.');
+  const u = await uzytkownikSesji(kontekst.cookies);
+  if (!u) return blad(401, 'Sesja wygasła. Zaloguj się ponownie.');
+  if ((await zmienHaslo(u, obecne, nowe, kontekst.cookies)) !== 'ok') {
+    odnotujNieudana(adresKlienta(kontekst.request));
+    return blad(400, 'Obecne hasło jest nieprawidłowe.');
+  }
   return json({ ok: true });
 };

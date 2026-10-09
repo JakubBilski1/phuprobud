@@ -27,16 +27,29 @@ const SCHEMAT = `
     pola jsonb not null,
     zapisano timestamptz not null default now()
   );
-  create table if not exists panel_konto (
-    id int primary key check (id = 1),
-    login text not null,
+  -- Konta panelu: login to e-mail, na ktory przychodzi kod logowania. Dodawane w bazie
+  -- (scripts/panel-uzytkownik.mjs). Dawna tabela panel_konto (jedno konto „admin”) nie jest uzywana.
+  create table if not exists panel_uzytkownicy (
+    id int generated always as identity primary key,
+    email text not null unique check (email = lower(email)),
     skrot text not null,
     sol text not null,
     wymaga_zmiany boolean not null default true,
-    zmieniono timestamptz not null default now()
+    zmieniono timestamptz not null default now(),
+    utworzono timestamptz not null default now()
   );
   create table if not exists panel_sesje (
     skrot_tokenu text primary key,
+    wygasa timestamptz not null
+  );
+  alter table panel_sesje add column if not exists uzytkownik_id int references panel_uzytkownicy (id) on delete cascade;
+  -- Drugi krok logowania: kod z e-maila (HMAC z tokenem z ciasteczka), 10 minut, 5 prob.
+  create table if not exists panel_kody (
+    skrot_tokenu text primary key,
+    uzytkownik_id int not null references panel_uzytkownicy (id) on delete cascade,
+    skrot_kodu text not null,
+    proby int not null default 0,
+    utworzono timestamptz not null default now(),
     wygasa timestamptz not null
   );
   create table if not exists panel_zdjecia (

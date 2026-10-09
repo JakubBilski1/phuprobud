@@ -70,8 +70,8 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
         <h1>Panel strony</h1>
         <p class="logowanie__wstep">Zaloguj się, żeby zmienić ofertę, teksty i dane kontaktowe na stronie.</p>
         <div class="pole">
-          <label for="l-login">Login</label>
-          <input id="l-login" name="login" type="text" autocomplete="username" required />
+          <label for="l-login">E-mail</label>
+          <input id="l-login" name="login" type="email" autocomplete="username" inputmode="email" required />
         </div>
         <div class="pole">
           <label for="l-haslo">Hasło</label>
@@ -79,6 +79,23 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
         </div>
         <p class="logowanie__blad" data-blad-logowania role="alert" hidden></p>
         <button class="przycisk logowanie__przycisk" type="submit" data-przycisk-logowania>Zaloguj się</button>
+      </form>
+      <!-- Drugi krok: kod z e-maila, obowiazkowy przy kazdym logowaniu. -->
+      <form class="logowanie__karta" data-form-kodu novalidate hidden>
+        <img class="logowanie__logo" src="/marka/probud-logo-ciemne.webp" alt="PHU Probud" width="489" height="98" />
+        <h1>Kod z e-maila</h1>
+        <p class="logowanie__wstep" data-opis-kodu>Wysłaliśmy 6-cyfrowy kod na Twój e-mail.</p>
+        <div class="pole">
+          <label for="l-kod">Kod</label>
+          <input id="l-kod" name="kod" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
+        </div>
+        <p class="logowanie__blad" data-blad-kodu role="alert" hidden></p>
+        <p class="logowanie__info" data-info-kodu role="status" hidden></p>
+        <button class="przycisk logowanie__przycisk" type="submit" data-przycisk-kodu>Potwierdź</button>
+        <div class="logowanie__akcje">
+          <button type="button" class="logowanie__link" data-nowy-kod>Wyślij nowy kod</button>
+          <button type="button" class="logowanie__link" data-wroc-do-hasla>Wróć</button>
+        </div>
       </form>
       <a class="logowanie__powrot" href="/">Wróć na stronę</a>
     </div>
@@ -422,7 +439,7 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
             <p class="konto-panelu__ok" data-ok-hasla role="status" hidden></p>
             <button class="przycisk" type="submit" data-przycisk-hasla>Zmień hasło</button>
           </form>
-          <p class="uwaga-panelu">Hasło sprawdza serwer; w bazie leży tylko jego skrót. Po zmianie hasła panel wylogowuje wszystkie inne urządzenia.</p>
+          <p class="uwaga-panelu">Hasło sprawdza serwer; w bazie leży tylko jego skrót. Każde logowanie wymaga też kodu z e-maila. Po zmianie hasła panel wylogowuje wszystkie inne urządzenia.</p>
         </section>
       </main>
 
@@ -508,6 +525,11 @@ const ETYKIETY = ['Nowość', 'Promocja', 'Dostępny od ręki', 'Ostatnie sztuki
   .logowanie__przycisk { justify-content: center; width: 100%; margin-top: 0.25rem; }
   .logowanie__przycisk[disabled] { opacity: 0.75; cursor: progress; }
   .logowanie__powrot { color: var(--papier); font-weight: 600; }
+  .logowanie__info { padding: 0.6rem 0.8rem; background: var(--beton); color: var(--grafit); font-weight: 600; }
+  .logowanie__akcje { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1rem; }
+  .logowanie__link { padding: 0.25rem 0; border: 0; background: none; color: var(--probud); font: inherit; font-weight: 650; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
+  .logowanie__link[disabled] { color: var(--stal); cursor: progress; }
+  #l-kod { font-size: 1.6rem; letter-spacing: 0.4em; font-variant-numeric: tabular-nums; }
 
   /* Uklad panelu */
   /* --gora: wysokosc gornego paska; na niej opieraja sie przyklejone menu i wyszukiwarka. */

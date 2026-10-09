@@ -1,17 +1,29 @@
-// Konto panelu /admin/: jedno konto, haslo jako skrot scrypt w bazie, sesje w bazie.
+// Konta panelu /admin/: uzytkownicy w tabeli panel_uzytkownicy (login = e-mail), haslo jako
+// skrot scrypt, sesje w bazie.
 //
-// Konto zaklada sie samo przy pierwszym uzyciu, z haslem ze zmiennej PANEL_HASLO_STARTOWE
-// (login z PANEL_LOGIN, domyslnie „admin”). Haslo startowe trzeba zmienic w panelu; po zmianie
-// zmienna nie ma juz znaczenia. Ciasteczko sesji niesie losowy token, w bazie lezy jego skrot.
-import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
+// Logowanie ma dwa obowiazkowe kroki: e-mail z haslem, potem 6-cyfrowy kod wyslany na ten e-mail.
+// Po dobrym hasle serwer zapisuje wyzwanie (panel_kody) i daje przegladarce ciasteczko z losowym
+// tokenem wyzwania. Kod w bazie lezy jako HMAC z tym tokenem: sam wyciek bazy nie pozwala go
+// zgadnac bez ciasteczka. Kod dziala 10 minut i przyjmuje 5 prob; sesja powstaje dopiero po kodzie.
+//
+// Uzytkownikow dodaje sie w bazie: scripts/panel-uzytkownik.mjs wypisuje gotowe zapytanie SQL.
+import { createHash, createHmac, randomBytes, randomInt, scrypt, timingSafeEqual } from 'node:crypto';
 import type { AstroCookies } from 'astro';
 import { sql } from './baza';
+import { wyslijKod } from './poczta';
 
 const CIASTECZKO = 'probud_panel';
+const CIASTECZKO_KODU = 'probud_kod';
+const SCIEZKA_KODU = '/api/panel/';
 const SESJA_DNI = 14;
+export const KOD_MINUTY = 10;
+const KOD_PROBY = 5;
+const KOD_ODSTEP_S = 30;
 
-type Konto = { login: string; skrot: string; sol: string; wymaga_zmiany: boolean; zmieniono: Date };
+export type Uzytkownik = { id: number; email: string; skrot: string; sol: string; wymaga_zmiany: boolean; zmieniono: Date };
+const KOLUMNY = 'u.id, u.email, u.skrot, u.sol, u.wymaga_zmiany, u.zmieniono';
 
+// Te same parametry ma scripts/panel-uzytkownik.mjs. Zmiana tutaj wymaga zmiany tam.
 function skrotHasla(haslo: string, sol: string): Promise<Buffer> {
   return new Promise((ok, blad) => {
     scrypt(haslo.normalize('NFKC'), Buffer.from(sol, 'base64'), 64, { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 }, (e, klucz) => (e ? blad(e) : ok(klucz)));
@@ -23,26 +35,32 @@ async function nowySkrot(haslo: string) {
   return { sol, skrot: (await skrotHasla(haslo, sol)).toString('base64') };
 }
 
-async function zgodne(haslo: string, konto: Pick<Konto, 'skrot' | 'sol'>): Promise<boolean> {
-  const wzor = Buffer.from(konto.skrot, 'base64');
-  const proba = await skrotHasla(haslo, konto.sol);
-  return wzor.length === proba.length && timingSafeEqual(wzor, proba);
+async function zgodne(haslo: string, wzor: Pick<Uzytkownik, 'skrot' | 'sol'>): Promise<boolean> {
+  const oczekiwany = Buffer.from(wzor.skrot, 'base64');
+  const proba = await skrotHasla(haslo, wzor.sol);
+  return oczekiwany.length === proba.length && timingSafeEqual(oczekiwany, proba);
 }
 
-/** Konto z bazy; przy pierwszym uzyciu zaklada je z haslem startowym. Null = panel nieskonfigurowany. */
-export async function konto(): Promise<Konto | null> {
-  const [istniejace] = await sql<Konto>('select login, skrot, sol, wymaga_zmiany, zmieniono from panel_konto where id = 1');
-  if (istniejace) return istniejace;
-  const startowe = process.env.PANEL_HASLO_STARTOWE;
-  if (!startowe) return null;
-  const { sol, skrot } = await nowySkrot(startowe);
-  await sql('insert into panel_konto (id, login, skrot, sol, wymaga_zmiany) values (1, $1, $2, $3, true) on conflict (id) do nothing', [process.env.PANEL_LOGIN || 'admin', skrot, sol]);
-  const [nowe] = await sql<Konto>('select login, skrot, sol, wymaga_zmiany, zmieniono from panel_konto where id = 1');
-  return nowe ?? null;
+// Dla nieznanego e-maila liczymy skrot atrapy, zeby czas odpowiedzi nie zdradzal, ktore konto istnieje.
+const ATRAPA = { skrot: randomBytes(64).toString('base64'), sol: randomBytes(16).toString('base64') };
+
+export const normalizujEmail = (email: string) => email.trim().toLowerCase();
+
+/** „info@phuprobud.pl” → „i***@phuprobud.pl”: wystarczy, zeby rozpoznac skrzynke. */
+export function zamaskujEmail(email: string): string {
+  const [nazwa, domena] = email.split('@');
+  return domena ? `${nazwa.slice(0, 1)}***@${domena}` : email;
+}
+
+/** Czy w bazie jest choc jedno konto (inaczej panel jest nieskonfigurowany). */
+export async function saUzytkownicy(): Promise<boolean> {
+  const [w] = await sql<{ jest: boolean }>('select exists (select 1 from panel_uzytkownicy) as jest');
+  return Boolean(w?.jest);
 }
 
 // ---------- Ograniczenie prob logowania ----------
 // W pamieci procesu: na adres i lacznie (adres z naglowka da sie podrobic, limit laczny nie).
+// Licza sie zle hasla i zle kody.
 const OKNO_MS = 10 * 60_000;
 const MAKS_NA_ADRES = 6;
 const MAKS_LACZNIE = 40;
@@ -63,45 +81,126 @@ export function blokada(adres: string): number {
   return Math.max(pozostalo(swieze(adres), MAKS_NA_ADRES), pozostalo(swieze(WSZYSCY), MAKS_LACZNIE), 0);
 }
 
-function odnotujNieudana(adres: string) {
+export function odnotujNieudana(adres: string) {
   for (const klucz of [adres, WSZYSCY]) nieudane.set(klucz, [...swieze(klucz), Date.now()]);
   if (nieudane.size > 5000) nieudane.clear();
 }
 
 export const adresKlienta = (zadanie: Request) => zadanie.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'nieznany';
 
-/** Sprawdza login i haslo. Nieudana proba liczy sie do blokady. */
-export async function sprawdzLogowanie(login: string, haslo: string, adres: string): Promise<Konto | null> {
-  const k = await konto();
-  // Skrot liczymy takze dla zlego loginu, zeby czas odpowiedzi nie zdradzal, co bylo bledne.
-  const ok = k ? (await zgodne(haslo, k)) && login === k.login : false;
+/** Krok 1: e-mail i haslo. Nieudana proba liczy sie do blokady. */
+export async function sprawdzHaslo(email: string, haslo: string, adres: string): Promise<Uzytkownik | null> {
+  const [u] = await sql<Uzytkownik>(`select ${KOLUMNY} from panel_uzytkownicy u where u.email = $1`, [normalizujEmail(email)]);
+  const ok = (await zgodne(haslo, u ?? ATRAPA)) && Boolean(u);
   if (!ok) odnotujNieudana(adres);
-  return ok ? k : null;
+  return ok ? u : null;
+}
+
+// ---------- Kod z e-maila ----------
+const skrotTokenu = (token: string) => createHash('sha256').update(token).digest('hex');
+const skrotKodu = (token: string, kod: string) => createHmac('sha256', token).update(kod).digest();
+const poprawnyToken = (token: string | undefined): token is string => Boolean(token && /^[a-f0-9]{64}$/.test(token));
+
+const opcjeCiasteczka = (maxAge: number, path: string) => ({
+  httpOnly: true,
+  sameSite: 'strict' as const,
+  // W trybie deweloperskim (http://localhost) ciasteczko bez Secure, na serwerze zawsze z.
+  secure: !import.meta.env.DEV,
+  path,
+  maxAge,
+});
+
+/**
+ * Wysyla nowy kod na e-mail uzytkownika i zapisuje wyzwanie. Poprzedni kod tego uzytkownika
+ * przestaje dzialac. Nowy kod najwczesniej 30 s po poprzednim, zeby nie zasypac skrzynki.
+ */
+export async function wyslijKodLogowania(u: Uzytkownik, ciasteczka: AstroCookies): Promise<{ wyslano: true } | { wyslano: false; sekundy: number }> {
+  const [ostatni] = await sql<{ sekundy: number }>(
+    `select ceil(extract(epoch from (utworzono + interval '${KOD_ODSTEP_S} seconds' - now())))::int as sekundy
+     from panel_kody where uzytkownik_id = $1 order by utworzono desc limit 1`,
+    [u.id],
+  );
+  if (ostatni && ostatni.sekundy > 0) return { wyslano: false, sekundy: ostatni.sekundy };
+
+  const token = randomBytes(32).toString('hex');
+  const kod = String(randomInt(0, 1_000_000)).padStart(6, '0');
+  await sql('delete from panel_kody where wygasa < now() or uzytkownik_id = $1', [u.id]);
+  await sql(
+    `insert into panel_kody (skrot_tokenu, uzytkownik_id, skrot_kodu, wygasa) values ($1, $2, $3, now() + interval '${KOD_MINUTY} minutes')`,
+    [skrotTokenu(token), u.id, skrotKodu(token, kod).toString('hex')],
+  );
+  try {
+    await wyslijKod(u.email, kod, KOD_MINUTY);
+  } catch (e) {
+    // Kod, ktory nie dotarl, nie moze blokowac kolejnej proby przez 30 s.
+    await sql('delete from panel_kody where skrot_tokenu = $1', [skrotTokenu(token)]);
+    throw e;
+  }
+  ciasteczka.set(CIASTECZKO_KODU, token, opcjeCiasteczka(KOD_MINUTY * 60, SCIEZKA_KODU));
+  return { wyslano: true };
+}
+
+/**
+ * Krok 2: kod z e-maila. Dobry kod zamyka wyzwanie i otwiera sesje. „wygasl” oznacza, ze trzeba
+ * zaczac od hasla: kod minal, zostal juz uzyty albo wyczerpal limit prob.
+ */
+export async function sprawdzKod(kod: string, ciasteczka: AstroCookies, adres: string): Promise<'ok' | 'zly' | 'wygasl'> {
+  const token = ciasteczka.get(CIASTECZKO_KODU)?.value;
+  if (!poprawnyToken(token)) return 'wygasl';
+  const klucz = skrotTokenu(token);
+  const zamknij = async () => {
+    await sql('delete from panel_kody where skrot_tokenu = $1', [klucz]);
+    ciasteczka.delete(CIASTECZKO_KODU, { path: SCIEZKA_KODU });
+  };
+
+  // Proba liczy sie, zanim porownamy kod: rownolegle zadania nie obejda limitu.
+  const [w] = await sql<{ uzytkownik_id: number; skrot_kodu: string; proby: number }>(
+    `update panel_kody set proby = proby + 1
+     where skrot_tokenu = $1 and wygasa > now() and proby < $2
+     returning uzytkownik_id, skrot_kodu, proby`,
+    [klucz, KOD_PROBY],
+  );
+  if (!w) {
+    await zamknij();
+    return 'wygasl';
+  }
+  const oczekiwany = Buffer.from(w.skrot_kodu, 'hex');
+  const proba = skrotKodu(token, kod);
+  if (/^\d{6}$/.test(kod) && oczekiwany.length === proba.length && timingSafeEqual(oczekiwany, proba)) {
+    await zamknij();
+    await otworzSesje(w.uzytkownik_id, ciasteczka);
+    return 'ok';
+  }
+  odnotujNieudana(adres);
+  if (w.proby >= KOD_PROBY) {
+    await zamknij();
+    return 'wygasl';
+  }
+  return 'zly';
 }
 
 // ---------- Sesje ----------
-const skrotTokenu = (token: string) => createHash('sha256').update(token).digest('hex');
-
-export async function otworzSesje(ciasteczka: AstroCookies) {
+export async function otworzSesje(uzytkownikId: number, ciasteczka: AstroCookies) {
   const token = randomBytes(32).toString('hex');
-  await sql('delete from panel_sesje where wygasa < now()');
-  await sql(`insert into panel_sesje (skrot_tokenu, wygasa) values ($1, now() + interval '${SESJA_DNI} days')`, [skrotTokenu(token)]);
-  ciasteczka.set(CIASTECZKO, token, {
-    httpOnly: true,
-    sameSite: 'strict',
-    // W trybie deweloperskim (http://localhost) ciasteczko bez Secure, na serwerze zawsze z.
-    secure: !import.meta.env.DEV,
-    path: '/',
-    maxAge: SESJA_DNI * 86_400,
-  });
+  // Sesje sprzed kont w bazie (bez uzytkownika) nie sa juz wazne.
+  await sql('delete from panel_sesje where wygasa < now() or uzytkownik_id is null');
+  await sql(`insert into panel_sesje (skrot_tokenu, uzytkownik_id, wygasa) values ($1, $2, now() + interval '${SESJA_DNI} days')`, [skrotTokenu(token), uzytkownikId]);
+  ciasteczka.set(CIASTECZKO, token, opcjeCiasteczka(SESJA_DNI * 86_400, '/'));
 }
 
-export async function zalogowany(ciasteczka: AstroCookies): Promise<boolean> {
+/** Uzytkownik zalogowany w tej przegladarce albo null. */
+export async function uzytkownikSesji(ciasteczka: AstroCookies): Promise<Uzytkownik | null> {
   const token = ciasteczka.get(CIASTECZKO)?.value;
-  if (!token || !/^[a-f0-9]{64}$/.test(token)) return false;
-  const [sesja] = await sql('select 1 from panel_sesje where skrot_tokenu = $1 and wygasa > now()', [skrotTokenu(token)]);
-  return Boolean(sesja);
+  if (!poprawnyToken(token)) return null;
+  const [u] = await sql<Uzytkownik>(
+    `select ${KOLUMNY} from panel_sesje s join panel_uzytkownicy u on u.id = s.uzytkownik_id
+     where s.skrot_tokenu = $1 and s.wygasa > now()`,
+    [skrotTokenu(token)],
+  );
+  return u ?? null;
 }
+
+export const zalogowany = async (ciasteczka: AstroCookies) => Boolean(await uzytkownikSesji(ciasteczka));
 
 export async function zamknijSesje(ciasteczka: AstroCookies) {
   const token = ciasteczka.get(CIASTECZKO)?.value;
@@ -109,13 +208,12 @@ export async function zamknijSesje(ciasteczka: AstroCookies) {
   ciasteczka.delete(CIASTECZKO, { path: '/' });
 }
 
-/** Zmienia haslo po sprawdzeniu obecnego i wylogowuje pozostale sesje. */
-export async function zmienHaslo(obecne: string, nowe: string, ciasteczka: AstroCookies): Promise<'ok' | 'zle-haslo'> {
-  const k = await konto();
-  if (!k || !(await zgodne(obecne, k))) return 'zle-haslo';
+/** Zmienia haslo po sprawdzeniu obecnego i wylogowuje pozostale sesje tego uzytkownika. */
+export async function zmienHaslo(u: Uzytkownik, obecne: string, nowe: string, ciasteczka: AstroCookies): Promise<'ok' | 'zle-haslo'> {
+  if (!(await zgodne(obecne, u))) return 'zle-haslo';
   const { sol, skrot } = await nowySkrot(nowe);
-  await sql('update panel_konto set skrot = $1, sol = $2, wymaga_zmiany = false, zmieniono = now() where id = 1', [skrot, sol]);
-  await sql('delete from panel_sesje');
-  await otworzSesje(ciasteczka);
+  await sql('update panel_uzytkownicy set skrot = $1, sol = $2, wymaga_zmiany = false, zmieniono = now() where id = $3', [skrot, sol, u.id]);
+  await sql('delete from panel_sesje where uzytkownik_id = $1', [u.id]);
+  await otworzSesje(u.id, ciasteczka);
   return 'ok';
 }

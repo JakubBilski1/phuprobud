@@ -28,7 +28,10 @@ const wyslij = (metoda: string, tresc: unknown): RequestInit => ({ method: metod
 
 export const pobierzStan = () => zadanie<StanPanelu>('stan');
 export const zapiszStan = (pola: Pola) => zadanie<{ zapisano: string }>('stan', wyslij('PUT', { pola }));
-export const zaloguj = (login: string, haslo: string) => zadanie<{ ok: true }>('logowanie', wyslij('POST', { login, haslo }));
+/** Krok 1: e-mail i haslo. Serwer wysyla kod na e-mail i zwraca zamaskowany adres. */
+export const zaloguj = (login: string, haslo: string) => zadanie<{ ok: true; email: string; minuty: number }>('logowanie', wyslij('POST', { login, haslo }));
+/** Krok 2: kod z e-maila. 410 = trzeba zaczac od hasla. */
+export const potwierdzKod = (kod: string) => zadanie<{ ok: true }>('kod', wyslij('POST', { kod }));
 export const wyloguj = () => zadanie<{ ok: true }>('wyloguj', wyslij('POST', {}));
 export const zmienHaslo = (obecne: string, nowe: string) => zadanie<{ ok: true }>('haslo', wyslij('POST', { obecne, nowe }));
 

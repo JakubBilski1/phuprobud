@@ -2,7 +2,7 @@
 // PUT zapisuje nowy komplet zmian i od razu przelicza strone.
 import type { APIRoute } from 'astro';
 import { maBaze, sql } from '../../../server/baza';
-import { konto, zalogowany } from '../../../server/konto';
+import { saUzytkownicy, uzytkownikSesji } from '../../../server/konto';
 import { blad, json, trescJson, wymagajSesji } from '../../../server/odpowiedzi';
 import { ostatniZapis, wczytajStan } from '../../../server/stan-serwera';
 import { sprawdzPola, uzywaneMedia } from '../../../server/walidacja';
@@ -15,16 +15,15 @@ const HISTORIA = 50;
 export const GET: APIRoute = async ({ cookies }) => {
   if (!maBaze()) return json({ zalogowany: false, skonfigurowany: false });
   try {
-    const k = await konto();
-    if (!k) return json({ zalogowany: false, skonfigurowany: false });
-    if (!(await zalogowany(cookies))) return json({ zalogowany: false, skonfigurowany: true });
+    const u = await uzytkownikSesji(cookies);
+    if (!u) return json({ zalogowany: false, skonfigurowany: await saUzytkownicy() });
     const [stan] = await sql<{ pola: Pola }>('select pola from panel_stan where id = 1');
     return json({
       zalogowany: true,
       skonfigurowany: true,
-      login: k.login,
-      wymagaZmianyHasla: k.wymaga_zmiany,
-      hasloZmieniono: k.zmieniono.toISOString(),
+      login: u.email,
+      wymagaZmianyHasla: u.wymaga_zmiany,
+      hasloZmieniono: u.zmieniono.toISOString(),
       pola: stan?.pola ?? {},
       zapisano: ostatniZapis(),
     });

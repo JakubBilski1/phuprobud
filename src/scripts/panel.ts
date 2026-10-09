@@ -6,7 +6,7 @@ import type { Pola, Wartosc } from '../lib/nadpisania';
 import { odmiana } from '../lib/tekst';
 import { opisWartosciZdjec } from './panel-zdjecia';
 import { pokazKonto, uruchomKontoPanelu } from './panel-konto';
-import { BladPanelu, pobierzStan, wyloguj, zaloguj, zapiszStan, type StanPanelu } from './panel-api';
+import { BladPanelu, pobierzStan, potwierdzKod, wyloguj, zaloguj, zapiszStan, type StanPanelu } from './panel-api';
 
 type Pole = HTMLInputElement | HTMLTextAreaElement;
 
@@ -40,19 +40,41 @@ export async function uruchomPanel() {
   const formLogowania = $<HTMLFormElement>('[data-form-logowania]')!;
   const bladLogowania = $('[data-blad-logowania]')!;
   const przyciskLogowania = $<HTMLButtonElement>('[data-przycisk-logowania]')!;
+  const formKodu = $<HTMLFormElement>('[data-form-kodu]')!;
+  const opisKodu = $('[data-opis-kodu]')!;
+  const bladKodu = $('[data-blad-kodu]')!;
+  const infoKodu = $('[data-info-kodu]')!;
+  const przyciskKodu = $<HTMLButtonElement>('[data-przycisk-kodu]')!;
+  const przyciskNowegoKodu = $<HTMLButtonElement>('[data-nowy-kod]')!;
+  // E-mail i haslo z kroku 1 zostaja tylko w pamieci karty, do „Wyslij nowy kod”.
+  let dane1: { login: string; haslo: string } | null = null;
+
+  const napisz = (el: HTMLElement, tekst: string) => { el.textContent = tekst; el.hidden = !tekst; };
 
   const pokazPanel = () => {
     logowanie.hidden = true;
     panel.hidden = false;
     zHasha();
   };
-  const pokazLogowanie = (komunikat = '') => {
+  const pokazLogowanie = (tekst = '') => {
     panel.hidden = true;
     logowanie.hidden = false;
-    bladLogowania.textContent = komunikat;
-    bladLogowania.hidden = !komunikat;
+    formKodu.hidden = true;
+    formKodu.reset();
+    dane1 = null;
+    formLogowania.hidden = false;
+    napisz(bladLogowania, tekst);
     formLogowania.reset();
     $<HTMLInputElement>('#l-login')?.focus();
+  };
+  const pokazKrokKodu = (email: string, minuty: number) => {
+    formLogowania.hidden = true;
+    formKodu.hidden = false;
+    formKodu.reset();
+    opisKodu.textContent = `Wysłaliśmy 6-cyfrowy kod na ${email}. Kod działa ${minuty} minut.`;
+    napisz(bladKodu, '');
+    napisz(infoKodu, '');
+    $<HTMLInputElement>('#l-kod')?.focus();
   };
   /** Wczytuje do pol zmiany zapisane na serwerze i otwiera panel. */
   const otworz = (stan: Extract<StanPanelu, { zalogowany: true }>) => {
@@ -72,23 +94,63 @@ export async function uruchomPanel() {
   formLogowania.addEventListener('submit', async (e) => {
     e.preventDefault();
     const dane = new FormData(formLogowania);
-    bladLogowania.hidden = true;
+    const proba = { login: String(dane.get('login') ?? '').trim(), haslo: String(dane.get('haslo') ?? '') };
+    napisz(bladLogowania, '');
     przyciskLogowania.disabled = true;
-    przyciskLogowania.textContent = 'Logowanie…';
+    przyciskLogowania.textContent = 'Wysyłamy kod…';
     try {
-      await zaloguj(String(dane.get('login') ?? '').trim(), String(dane.get('haslo') ?? ''));
-      const stan = await pobierzStan();
-      if (!stan.zalogowany) throw new BladPanelu(0, 'Przeglądarka nie zapisała sesji. Sprawdź, czy nie blokuje ciasteczek tej strony.');
+      const wynik = await zaloguj(proba.login, proba.haslo);
+      dane1 = proba;
       formLogowania.reset();
-      otworz(stan);
+      pokazKrokKodu(wynik.email, wynik.minuty);
     } catch (b) {
-      bladLogowania.textContent = b instanceof Error ? b.message : 'Nie udało się zalogować.';
-      bladLogowania.hidden = false;
+      napisz(bladLogowania, b instanceof Error ? b.message : 'Nie udało się zalogować.');
     } finally {
       przyciskLogowania.disabled = false;
       przyciskLogowania.textContent = 'Zaloguj się';
     }
   });
+  formKodu.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const kod = String(new FormData(formKodu).get('kod') ?? '').replace(/\s/g, '');
+    napisz(infoKodu, '');
+    if (!/^\d{6}$/.test(kod)) return napisz(bladKodu, 'Wpisz 6 cyfr z e-maila.');
+    napisz(bladKodu, '');
+    przyciskKodu.disabled = true;
+    przyciskKodu.textContent = 'Sprawdzamy…';
+    try {
+      await potwierdzKod(kod);
+      const stan = await pobierzStan();
+      if (!stan.zalogowany) throw new BladPanelu(0, 'Przeglądarka nie zapisała sesji. Sprawdź, czy nie blokuje ciasteczek tej strony.');
+      dane1 = null;
+      formKodu.reset();
+      otworz(stan);
+    } catch (b) {
+      // Kod wygasl albo wyczerpal proby: wracamy do hasla, a serwer wysle nowy kod.
+      if (b instanceof BladPanelu && b.status === 410) return pokazLogowanie(b.message);
+      napisz(bladKodu, b instanceof Error ? b.message : 'Nie udało się sprawdzić kodu.');
+      $<HTMLInputElement>('#l-kod')?.select();
+    } finally {
+      przyciskKodu.disabled = false;
+      przyciskKodu.textContent = 'Potwierdź';
+    }
+  });
+  przyciskNowegoKodu.addEventListener('click', async () => {
+    if (!dane1) return pokazLogowanie();
+    napisz(bladKodu, '');
+    napisz(infoKodu, '');
+    przyciskNowegoKodu.disabled = true;
+    try {
+      const wynik = await zaloguj(dane1.login, dane1.haslo);
+      pokazKrokKodu(wynik.email, wynik.minuty);
+      napisz(infoKodu, 'Wysłaliśmy nowy kod. Poprzedni już nie działa.');
+    } catch (b) {
+      napisz(bladKodu, b instanceof Error ? b.message : 'Nie udało się wysłać nowego kodu.');
+    } finally {
+      przyciskNowegoKodu.disabled = false;
+    }
+  });
+  $('[data-wroc-do-hasla]')!.addEventListener('click', () => pokazLogowanie());
   $('[data-wyloguj]')!.addEventListener('click', async () => {
     odrzuc();
     await wyloguj().catch(() => { /* bez polaczenia sesja i tak wygasnie sama */ });
@@ -413,7 +475,7 @@ export async function uruchomPanel() {
     const stan = await pobierzStan();
     if (stan.zalogowany) return otworz(stan);
     if (!stan.skonfigurowany) {
-      pokazLogowanie('Panel nie jest jeszcze podłączony do bazy danych. Skontaktuj się z opiekunem strony.');
+      pokazLogowanie('Panel nie ma jeszcze połączenia z bazą danych albo żadnego konta. Skontaktuj się z opiekunem strony.');
       przyciskLogowania.disabled = true;
       return;
     }
