@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
 
 export default defineConfig({
-  site: 'https://phuprobud.pbdevs.com',
+  site: 'https://phuprobud.pl',
   trailingSlash: 'always',
   build: { format: 'directory' },
   devToolbar: { enabled: false },
