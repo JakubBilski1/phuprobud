@@ -30,14 +30,15 @@ realizacji, zdjęcia w sekcji „Maszyny używane”, osoby, telefony, e-maile i
   Ukryty model albo grupa zwraca 404 i znika z mapy strony.
 - **Logowanie**: konta w bazie (login to e-mail), hasło jako skrót scrypt, potem obowiązkowy
   6-cyfrowy kod wysłany na ten e-mail (SMTP), sesja w ciasteczku `HttpOnly`, limit nieudanych
-  prób. Konto dodaje `scripts/panel-uzytkownik.mjs`.
+  prób. Nowe konto loguje się hasłem startowym (`PANEL_HASLO_STARTOWE`) i dopóki nie ustawi
+  własnego, panel nie zapisuje zmian.
 - **Zdjęcia z dysku**: przeglądarka zmniejsza je do 2000 px i miniatury 640 px, serwer zapisuje
   oba pliki w bazie i podaje spod `/media/`.
 - **Bezpieczeństwo zapisu**: serwer przyjmuje tylko znane klucze i sprawdza wartości
   (`src/server/walidacja.ts`); 50 ostatnich zapisów zostaje w tabeli `panel_historia`.
 
-Lokalnie panel potrzebuje Postgresa: ustaw `DATABASE_URL` przed `npm run dev` i dodaj konto
-skryptem `scripts/panel-uzytkownik.mjs`. Bez SMTP kod logowania pojawia się w konsoli serwera
+Lokalnie panel potrzebuje Postgresa: ustaw `DATABASE_URL` i `PANEL_HASLO_STARTOWE` przed
+`npm run dev` i dodaj konto zapytaniem z `docs/WDROZENIE.md`. Bez SMTP kod logowania pojawia się w konsoli serwera
 (tylko w trybie deweloperskim). Bez bazy strona działa na treści z repozytorium, a panel
 informuje o braku bazy.
 Konfiguracja na serwerze: [docs/WDROZENIE.md](docs/WDROZENIE.md).

@@ -83,6 +83,8 @@ export async function uruchomPanel() {
     pola.forEach((p) => { ustaw(p, stanZapisany(p)); pokazBlad(p, ''); });
     pokazKonto(stan);
     odswiez();
+    // Na hasle startowym panel nic nie zapisze: od razu zakladka zmiany hasla.
+    if (stan.wymagaZmianyHasla) history.replaceState(null, '', '#konto');
     pokazPanel();
   };
   /** Serwer odrzucil zadanie: przy wygaslej sesji wracamy do logowania, inaczej pokazujemy powod. */

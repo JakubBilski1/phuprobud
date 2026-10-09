@@ -1,12 +1,16 @@
 // Konta panelu /admin/: uzytkownicy w tabeli panel_uzytkownicy (login = e-mail), haslo jako
 // skrot scrypt, sesje w bazie.
 //
+// Nowe konto (wymaga_zmiany = true) loguje sie haslem startowym ze zmiennej PANEL_HASLO_STARTOWE,
+// tez z kodem z e-maila. Dopoki nie ustawi wlasnego hasla, moze tylko je zmienic: zapis zmian
+// na stronie i zdjec serwer odrzuca (wymagajSesji w src/server/odpowiedzi.ts).
+//
 // Logowanie ma dwa obowiazkowe kroki: e-mail z haslem, potem 6-cyfrowy kod wyslany na ten e-mail.
 // Po dobrym hasle serwer zapisuje wyzwanie (panel_kody) i daje przegladarce ciasteczko z losowym
 // tokenem wyzwania. Kod w bazie lezy jako HMAC z tym tokenem: sam wyciek bazy nie pozwala go
 // zgadnac bez ciasteczka. Kod dziala 10 minut i przyjmuje 5 prob; sesja powstaje dopiero po kodzie.
 //
-// Uzytkownikow dodaje sie w bazie: scripts/panel-uzytkownik.mjs wypisuje gotowe zapytanie SQL.
+// Uzytkownikow dodaje sie w bazie jednym zapytaniem SQL (docs/WDROZENIE.md, sekcja Panel).
 import { createHash, createHmac, randomBytes, randomInt, scrypt, timingSafeEqual } from 'node:crypto';
 import type { AstroCookies } from 'astro';
 import { sql } from './baza';
@@ -23,7 +27,6 @@ const KOD_ODSTEP_S = 30;
 export type Uzytkownik = { id: number; email: string; skrot: string; sol: string; wymaga_zmiany: boolean; zmieniono: Date };
 const KOLUMNY = 'u.id, u.email, u.skrot, u.sol, u.wymaga_zmiany, u.zmieniono';
 
-// Te same parametry ma scripts/panel-uzytkownik.mjs. Zmiana tutaj wymaga zmiany tam.
 function skrotHasla(haslo: string, sol: string): Promise<Buffer> {
   return new Promise((ok, blad) => {
     scrypt(haslo.normalize('NFKC'), Buffer.from(sol, 'base64'), 64, { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 }, (e, klucz) => (e ? blad(e) : ok(klucz)));
@@ -39,6 +42,19 @@ async function zgodne(haslo: string, wzor: Pick<Uzytkownik, 'skrot' | 'sol'>): P
   const oczekiwany = Buffer.from(wzor.skrot, 'base64');
   const proba = await skrotHasla(haslo, wzor.sol);
   return oczekiwany.length === proba.length && timingSafeEqual(oczekiwany, proba);
+}
+
+/** Haslo startowe ze zmiennej PANEL_HASLO_STARTOWE; bez zmiennej zadne haslo nie jest startowe. */
+function hasloStartowe(haslo: string): boolean {
+  const startowe = process.env.PANEL_HASLO_STARTOWE ?? '';
+  if (!startowe) return false;
+  const skrot = (tekst: string) => createHash('sha256').update(tekst.normalize('NFKC')).digest();
+  return timingSafeEqual(skrot(haslo), skrot(startowe));
+}
+
+/** Haslo konta: startowe, dopoki konto nie ma wlasnego, potem wlasne ze skrotu w bazie. */
+async function hasloKonta(haslo: string, u: Uzytkownik): Promise<boolean> {
+  return u.wymaga_zmiany ? hasloStartowe(haslo) : zgodne(haslo, u);
 }
 
 // Dla nieznanego e-maila liczymy skrot atrapy, zeby czas odpowiedzi nie zdradzal, ktore konto istnieje.
@@ -91,7 +107,9 @@ export const adresKlienta = (zadanie: Request) => zadanie.headers.get('x-forward
 /** Krok 1: e-mail i haslo. Nieudana proba liczy sie do blokady. */
 export async function sprawdzHaslo(email: string, haslo: string, adres: string): Promise<Uzytkownik | null> {
   const [u] = await sql<Uzytkownik>(`select ${KOLUMNY} from panel_uzytkownicy u where u.email = $1`, [normalizujEmail(email)]);
-  const ok = (await zgodne(haslo, u ?? ATRAPA)) && Boolean(u);
+  // Skrot liczymy zawsze, takze dla hasla startowego, zeby czas odpowiedzi nie zdradzal stanu konta.
+  const zAtrapa = await zgodne(haslo, u && !u.wymaga_zmiany ? u : ATRAPA);
+  const ok = u ? (u.wymaga_zmiany ? hasloStartowe(haslo) : zAtrapa) : false;
   if (!ok) odnotujNieudana(adres);
   return ok ? u : null;
 }
@@ -200,8 +218,6 @@ export async function uzytkownikSesji(ciasteczka: AstroCookies): Promise<Uzytkow
   return u ?? null;
 }
 
-export const zalogowany = async (ciasteczka: AstroCookies) => Boolean(await uzytkownikSesji(ciasteczka));
-
 export async function zamknijSesje(ciasteczka: AstroCookies) {
   const token = ciasteczka.get(CIASTECZKO)?.value;
   if (token) await sql('delete from panel_sesje where skrot_tokenu = $1', [skrotTokenu(token)]);
@@ -209,8 +225,9 @@ export async function zamknijSesje(ciasteczka: AstroCookies) {
 }
 
 /** Zmienia haslo po sprawdzeniu obecnego i wylogowuje pozostale sesje tego uzytkownika. */
-export async function zmienHaslo(u: Uzytkownik, obecne: string, nowe: string, ciasteczka: AstroCookies): Promise<'ok' | 'zle-haslo'> {
-  if (!(await zgodne(obecne, u))) return 'zle-haslo';
+export async function zmienHaslo(u: Uzytkownik, obecne: string, nowe: string, ciasteczka: AstroCookies): Promise<'ok' | 'zle-haslo' | 'startowe'> {
+  if (!(await hasloKonta(obecne, u))) return 'zle-haslo';
+  if (hasloStartowe(nowe)) return 'startowe';
   const { sol, skrot } = await nowySkrot(nowe);
   await sql('update panel_uzytkownicy set skrot = $1, sol = $2, wymaga_zmiany = false, zmieniono = now() where id = $3', [skrot, sol, u.id]);
   await sql('delete from panel_sesje where uzytkownik_id = $1', [u.id]);

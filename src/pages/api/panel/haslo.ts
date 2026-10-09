@@ -7,7 +7,7 @@ import { MIN_DLUGOSC_HASLA } from '../../../lib/nadpisania';
 export const prerender = false;
 
 export const POST: APIRoute = async (kontekst) => {
-  const odmowa = await wymagajSesji(kontekst);
+  const odmowa = await wymagajSesji(kontekst, { hasloStartowe: true });
   if (odmowa) return odmowa;
   if (blokada(adresKlienta(kontekst.request))) return blad(429, 'Za dużo nieudanych prób. Spróbuj ponownie później.');
 
@@ -19,7 +19,9 @@ export const POST: APIRoute = async (kontekst) => {
   if (nowe === obecne) return blad(400, 'Nowe hasło jest takie samo jak obecne.');
   const u = await uzytkownikSesji(kontekst.cookies);
   if (!u) return blad(401, 'Sesja wygasła. Zaloguj się ponownie.');
-  if ((await zmienHaslo(u, obecne, nowe, kontekst.cookies)) !== 'ok') {
+  const wynik = await zmienHaslo(u, obecne, nowe, kontekst.cookies);
+  if (wynik === 'startowe') return blad(400, 'Nowe hasło musi być inne niż hasło startowe.');
+  if (wynik !== 'ok') {
     odnotujNieudana(adresKlienta(kontekst.request));
     return blad(400, 'Obecne hasło jest nieprawidłowe.');
   }

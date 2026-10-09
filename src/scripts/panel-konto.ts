@@ -16,7 +16,7 @@ export function pokazKonto(k: Pick<Konto, 'login' | 'wymagaZmianyHasla' | 'haslo
   const stan = $('[data-konto-stan]');
   if (stan) {
     stan.textContent = k.wymagaZmianyHasla
-      ? 'Panel działa jeszcze na haśle startowym. Ustaw własne hasło.'
+      ? 'Panel działa jeszcze na haśle startowym. Ustaw własne hasło; do tego czasu panel nie zapisuje zmian na stronie.'
       : `Hasło zmienione ${new Date(k.hasloZmieniono).toLocaleString('pl-PL', { dateStyle: 'long', timeStyle: 'short' })}.`;
   }
 }

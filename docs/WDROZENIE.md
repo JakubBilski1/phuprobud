@@ -54,11 +54,16 @@ Logowanie: e-mail i hasło, potem obowiązkowy 6-cyfrowy kod wysłany na ten e-m
 10 minut i przyjmuje 5 prób; nowy można poprosić po 30 s. Bez skonfigurowanej poczty panel nie
 wpuszcza nikogo, zamiast logować samym hasłem.
 
+Nowe konto loguje się hasłem startowym z `PANEL_HASLO_STARTOWE`, też z kodem z e-maila, więc
+pierwsze logowanie od razu sprawdza pocztę. Na haśle startowym panel otwiera zakładkę „Konto
+i hasło” i nie zapisuje żadnych zmian na stronie, dopóki konto nie ustawi własnego hasła.
+
 Zmienne w aplikacji (zakładka Environment Variables), tylko w czasie działania, nie przy buildzie:
 
 | Zmienna | Wartość |
 | --- | --- |
 | `DATABASE_URL` | adres bazy z sekcji wyżej |
+| `PANEL_HASLO_STARTOWE` | hasło startowe dla nowych kont i kont po resecie; podaje je Jakub, nie trafia do repozytorium |
 | `SMTP_HOST` | `cloudserver106176.home.pl` (serwer poczty Probudu w home.pl) |
 | `SMTP_PORT` | `465` (SSL); `587` też działa, ze STARTTLS |
 | `SMTP_UZYTKOWNIK` | skrzynka, z której idą kody, np. `info@phuprobud.pl` |
@@ -69,19 +74,19 @@ Po zmianie zmiennych: Restart aplikacji w Coolify (bez nowego builda).
 
 ### Konta
 
-Konta dodaje się w bazie. Skrypt liczy skrót hasła lokalnie i wypisuje zapytanie SQL:
+Konto dodaje się w bazie samym e-mailem; hasłem startowym jest `PANEL_HASLO_STARTOWE`.
+W Coolify: zasób `pbdevs-postgres`, Terminal:
 
 ```
-node scripts/panel-uzytkownik.mjs info@phuprobud.pl
+psql -U postgres -d probud -c "insert into panel_uzytkownicy (email, skrot, sol, wymaga_zmiany) values ('info@phuprobud.pl', '', '', true) on conflict (email) do update set skrot = '', sol = '', wymaga_zmiany = true, zmieniono = now();"
 ```
 
-Bez podanego hasła losuje hasło startowe i wypisuje je osobno. Zapytanie wklej w Coolify:
-zasób `pbdevs-postgres`, Terminal, `psql -U postgres -d probud`. Tabela musi już istnieć, więc
-najpierw wejdź na `/api/panel/stan/` po wdrożeniu (serwer zakłada tabele przy pierwszym
-zapytaniu). Panel prosi o zmianę hasła startowego po pierwszym logowaniu.
+Tabela musi już istnieć: serwer zakłada ją przy pierwszym zapytaniu, więc po wdrożeniu wystarczy
+wejść na `/api/panel/stan/`. E-mail małymi literami.
 
-Zapomniane hasło: to samo polecenie dla tego samego e-maila ustawia nowe hasło startowe
-i wylogowuje jego sesje. Usunięcie konta: `delete from panel_uzytkownicy where email = '...';`.
+Zapomniane hasło: to samo polecenie dla tego e-maila przywraca hasło startowe; dobrze też
+wylogować sesje: `delete from panel_sesje where uzytkownik_id = (select id from panel_uzytkownicy where email = '...');`.
+Usunięcie konta: `delete from panel_uzytkownicy where email = '...';`.
 
 Stan panelu bez logowania: `curl -s https://<domena>/api/panel/stan/`. Odpowiedź
 `"skonfigurowany":false` oznacza brak bazy albo brak kont.

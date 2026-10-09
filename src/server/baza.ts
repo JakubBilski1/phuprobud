@@ -28,7 +28,7 @@ const SCHEMAT = `
     zapisano timestamptz not null default now()
   );
   -- Konta panelu: login to e-mail, na ktory przychodzi kod logowania. Dodawane w bazie
-  -- (scripts/panel-uzytkownik.mjs). Dawna tabela panel_konto (jedno konto „admin”) nie jest uzywana.
+  -- (zapytanie w docs/WDROZENIE.md; haslo startowe z PANEL_HASLO_STARTOWE). Dawna tabela panel_konto (jedno konto „admin”) nie jest uzywana.
   create table if not exists panel_uzytkownicy (
     id int generated always as identity primary key,
     email text not null unique check (email = lower(email)),
