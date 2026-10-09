@@ -1,0 +1,69 @@
+<mjml lang="pl">
+  <mj-head>
+    <mj-title>Kod logowania do panelu phuprobud.pl</mj-title>
+    <mj-preview>Twój kod logowania: {{kod}}. Działa {{minuty}} minut.</mj-preview>
+    <mj-font name="Archivo" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,900&amp;display=swap" />
+    <mj-font name="Figtree" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&amp;display=swap" />
+    <mj-raw>
+      <meta name="color-scheme" content="light dark" />
+      <meta name="supported-color-schemes" content="light dark" />
+    </mj-raw>
+    <mj-raw>
+      <!--[if mso]>
+      <style type="text/css">
+        body, table, td, div, p, a, span { font-family: Arial, Helvetica, sans-serif !important; }
+        .display div { font-family: 'Arial Black', Arial, sans-serif !important; }
+      </style>
+      <![endif]-->
+    </mj-raw>
+    <mj-attributes>
+      <mj-all font-family="Figtree, 'Helvetica Neue', Helvetica, Arial, sans-serif" />
+      <mj-body background-color="#161511" />
+      <mj-section background-color="#161511" padding="0 24px" />
+      <mj-column padding="0" />
+      <mj-text color="#F7F3EA" font-size="16px" line-height="26px" padding="0" />
+      <mj-divider border-color="#2A2824" border-width="1px" padding="0" />
+      <mj-class name="display" css-class="display" font-family="Archivo, 'Arial Black', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="900" text-transform="uppercase" />
+      <mj-class name="etykieta" font-size="12px" line-height="18px" letter-spacing="2px" text-transform="uppercase" font-weight="600" color="#9A8E7C" />
+    </mj-attributes>
+    <mj-style>
+      :root { color-scheme: light dark; supported-color-schemes: light dark; }
+      .display div { font-stretch: 125%; }
+      a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
+    </mj-style>
+  </mj-head>
+  <mj-body>
+    <mj-section padding="32px 24px 0">
+      <mj-column>
+        <mj-text mj-class="display" font-size="15px" line-height="20px" letter-spacing="3px">PB Devs</mj-text>
+        <mj-divider padding="16px 0 0" />
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding="28px 24px 0">
+      <mj-column>
+        <mj-text mj-class="etykieta">Panel strony phuprobud.pl</mj-text>
+        <mj-text font-size="17px" line-height="26px" padding="10px 0 0">Twój kod logowania do panelu:</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding="16px 24px 0">
+      <mj-column background-color="#F0EDE4" padding="22px 20px 22px">
+        <mj-text mj-class="display" css-class="display" align="center" color="#161511" font-size="40px" line-height="46px" letter-spacing="10px">{{kod}}</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding="20px 24px 0">
+      <mj-column>
+        <mj-text font-size="15px" line-height="24px" color="#C5BAA6">Kod działa {{minuty}} minut i tylko raz. Jeśli to nie Ty logujesz się do panelu, zignoruj tę wiadomość i daj znać PB Devs.</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section padding="40px 24px 36px">
+      <mj-column>
+        <mj-divider />
+        <mj-text font-size="13px" line-height="20px" color="#9A8E7C" padding="16px 0 0">Wiadomość z panelu strony <a href="https://phuprobud.pl" style="color:#C5BAA6;text-decoration:underline;">phuprobud.pl</a>, którą prowadzi <a href="https://pbdevs.com" style="color:#C5BAA6;text-decoration:underline;">PB Devs</a>.</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

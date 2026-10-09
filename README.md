@@ -29,7 +29,7 @@ realizacji, zdjęcia w sekcji „Maszyny używane”, osoby, telefony, e-maile i
   więc zapis jest od razu widoczny dla wszystkich odwiedzających i w kodzie HTML (ważne dla SEO).
   Ukryty model albo grupa zwraca 404 i znika z mapy strony.
 - **Logowanie**: konta w bazie (login to e-mail), hasło jako skrót scrypt, potem obowiązkowy
-  6-cyfrowy kod wysłany na ten e-mail (SMTP), sesja w ciasteczku `HttpOnly`, limit nieudanych
+  6-cyfrowy kod wysłany na ten e-mail (pbdevs-mail, skrzynka PB Devs), sesja w ciasteczku `HttpOnly`, limit nieudanych
   prób. Nowe konto loguje się hasłem startowym (`PANEL_HASLO_STARTOWE`) i dopóki nie ustawi
   własnego, panel nie zapisuje zmian.
 - **Zdjęcia z dysku**: przeglądarka zmniejsza je do 2000 px i miniatury 640 px, serwer zapisuje
@@ -38,7 +38,7 @@ realizacji, zdjęcia w sekcji „Maszyny używane”, osoby, telefony, e-maile i
   (`src/server/walidacja.ts`); 50 ostatnich zapisów zostaje w tabeli `panel_historia`.
 
 Lokalnie panel potrzebuje Postgresa: ustaw `DATABASE_URL` i `PANEL_HASLO_STARTOWE` przed
-`npm run dev` i dodaj konto zapytaniem z `docs/WDROZENIE.md`. Bez SMTP kod logowania pojawia się w konsoli serwera
+`npm run dev` i dodaj konto zapytaniem z `docs/WDROZENIE.md`. Bez kluczy pbdevs-mail kod logowania pojawia się w konsoli serwera
 (tylko w trybie deweloperskim). Bez bazy strona działa na treści z repozytorium, a panel
 informuje o braku bazy.
 Konfiguracja na serwerze: [docs/WDROZENIE.md](docs/WDROZENIE.md).

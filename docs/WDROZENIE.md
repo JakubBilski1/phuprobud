@@ -50,7 +50,10 @@ Panel zapisuje zmiany w bazie `probud`. Tabele (`panel_stan`, `panel_historia`,
 `panel_uzytkownicy`, `panel_sesje`, `panel_kody`, `panel_zdjecia`) serwer zakłada sam przy
 pierwszym połączeniu. Dawna tabela `panel_konto` (jedno konto `admin`) nie jest już używana.
 
-Logowanie: e-mail i hasło, potem obowiązkowy 6-cyfrowy kod wysłany na ten e-mail. Kod działa
+Logowanie: e-mail i hasło, potem obowiązkowy 6-cyfrowy kod wysłany na ten e-mail. Kod wysyła
+pbdevs-mail (mail.pbdevs.com) ze skrzynki PB Devs, aplikacja `phuprobud`, szablon `kod-logowania`
+(źródło: `docs/maile/kod-logowania.mjml`, zmienne `kod` i `minuty`). Serwer strony nie ma dostępu
+do poczty Probudu. Kod działa
 10 minut i przyjmuje 5 prób; nowy można poprosić po 30 s. Bez skonfigurowanej poczty panel nie
 wpuszcza nikogo, zamiast logować samym hasłem.
 
@@ -64,11 +67,8 @@ Zmienne w aplikacji (zakładka Environment Variables), tylko w czasie działania
 | --- | --- |
 | `DATABASE_URL` | adres bazy z sekcji wyżej |
 | `PANEL_HASLO_STARTOWE` | hasło startowe dla nowych kont i kont po resecie; podaje je Jakub, nie trafia do repozytorium |
-| `SMTP_HOST` | `cloudserver106176.home.pl` (serwer poczty Probudu w home.pl) |
-| `SMTP_PORT` | `465` (SSL); `587` też działa, ze STARTTLS |
-| `SMTP_UZYTKOWNIK` | skrzynka, z której idą kody, np. `info@phuprobud.pl` |
-| `SMTP_HASLO` | hasło tej skrzynki; wpisuje je Probud albo Jakub, nie trafia do repozytorium |
-| `SMTP_NADAWCA` | opcjonalnie, domyślnie `Panel phuprobud.pl <SMTP_UZYTKOWNIK>` |
+| `PBDEVS_MAIL_URL` | `https://mail.pbdevs.com` |
+| `PBDEVS_MAIL_KEY` | klucz aplikacji `phuprobud` z panelu mail.pbdevs.com (Apps, phuprobud, „Wygeneruj klucz”, środowisko live); pokazywany raz, wkleja go Jakub, nie trafia do repozytorium |
 
 Po zmianie zmiennych: Restart aplikacji w Coolify (bez nowego builda).
 
