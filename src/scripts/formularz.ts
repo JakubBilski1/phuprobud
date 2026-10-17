@@ -1,6 +1,8 @@
 // Formularz kontaktowy: walidacja po polsku, wybor dzialu zmienia adres i podpis przycisku,
 // parametry z adresu (?temat=skup, ?model=...) wypelniaja pola.
 
+import { sledz, type Dane } from './statystyki';
+
 type Dzial = { id: string; nazwa: string; email: string; telefon: string; przycisk: string };
 
 export function uruchomFormularz(form: HTMLFormElement) {
@@ -21,6 +23,8 @@ export function uruchomFormularz(form: HTMLFormElement) {
     if (adres) adres.textContent = d.email;
   };
   form.querySelectorAll('input[name="dzial"]').forEach((r) => r.addEventListener('change', odswiezDzial));
+  // Pierwsze wpisanie czegokolwiek: razem z wyslaniem daje odsetek porzuconych formularzy.
+  form.addEventListener('input', () => sledz('formularz-start', { dzial: wybrany().id }), { once: true });
 
   // Wypelnienie z adresu strony: karta maszyny linkuje tu z ?model=..., sekcja uzywanych z ?temat=skup.
   const parametry = new URLSearchParams(location.search);
@@ -81,10 +85,14 @@ export function uruchomFormularz(form: HTMLFormElement) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!sprawdz()) {
+      sledz('formularz-bledy', { pola: Object.keys(bledy).filter((k) => bledy[k]).join(',') });
       form.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
       return;
     }
     const { temat, tresc, dzial } = trescWiadomosci();
+    const maszyna = pole('maszyna')?.value.trim().slice(0, 120);
+    const daneZdarzenia: Dane = { dzial: dzial.id };
+    if (maszyna) daneZdarzenia.maszyna = maszyna;
     if (endpoint) {
       przycisk?.setAttribute('disabled', '');
       try {
@@ -94,16 +102,19 @@ export function uruchomFormularz(form: HTMLFormElement) {
           body: JSON.stringify({ dzial: dzial.id, do: dzial.email, temat, tresc }),
         });
         if (!odp.ok) throw new Error(String(odp.status));
+        sledz('formularz-wyslany', daneZdarzenia);
         form.reset();
         odswiezDzial();
         pokazWynik('Wiadomość wysłana', `Trafiła do: ${dzial.nazwa} (${dzial.email}).`);
-      } catch {
+      } catch (blad) {
+        sledz('formularz-blad', { ...daneZdarzenia, kod: blad instanceof TypeError ? 'siec' : String((blad as Error).message) });
         pokazWynik('Nie udało się wysłać', `Serwer nie przyjął wiadomości. Zadzwoń: ${dzial.telefon} albo napisz na ${dzial.email}.`);
       } finally {
         przycisk?.removeAttribute('disabled');
       }
       return;
     }
+    sledz('formularz-mailto', daneZdarzenia);
     window.location.href = `mailto:${dzial.email}?subject=${encodeURIComponent(temat)}&body=${encodeURIComponent(tresc)}`;
     pokazWynik(
       'Wiadomość czeka w programie pocztowym',

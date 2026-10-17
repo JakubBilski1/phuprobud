@@ -9,6 +9,7 @@ import Naglowek from '../components/Naglowek.astro';
 import Stopka from '../components/Stopka.astro';
 import PasekTelefonu from '../components/PasekTelefonu.astro';
 import Ogloszenie from '../components/Ogloszenie.astro';
+import Statystyki from '../components/Statystyki.astro';
 import { firma, dzialy } from '../data/firma';
 
 interface Props {
@@ -101,6 +102,7 @@ const daneFirmy = {
     <meta property="og:site_name" content={firma.nazwa} />
     <meta name="twitter:card" content="summary_large_image" />
     {glowna && <script type="application/ld+json" is:inline set:html={JSON.stringify(daneFirmy)} />}
+    <Statystyki />
     <slot name="glowa" />
   </head>
   <body>

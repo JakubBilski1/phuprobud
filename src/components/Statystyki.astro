@@ -1,0 +1,15 @@
+---
+// Umami na serwerze PB Devs (ten sam, co na pbdevs.com), wpis „PHU Probud” w zespole PB Devs.
+// Identyfikator jest publiczny z definicji (laduje w znaczniku skryptu), wiec siedzi w kodzie.
+// data-domains przypina liczenie do domeny docelowej: localhost i adres demonstracyjny nie wchodza
+// do liczb. Umami nie zapisuje ciasteczek ani niczego w przegladarce, wiec baner zgody nie jest potrzebny.
+// Panel /admin/ nie uzywa ukladu Strona, wiec nie jest liczony.
+const UMAMI_SRC = 'https://umami.pbdevs.com/script.js';
+const UMAMI_WEBSITE_ID = '655dff41-d1cf-4cc4-9578-7d8e82378aa8';
+const DOMENA = 'phuprobud.pl';
+---
+<script is:inline defer src={UMAMI_SRC} data-website-id={UMAMI_WEBSITE_ID} data-domains={DOMENA}></script>
+<script>
+  import { uruchomStatystyki } from '../scripts/statystyki';
+  uruchomStatystyki();
+</script>
