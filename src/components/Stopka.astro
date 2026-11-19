@@ -52,8 +52,13 @@ const rok = new Date().getFullYear();
 
     <div class="stopka__dol">
       <p>© {rok} {firma.nazwaPrawna}</p>
+      <!-- Podpis wykonawcy jak na 4fis.pbdevs.com: logo PB Devs i dane spółki, przygaszony, żeby nie konkurował z marką klienta. -->
       <a class="stopka__pbdevs" href={pbdevs.url} rel="noopener" target="_blank">
-        <img src="/logo/pbdevs.svg" alt="PB Devs" width="871" height="118" loading="lazy" />
+        <span class="stopka__pbdevs-gora">
+          <span class="stopka__pbdevs-etykieta">Projekt i wykonanie</span>
+          <img src="/logo/pbdevs.svg" alt="PB Devs" width="871" height="118" loading="lazy" />
+        </span>
+        <span class="stopka__pbdevs-dane">{pbdevs.nazwaPrawna} · NIP {pbdevs.nip}</span>
       </a>
     </div>
   </div>
@@ -100,15 +105,23 @@ const rok = new Date().getFullYear();
     color: #ffffff99;
     font-size: 0.88rem;
   }
-  /* Samo logo PB Devs w prawym rogu, przygaszone, zeby nie konkurowalo z marka klienta. */
+  /* Podpis PB Devs w prawym rogu: etykieta i logo, pod spodem dane spółki. Przygaszony, żeby nie konkurował z marką klienta. */
   .stopka__pbdevs {
     display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
     margin-left: auto;
-    opacity: 0.55;
-    transition: opacity var(--ruch-szybki);
+    color: #ffffff80;
+    text-decoration: none;
+    opacity: 0.75;
+    transition: opacity var(--ruch-szybki), color var(--ruch-szybki);
   }
-  .stopka__pbdevs:hover, .stopka__pbdevs:focus-visible { opacity: 1; }
-  .stopka__pbdevs img { height: 18px; width: auto; }
+  .stopka__pbdevs:hover, .stopka__pbdevs:focus-visible { opacity: 1; color: #ffffffe6; }
+  .stopka__pbdevs-gora { display: inline-flex; align-items: center; gap: 0.75rem; }
+  .stopka__pbdevs-etykieta { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+  .stopka__pbdevs img { height: 16px; width: auto; }
+  .stopka__pbdevs-dane { font-size: 0.75rem; }
 
   @media (max-width: 63.99rem) {
     .stopka__gora { grid-template-columns: 1fr 1fr; }
@@ -117,5 +130,19 @@ const rok = new Date().getFullYear();
   @media (max-width: 34rem) {
     .stopka__gora { grid-template-columns: 1fr; }
     .stopka { padding-bottom: 6.5rem; }
+    /* Telefon: podpis wykonawcy jako osobna, wyśrodkowana karta pod copyrightem (jak na 4fis.pbdevs.com). */
+    .stopka__dol { justify-content: center; text-align: center; }
+    .stopka__pbdevs {
+      width: 100%;
+      margin-left: 0;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 1.1rem 1.25rem;
+      border: 1px solid #ffffff1a;
+      border-radius: 1rem;
+      background: #ffffff08;
+    }
+    .stopka__pbdevs-gora { flex-direction: column; gap: 0.6rem; }
+    .stopka__pbdevs img { height: 20px; }
   }
 </style>

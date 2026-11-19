@@ -123,4 +123,5 @@ poZmianie(() => {
   };
 });
 
-export const pbdevs = { url: 'https://pbdevs.com', nazwa: 'PB Devs' };
+/** Wykonawca strony: dane z KRS 0001273429, te same co w stopce pbdevs.com i na innych stronach PB Devs. */
+export const pbdevs = { url: 'https://pbdevs.com', nazwa: 'PB Devs', nazwaPrawna: 'PB Devs sp. z o.o.', nip: '7773478115' };
